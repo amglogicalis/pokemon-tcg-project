@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCG Explorer V9 - Smart Format System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #020617; color: white; min-height: 100vh; font-family: 'Inter', sans-serif; padding: 20px; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.5rem; }
+        .btn-action { transition: all 0.1s ease-out; cursor: pointer; }
+        .btn-action:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        .btn-action:active { transform: translateY(0); scale: 0.95; }
+        select, input { background: #0f172a; color: #fbbf24; border: 1px solid #334155; padding: 10px; border-radius: 0.75rem; width: 100%; font-weight: bold; }
+        
+        .image-container { 
+            background: radial-gradient(circle, #1e293b 0%, #020617 100%); 
+            border: 2px solid #475569; 
+            height: 80vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            border-radius: 1.5rem; 
+            position: relative;
+            padding: 2rem;
+        }
+        #cardDisplay {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 25px 25px rgba(0, 0, 0, 0.5));
+        }
+
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 12px 30px; border-radius: 50px; font-weight: 900; display: none; z-index: 100; box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast">✓ URL COPIADA</div>
+
+    <div class="max-w-7xl mx-auto">
+        <header class="flex justify-between items-end mb-6">
+            <div>
+                <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 uppercase italic leading-none">TCG Master V9</h1>
+                <p class="text-slate-500 text-xs font-bold tracking-[0.3em] uppercase mt-2">Smart Format Mapping & Explorer</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="togglePanel('adminPanel')" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-[10px] font-black uppercase">Añadir Nuevo</button>
+                <button onclick="openEditor()" class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-lg text-[10px] font-black uppercase">Editar Colección</button>
+                <button onclick="resetDatabase()" class="bg-red-900/50 hover:bg-red-600 px-4 py-2 rounded-lg text-[10px] font-black uppercase">Reset</button>
+            </div>
+        </header>
+
+        <!-- PANEL DE AÑADIR -->
+        <div id="adminPanel" class="hidden glass p-6 mb-6 border-2 border-yellow-500/30">
+            <h3 class="text-yellow-500 font-black mb-4 uppercase text-xs text-center">Añadir Nueva Colección</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="text" id="customName" placeholder="Nombre">
+                <input type="text" id="customId" placeholder="ID (ej: swsh1)">
+                <select id="customFormat">
+                    <option value="none">Formato: 1 (Normal)</option>
+                    <option value="XY">Formato: XY01 (Prefijo)</option>
+                    <option value="pad2">Formato: 01 (2 dígitos)</option>
+                    <option value="pad3">Formato: 001 (3 dígitos)</option>
+                </select>
+                <button onclick="addCustomSet()" class="bg-yellow-500 text-black font-black rounded-lg text-sm uppercase">Guardar</button>
+            </div>
+        </div>
+
+        <!-- PANEL DE EDICIÓN -->
+        <div id="editPanel" class="hidden glass p-6 mb-6 border-2 border-emerald-500/30">
+            <h3 class="text-emerald-500 font-black mb-4 uppercase text-xs text-center">Editar Colección Seleccionada</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="text" id="editName">
+                <input type="text" id="editId">
+                <select id="editFormat">
+                    <option value="none">1</option>
+                    <option value="XY">Prefijo</option>
+                    <option value="pad2">01</option>
+                    <option value="pad3">001</option>
+                </select>
+                <button onclick="saveEdit()" class="bg-emerald-500 text-white font-black rounded-lg text-sm uppercase">Actualizar</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-4 space-y-4">
+                <div class="glass p-6">
+                    <label class="text-[10px] font-black text-slate-500 uppercase block mb-2">Selección de Expansión</label>
+                    <select id="setSelector" onchange="loadNewSet()"></select>
+                    
+                    <div class="mt-8 p-4 bg-black/40 rounded-xl border border-slate-800">
+                        <span class="text-[10px] text-slate-500 uppercase block mb-2 font-black italic">URL de Imagen</span>
+                        <p id="urlDisplay" class="text-[10px] font-mono text-blue-400 break-all leading-tight"></p>
+                    </div>
+
+                    <button onclick="copyToClipboard()" class="btn-action w-full bg-yellow-500 text-black font-black py-5 rounded-2xl uppercase mt-6 text-lg">
+                        Copiar URL
+                    </button>
+                </div>
+
+                <div class="glass p-6 grid grid-cols-2 gap-4">
+                    <button onclick="changeCard(-1)" class="btn-action bg-slate-800 py-8 rounded-2xl text-4xl">←</button>
+                    <button onclick="changeCard(1)" class="btn-action bg-slate-800 py-8 rounded-2xl text-4xl">→</button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8">
+                <div class="image-container group">
+                    <div id="loader" class="absolute inset-0 bg-slate-950/80 flex items-center justify-center z-10 hidden">
+                        <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-yellow-500"></div>
+                    </div>
+                    <img id="cardDisplay" src="" class="transition-all duration-300 opacity-0 scale-95 shadow-none group-hover:scale-100">
+                    
+                    <div class="absolute top-6 right-6 glass px-6 py-3 border-yellow-500/50 border-2">
+                        <span id="cardCounter" class="text-5xl font-black text-yellow-500 italic">001</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const defaultData = {
+            "Era Mega Evolución (2026)": [
+                { id: "me2pt5", name: "Ascended Heroes", format: "none" },
+                { id: "me2", name: "Mega Evolution Clash", format: "none" }
+            ],
+            "Especiales & Promos": [
+                { id: "xyp", name: "XY Promos", format: "XY" },
+                { id: "swshp", name: "SWSH Promos", format: "SWSH" },
+                { id: "svp", name: "SV Promos", format: "SVP" }
+            ],
+            "Clásicos": [
+                { id: "base1", name: "Base Set", format: "none" },
+                { id: "sm12", name: "Cosmic Eclipse", format: "none" }
+            ]
+        };
+
+        let tcgData = JSON.parse(localStorage.getItem('tcgData_v9')) || defaultData;
+        let currentNum = 1;
+
+        function init() {
+            const selector = document.getElementById('setSelector');
+            selector.innerHTML = "";
+            for (const era in tcgData) {
+                const group = document.createElement('optgroup');
+                group.label = era;
+                tcgData[era].forEach(set => {
+                    const opt = document.createElement('option');
+                    opt.value = set.id;
+                    opt.dataset.format = set.format;
+                    opt.textContent = set.name;
+                    group.appendChild(opt);
+                });
+                selector.appendChild(group);
+            }
+            loadNewSet();
+        }
+
+        function togglePanel(id) { document.getElementById(id).classList.toggle('hidden'); }
+
+        function openEditor() {
+            const selector = document.getElementById('setSelector');
+            const selectedSet = findSetById(selector.value);
+            if(!selectedSet) return;
+            
+            document.getElementById('editName').value = selectedSet.name;
+            document.getElementById('editId').value = selectedSet.id;
+            document.getElementById('editFormat').value = selectedSet.format;
+            togglePanel('editPanel');
+        }
+
+        function findSetById(id) {
+            for (let era in tcgData) {
+                let found = tcgData[era].find(s => s.id === id);
+                if (found) return found;
+            }
+            return null;
+        }
+
+        function saveEdit() {
+            const oldId = document.getElementById('setSelector').value;
+            const target = findSetById(oldId);
+            if(target) {
+                target.name = document.getElementById('editName').value;
+                target.id = document.getElementById('editId').value;
+                target.format = document.getElementById('editFormat').value;
+                localStorage.setItem('tcgData_v9', JSON.stringify(tcgData));
+                init();
+                togglePanel('editPanel');
+            }
+        }
+
+        function addCustomSet() {
+            const name = document.getElementById('customName').value;
+            const id = document.getElementById('customId').value;
+            const format = document.getElementById('customFormat').value;
+            if(!name || !id) return;
+            if(!tcgData["Mis Colecciones"]) tcgData["Mis Colecciones"] = [];
+            tcgData["Mis Colecciones"].unshift({ id, name, format });
+            localStorage.setItem('tcgData_v9', JSON.stringify(tcgData));
+            init();
+            togglePanel('adminPanel');
+        }
+
+        function resetDatabase() {
+            if(confirm("Reiniciar todo?")) { localStorage.removeItem('tcgData_v9'); location.reload(); }
+        }
+
+        function loadNewSet() { currentNum = 1; refresh(); }
+        function changeCard(step) { if (currentNum + step < 1) return; currentNum += step; refresh(); }
+
+        function getFormattedNumber(num, format, id) {
+            if (format === "pad2") return num.toString().padStart(2, '0');
+            if (format === "pad3") return num.toString().padStart(3, '0');
+            if (format === "none") return num.toString();
+            // Formatos con prefijo (Ej: XY, SWSH, SVP)
+            if (format !== "none") return `${format}${num.toString().padStart(2, '0')}`;
+            return num.toString();
+        }
+
+        function refresh() {
+            const selector = document.getElementById('setSelector');
+            const id = selector.value;
+            const format = selector.options[selector.selectedIndex].dataset.format;
+            
+            const numStr = getFormattedNumber(currentNum, format, id);
+            const url = `https://images.pokemontcg.io/${id}/${numStr}_hires.png`;
+            
+            const img = document.getElementById('cardDisplay');
+            const loader = document.getElementById('loader');
+            
+            img.classList.add('opacity-0');
+            loader.classList.remove('hidden');
+            document.getElementById('urlDisplay').innerText = url;
+            document.getElementById('cardCounter').innerText = numStr;
+            
+            img.src = url;
+            img.onload = () => { img.classList.remove('opacity-0'); loader.classList.add('hidden'); };
+            img.onerror = () => {
+                img.src = `https://via.placeholder.com/500x700/0f172a/94a3b8?text=ERROR+EN+FORMATO+U+ID`;
+                img.classList.remove('opacity-0');
+                loader.classList.add('hidden');
+            };
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(document.getElementById('urlDisplay').innerText);
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 1500);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (["INPUT", "SELECT"].includes(e.target.tagName)) return;
+            if (e.key === "ArrowLeft") changeCard(-1);
+            if (e.key === "ArrowRight") changeCard(1);
+        });
+
+        init();
+    </script>
+</body>
+</html>

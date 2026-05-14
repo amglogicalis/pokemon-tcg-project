@@ -1,0 +1,8 @@
+{
+  "users": [
+    {
+      "userId": "user-123",
+      "username": "Test User",
+      "packsAvailable": 9999,
+      "album": []
+}

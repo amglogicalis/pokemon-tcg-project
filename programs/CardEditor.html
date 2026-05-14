@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCG Card Editor Pro v2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: white; }
+        .card-row:hover { background-color: #1e293b; }
+        input, select { background-color: #334155; color: white; border: 1px solid #475569; padding: 4px 8px; border-radius: 4px; width: 100%; font-size: 0.875rem; }
+        input:focus, select:focus { outline: 2px solid #fbbf24; border-color: transparent; }
+        .btn-action { transition: all 0.2s; }
+        .btn-action:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-[1600px] mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 bg-slate-800 p-6 rounded-2xl shadow-2xl border border-slate-700 gap-4">
+            <div>
+                <h1 class="text-3xl font-black text-yellow-400 uppercase tracking-tighter italic">TCG Editor de Cartas</h1>
+                <p class="text-slate-400 text-sm">Auto-ID habilitado | Patrón card-000</p>
+            </div>
+            <div class="flex gap-4">
+                <input type="file" id="fileInput" accept=".json" class="hidden">
+                <button onclick="document.getElementById('fileInput').click()" class="btn-action bg-blue-600 hover:bg-blue-50 px-6 py-2 rounded-lg font-bold">Cargar JSON</button>
+                <button onclick="downloadJSON()" class="btn-action bg-green-600 hover:bg-green-500 px-6 py-2 rounded-lg font-bold">Guardar cards.json</button>
+            </div>
+        </header>
+
+        <div class="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900 text-slate-300 text-[10px] uppercase tracking-widest font-bold">
+                            <th class="p-4 border-b border-slate-700">Vista</th>
+                            <th class="p-4 border-b border-slate-700">ID (Auto)</th>
+                            <th class="p-4 border-b border-slate-700">Pokedex ID</th>
+                            <th class="p-4 border-b border-slate-700 w-24">Expansión</th>
+                            <th class="p-4 border-b border-slate-700">Nombre</th>
+                            <th class="p-4 border-b border-slate-700">Rareza</th>
+                            <th class="p-4 border-b border-slate-700">Tipo</th>
+                            <th class="p-4 border-b border-slate-700 w-16">HP</th>
+                            <th class="p-4 border-b border-slate-700 w-16">ATK</th>
+                            <th class="p-4 border-b border-slate-700 w-16">DEF</th>
+                            <th class="p-4 border-b border-slate-700">URL Imagen</th>
+                            <th class="p-4 border-b border-slate-700">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- JS content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <button onclick="addNewCard()" class="mt-6 w-full py-4 bg-slate-700 hover:bg-slate-600 border-2 border-dashed border-slate-500 rounded-xl font-bold text-slate-300 transition-all">+ Añadir Nueva Carta</button>
+    </div>
+
+    <script>
+        let cards = [];
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = JSON.parse(e.target.result);
+                    cards = Array.isArray(content) ? content : (content.cards || []);
+                    renderTable();
+                } catch(err) {
+                    alert("Error al leer el JSON: " + err.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            cards.forEach((card, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'card-row border-b border-slate-700 transition-colors';
+                
+                if(card.rarity === "ultra rare") card.rarity = "ultra-rare";
+
+                tr.innerHTML = `
+                    <td class="p-4">
+                        <img src="${card.imageUrl}" class="w-10 h-14 object-contain bg-slate-900 rounded border border-slate-600" onerror="this.src='https://via.placeholder.com/100x140?text=No+Img'">
+                    </td>
+                    <td class="p-2 font-mono text-yellow-500 font-bold">${card.id}</td>
+                    <td class="p-2"><input type="number" value="${card.pokemonId || 0}" onchange="updateCard(${index}, 'pokemonId', parseInt(this.value))"></td>
+                    <td class="p-2">
+                        <select onchange="updateCard(${index}, 'expansion', this.value)">
+                            <option value="dp6" ${card.expansion === 'dp6' ? 'selected' : ''}>dp6</option>
+                            <option value="bw9" ${card.expansion === 'bw9' ? 'selected' : ''}>bw9</option>
+                            <option value="xyp" ${card.expansion === 'xyp' ? 'selected' : ''}>xyp</option>
+                        </select>
+                    </td>
+                    <td class="p-2"><input type="text" value="${card.name || ''}" onchange="updateCard(${index}, 'name', this.value)"></td>
+                    <td class="p-2">
+                        <select onchange="updateCard(${index}, 'rarity', this.value)">
+                            <option value="common" ${card.rarity === 'common' ? 'selected' : ''}>Common</option>
+                            <option value="uncommon" ${card.rarity === 'uncommon' ? 'selected' : ''}>Uncommon</option>
+                            <option value="rare" ${card.rarity === 'rare' ? 'selected' : ''}>Rare</option>
+                            <option value="holographic" ${card.rarity === 'holographic' ? 'selected' : ''}>Holographic</option>
+                            <option value="ultra-rare" ${card.rarity === 'ultra-rare' ? 'selected' : ''}>Ultra Rare</option>
+                            <option value="shiny" ${card.rarity === 'shiny' ? 'selected' : ''}>Shiny ✨</option>
+                        </select>
+                    </td>
+                    <td class="p-2"><input type="text" value="${card.type || ''}" onchange="updateCard(${index}, 'type', this.value)"></td>
+                    <td class="p-2"><input type="number" value="${card.hp || 0}" onchange="updateCard(${index}, 'hp', parseInt(this.value))"></td>
+                    <td class="p-2"><input type="number" value="${card.attack || 0}" onchange="updateCard(${index}, 'attack', parseInt(this.value))"></td>
+                    <td class="p-2"><input type="number" value="${card.defense || 0}" onchange="updateCard(${index}, 'defense', parseInt(this.value))"></td>
+                    <td class="p-2"><input type="text" value="${card.imageUrl || ''}" onchange="updateCard(${index}, 'imageUrl', this.value); setTimeout(renderTable, 500);"></td>
+                    <td class="p-4 text-center">
+                        <button onclick="removeCard(${index})" class="text-red-500 hover:text-red-400 font-bold transition-colors">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateCard(index, field, value) {
+            cards[index][field] = value;
+        }
+
+        function removeCard(index) {
+            if(confirm('¿Seguro que quieres borrar a ' + cards[index].name + '?')) {
+                cards.splice(index, 1);
+                renderTable();
+            }
+        }
+
+        function addNewCard() {
+            let nextIdNum = 1;
+            let nextPokeId = 1;
+
+            if (cards.length > 0) {
+                // Buscamos el ID más alto para no repetir aunque estén desordenados
+                const ids = cards.map(c => parseInt(c.id.split('-')[1]) || 0);
+                nextIdNum = Math.max(...ids) + 1;
+
+                // Buscamos el pokemonId más alto
+                const pokeIds = cards.map(c => c.pokemonId || 0);
+                nextPokeId = Math.max(...pokeIds) + 1;
+            }
+
+            const lastCard = cards[cards.length - 1];
+            
+            const newCard = {
+                id: `card-${nextIdNum.toString().padStart(3, '0')}`,
+                pokemonId: nextPokeId,
+                name: "Nuevo Pokémon",
+                expansion: lastCard ? lastCard.expansion : "dp6",
+                rarity: "common",
+                hp: 60,
+                type: lastCard ? lastCard.type : "Normal",
+                attack: 10,
+                defense: 10,
+                imageUrl: ""
+            };
+
+            cards.push(newCard);
+            renderTable();
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function downloadJSON() {
+            if(cards.length === 0) return alert("No hay cartas para guardar");
+            // Formateo del JSON para que respete el patrón de la propiedad "cards"
+            const data = { cards: cards };
+            const blob = new Blob([JSON.stringify(data, null, 4)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cards.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

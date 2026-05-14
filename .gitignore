@@ -1,0 +1,12 @@
+# Dependencias
+node_modules/
+dist/
+
+# Variables de entorno (¡SECRETOS!)
+.env
+.env.local
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+pw.txt
