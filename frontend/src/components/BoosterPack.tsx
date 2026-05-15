@@ -7,7 +7,7 @@ interface BoosterPackProps {
   expansionId: string;
 }
 
-const PACK_ASSETS: Record<string, { imagePath: string; glow: string }> = {
+const PACK_ASSETS: Record<string, { imagePath: string; glow: string }> = { 
   dp6: {
     imagePath: 'dp6/packshots/DP6_Booster_Giratina.webp',
     glow: 'bg-yellow-500' // Legends Awakened
@@ -19,7 +19,8 @@ const PACK_ASSETS: Record<string, { imagePath: string; glow: string }> = {
   '621': { 
     imagePath: 'g1/packshots/Generations_Booster_Charizard.webp',
     glow: 'bg-red-600' // Generations (XYP Promos)
-  }
+  },
+  'zsv10pt5': { imagePath: 'zsv10pt5/packshots/Pokemon_TCG_Scarlet_Violet%E2%80%94Black_Bolt_Booster_Wrap_Zekrom.png', glow: 'bg-indigo-600' }
 };
 
 export default function BoosterPack({ onOpen, isLoading, expansionId }: BoosterPackProps) {

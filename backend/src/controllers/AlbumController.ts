@@ -2,10 +2,11 @@ import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { MongoUserRepository } from '../repositories/MongoUserRepository';
 
-// Importación estática para eliminar fs
+// Importación estática para asegurar compatibilidad
 import baseCards from '../data/cards.json';
 import bw9Cards from '../data/cards-bw9.json';
 import xypCards from '../data/cards-xyp.json';
+import zsv10pt5Cards from '../data/cards-zsv10pt5.json';
 
 const repo = new MongoUserRepository();
 
@@ -38,6 +39,7 @@ export class AlbumController {
       addCardsToMap(baseCards.cards, 'cards.json');
       addCardsToMap(bw9Cards.cards, 'cards-bw9.json');
       addCardsToMap(xypCards.cards, 'cards-xyp.json');
+      addCardsToMap(zsv10pt5Cards.cards, 'cards-zsv10pt5.json');
 
       const synchronizedAlbum = user.album.reduce((acc: any[], entry) => {
         const targetId = String(entry.card.id).trim();

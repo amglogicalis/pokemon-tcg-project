@@ -8,10 +8,11 @@ const rarityWeight: Record<string, number> = {
   'common': 1, 'uncommon': 2, 'rare': 3, 'holographic': 4, 'ultra-rare': 5, 'ultra rare': 5, 'shiny': 6
 };
 
-const EXPANSIONS = [
+const EXPANSIONS = [ 
   { id: 'dp6', name: 'Legends Awakened', color: 'text-yellow-500' },
   { id: 'bw9', name: 'Plasma Blast', color: 'text-blue-400' },
-  { id: '621', name: 'XY Black Star Promos', color: 'text-red-500' }
+  { id: '621', name: 'XY Black Star Promos', color: 'text-red-500' },
+  { id: 'zsv10pt5', name: 'BLACK BOLT', color: 'text-indigo-600' }
 ];
 
 export default function Shop() {

@@ -3,15 +3,17 @@ import { User } from '../domain/User';
 import { Card } from '../domain/Card';
 import { UserModel } from '../models/UserModel';
 
-// Importación estática para eliminar dependencias de "fs" y asegurar compatibilidad en Render
+// Importación estática para asegurar compatibilidad
 import dp6Cards from '../data/cards.json';
 import bw9Cards from '../data/cards-bw9.json';
 import xypCards from '../data/cards-xyp.json';
+import zsv10pt5Cards from '../data/cards-zsv10pt5.json';
 
-const expansionsData: Record<string, any> = {
+const expansionsData: Record<string, any> = { 
   'dp6': dp6Cards,
   'bw9': bw9Cards,
-  '621': xypCards
+  '621': xypCards,
+  'zsv10pt5': zsv10pt5Cards
 };
 
 export class MongoUserRepository implements IUserRepository {

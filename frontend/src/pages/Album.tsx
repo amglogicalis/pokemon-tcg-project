@@ -17,11 +17,12 @@ interface AlbumEntry {
 
 type SortOrder = 'recent' | 'id' | 'rarity' | 'hp';
 
-// 1. Definición de expansiones (Añadida XY Promos con color rojo)
+// 1. Definición de expansiones
 const EXPANSIONS = {
   dp6: { id: 'card', name: 'Legends Awakened', total: 146, color: 'text-yellow-400', bar: 'from-yellow-600 to-yellow-200' },
   bw9: { id: 'bw9', name: 'Plasma Blast', total: 122, color: 'text-blue-400', bar: 'from-blue-600 to-blue-300' },
-  xyp: { id: 'xyp', name: 'XY Black Star Promos', total: 208, color: 'text-red-500', bar: 'from-red-700 to-red-400' }
+  xyp: { id: 'xyp', name: 'XY Black Star Promos', total: 208, color: 'text-red-500', bar: 'from-red-700 to-red-400' },
+  zsv10pt5: { id: 'zsv10pt5', name: 'Black Bolt', total: 100, color: 'text-indigo-600', bar: 'from-indigo-600 to-indigo-300' }
 };
 
 export default function Album() {
@@ -29,7 +30,6 @@ export default function Album() {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<SortOrder>('recent');
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
-  // 2. Estado actualizado para permitir la nueva pestaña
   const [activeTab, setActiveTab] = useState<keyof typeof EXPANSIONS>('dp6');
 
   const rarityWeight: Record<string, number> = {
@@ -53,7 +53,6 @@ export default function Album() {
   const stats = useMemo(() => {
     const currentExp = EXPANSIONS[activeTab];
     
-    // 3. Lógica de filtrado corregida y ampliada
     const filteredEntries = entries.filter(e => {
       const cardId = e.card.id.toLowerCase();
       
@@ -64,8 +63,10 @@ export default function Album() {
         return cardId.startsWith('bw9-') || cardId.startsWith('bw-');
       }
       if (activeTab === 'xyp') {
-        // Detecta IDs que empiecen por xyp (nuestro ID interno) o xy/621 (IDs de la API)
         return cardId.startsWith('xyp-') || cardId.startsWith('xy-') || cardId.startsWith('621-');
+      }
+      if (activeTab === 'zsv10pt5') {
+        return cardId.startsWith('zsv10pt5-');
       }
       return false;
     });
@@ -94,7 +95,6 @@ export default function Album() {
     [entries, selectedCardId]
   );
 
-  // Hook derivado para reutilizar la misma lógica del brillo de fondo de Shop.tsx
   const currentBgEffect = useMemo(() => {
     if (!selectedEntry) return 'none';
     const rarity = selectedEntry.card.rarity.toLowerCase();
@@ -108,7 +108,6 @@ export default function Album() {
   return (
     <div className="p-10 min-h-screen bg-gray-900 text-white relative overflow-x-hidden">
       
-      {/* EFECTOS DE FONDO DINÁMICOS - AMPLIADOS (Igual que en Shop.tsx) */}
       <AnimatePresence>
         {currentBgEffect === 'ultra' && (
           <motion.div
@@ -141,7 +140,6 @@ export default function Album() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         
-        {/* TABS DINÁMICOS */}
         <div className="flex gap-6 mb-8 justify-center md:justify-start">
           {(Object.keys(EXPANSIONS) as Array<keyof typeof EXPANSIONS>).map((key) => (
             <button
@@ -155,7 +153,6 @@ export default function Album() {
           ))}
         </div>
 
-        {/* STATS */}
         <div className="mb-12 bg-gray-800/40 p-8 rounded-3xl border border-white/5 backdrop-blur-sm shadow-2xl">
           <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-6">
             <div>
@@ -175,7 +172,6 @@ export default function Album() {
           </div>
         </div>
 
-        {/* FILTROS */}
         <div className="flex justify-end mb-8">
           <div className="flex items-center gap-3 bg-black/40 p-2 px-4 rounded-2xl border border-white/10 shadow-lg">
             <span className="text-[10px] font-black text-gray-500 uppercase italic tracking-wider">Ordenar por:</span>
@@ -188,7 +184,6 @@ export default function Album() {
           </div>
         </div>
         
-        {/* GRID DE CARTAS */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
           {stats.sorted.map((entry, index) => {
             const isSelected = selectedCardId === entry.card.id;
