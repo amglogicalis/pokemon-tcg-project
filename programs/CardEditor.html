@@ -48,8 +48,7 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <!-- JS content -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -107,6 +106,7 @@
                             <option value="holographic" ${card.rarity === 'holographic' ? 'selected' : ''}>Holographic</option>
                             <option value="ultra-rare" ${card.rarity === 'ultra-rare' ? 'selected' : ''}>Ultra Rare</option>
                             <option value="shiny" ${card.rarity === 'shiny' ? 'selected' : ''}>Shiny ✨</option>
+                            <option value="secret" ${card.rarity === 'secret' ? 'selected' : ''}>Secret 🔒</option>
                         </select>
                     </td>
                     <td class="p-2"><input type="text" value="${card.type || ''}" onchange="updateCard(${index}, 'type', this.value)"></td>
