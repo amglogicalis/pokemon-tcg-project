@@ -13,9 +13,74 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #0f172a; /* Fondo azul muy oscuro */
+  background-color: #0f172a;
 }
 
 #root {
   width: 100%;
+}
+
+@layer utilities {
+  /* Efecto Diamante: Haz de luz más brillante y rápido */
+  .animate-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .animate-shimmer::after {
+    content: '';
+    position: absolute;
+    top: -150%;
+    left: -50%;
+    width: 200%;
+    height: 400%;
+    background: linear-gradient(
+      45deg,
+      transparent 0%,
+      rgba(103, 232, 249, 0) 30%,
+      rgba(255, 255, 255, 0.8) 50%,
+      rgba(103, 232, 249, 0) 70%,
+      transparent 100%
+    );
+    transform: rotate(35deg);
+    animation: crystal-shimmer 2s infinite;
+    pointer-events: none;
+  }
+
+  @keyframes crystal-shimmer {
+    0% { transform: translateX(-150%) rotate(35deg); }
+    100% { transform: translateX(150%) rotate(35deg); }
+  }
+
+  /* Efecto de Fondo: Pulso de luz de diamante */
+  .animate-diamond-pulse {
+    background-size: 200% 200%;
+    animation: diamond-pulse 4s ease infinite;
+  }
+
+  @keyframes diamond-pulse {
+    0%, 100% { background-position: 0% 0%; opacity: 0.8; }
+    50% { background-position: 100% 100%; opacity: 1; }
+  }
+
+  /* Gradiente de Texto para el fucsia-naranja */
+  .animate-text-fire {
+    background-size: 200% auto;
+    animation: text-fire 3s linear infinite;
+  }
+
+  @keyframes text-fire {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+
+  .animate-gradient-x {
+    background-size: 200% auto;
+    animation: gradient-x 3s linear infinite;
+  }
+
+  @keyframes gradient-x {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
 }

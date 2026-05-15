@@ -8,7 +8,6 @@ export interface ExpansionConfig {
 }
 
 export const AVAILABLE_EXPANSIONS: Record<string, ExpansionConfig> = { 
-  'sm3': { id: 'sm3', apiId: 'sm3', name: 'Burning Shadows', fileName: 'cards-sm3.json' }, 
   'dp6': {
     id: 'dp6',
     apiId: 'dp6',

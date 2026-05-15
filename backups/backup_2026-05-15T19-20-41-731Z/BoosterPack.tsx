@@ -8,7 +8,6 @@ interface BoosterPackProps {
 }
 
 const PACK_ASSETS: Record<string, { imagePath: string; glow: string }> = { 
-  'sm3': { imagePath: 'sm3/packshots/SM3_Booster_Ho-Oh.webp', glow: 'bg-red-950' }, 
   dp6: {
     imagePath: 'dp6/packshots/DP6_Booster_Giratina.webp',
     glow: 'bg-yellow-500' // Legends Awakened

@@ -5,11 +5,10 @@ import BoosterPack from '../components/BoosterPack';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const rarityWeight: Record<string, number> = {
-  'common': 1, 'uncommon': 2, 'rare': 3, 'holographic': 4, 'ultra-rare': 5, 'ultra rare': 5, 'shiny': 6, 'secret': 7
+  'common': 1, 'uncommon': 2, 'rare': 3, 'holographic': 4, 'ultra-rare': 5, 'ultra rare': 5, 'shiny': 6
 };
 
 const EXPANSIONS = [ 
-  { id: 'sm3', name: 'BURNING SHADOWS', color: 'text-red-950' }, 
   { id: 'dp6', name: 'Legends Awakened', color: 'text-yellow-500' },
   { id: 'bw9', name: 'Plasma Blast', color: 'text-blue-400' },
   { id: '621', name: 'XY Black Star Promos', color: 'text-red-500' },
@@ -39,7 +38,6 @@ export default function Shop() {
     if (!lastCard) return 'none';
     
     const rarity = lastCard.rarity.toLowerCase();
-    if (rarity.includes('secret')) return 'secret';
     if (rarity.includes('shiny')) return 'shiny';
     if (rarity.includes('ultra')) return 'ultra';
     
@@ -80,9 +78,7 @@ export default function Shop() {
   const nextCard = () => {
     if (revealedCount < newCards.length) {
       const nextRarity = newCards[revealedCount].rarity.toLowerCase();
-      if (nextRarity.includes('secret')) {
-        playSfx('/sounds/secret-reveal.mp3'); // Asumimos que el usuario podría añadirlo
-      } else if (nextRarity.includes('shiny')) {
+      if (nextRarity.includes('shiny')) {
         playSfx('/sounds/shiny-sparkle.mp3');
       } else if (nextRarity.includes('ultra')) {
         playSfx('/sounds/epic-reveal.mp3');
@@ -128,60 +124,6 @@ export default function Shop() {
             className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center"
           >
             <div className="w-full h-full scale-150 bg-[radial-gradient(circle,currentColor_10%,transparent_80%)]" />
-          </motion.div>
-        )}
-        {currentBgEffect === 'secret' && (
-          <motion.div
-            key="secret-bg"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0.4, 0.8, 0.4], scale: [1, 1.1, 1] }}
-            exit={{ opacity: 0, transition: { duration: 0.5 } }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center"
-          >
-            {/* Brillo Principal Azul Celeste */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(34,211,238,0.3)_0%,rgba(0,0,0,0)_70%)]" />
-            
-            {/* Brillo Secundario Fucsia/Naranja (EQUILIBRADO) */}
-            <motion.div 
-              animate={{ opacity: [0.3, 0.65, 0.3], scale: [0.9, 1.15, 0.9] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute inset-0 bg-[radial-gradient(circle,rgba(244,63,94,0.6)_0%,rgba(244,63,94,0.2)_25%,rgba(0,0,0,0)_50%)]" 
-            />
-            
-            {/* ESTRELLAS / PARTÍCULAS FUCSIA-NARANJA */}
-            {[...Array(15)].map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ 
-                  x: Math.random() * window.innerWidth - window.innerWidth/2, 
-                  y: Math.random() * window.innerHeight - window.innerHeight/2,
-                  scale: 0,
-                  opacity: 0
-                }}
-                animate={{ 
-                  x: [
-                    Math.random() * window.innerWidth - window.innerWidth/2, 
-                    Math.random() * window.innerWidth - window.innerWidth/2,
-                    Math.random() * window.innerWidth - window.innerWidth/2
-                  ],
-                  y: [
-                    Math.random() * window.innerHeight - window.innerHeight/2,
-                    Math.random() * window.innerHeight - window.innerHeight/2,
-                    Math.random() * window.innerHeight - window.innerHeight/2
-                  ],
-                  scale: [0, 1.5, 0],
-                  opacity: [0, 0.8, 0],
-                }}
-                transition={{ 
-                  duration: 4 + Math.random() * 4, 
-                  repeat: Infinity, 
-                  delay: Math.random() * 5,
-                  ease: "easeInOut"
-                }}
-                className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-fuchsia-500 via-red-500 to-orange-400 blur-[2px] shadow-[0_0_10px_#f43f5e]"
-              />
-            ))}
           </motion.div>
         )}
       </AnimatePresence>
@@ -250,7 +192,6 @@ export default function Shop() {
                 const style = rarityStyles[rKey] || rarityStyles[rKey.replace(' ', '-')] || rarityStyles.common;
                 const isUltra = rKey.includes('ultra');
                 const isShiny = rKey.includes('shiny');
-                const isSecret = rKey.includes('secret');
                 const isHolo = rKey.includes('holographic') || rKey.includes('holo');
                 
                 return (
@@ -258,25 +199,14 @@ export default function Shop() {
                     <AnimatePresence>
                       {isRevealed && (
                         <motion.div
-                          initial={{ 
-                            opacity: 0, 
-                            rotateY: isSecret ? 1080 : isShiny ? 720 : isUltra ? 540 : 180, 
-                            scale: isSecret ? 0 : isShiny ? 0.4 : isUltra ? 0.6 : 0.8 
-                          }}
+                          initial={{ opacity: 0, rotateY: 180, scale: 0.8 }}
                           animate={{ 
-                            opacity: 1, 
-                            rotateY: 0, 
-                            scale: 1,
-                            y: (isUltra || isShiny || isSecret) ? [0, -20, 0] : 0 
+                            opacity: 1, rotateY: 0, scale: 1,
+                            y: (isUltra || isShiny) ? [0, -12, 0] : 0 
                           }}
                           transition={{
-                            y: (isUltra || isShiny || isSecret) ? { repeat: Infinity, duration: 3, ease: "easeInOut" } : {},
-                            rotateY: { 
-                              duration: isSecret ? 1.5 : isShiny ? 1.1 : isUltra ? 0.8 : 0.5, 
-                              ease: (isSecret || isShiny || isUltra) ? "circOut" : "easeOut" 
-                            },
-                            scale: { duration: isSecret ? 1 : isShiny ? 0.8 : isUltra ? 0.6 : 0.4 },
-                            opacity: { duration: 0.3 }
+                            y: (isUltra || isShiny) ? { repeat: Infinity, duration: 4, ease: "easeInOut" } : {},
+                            rotateY: { duration: 0.5, ease: "easeOut" }
                           }}
                           className={`w-full h-full p-2 rounded-xl border-2 shadow-2xl relative overflow-hidden flex flex-col ${style.border} ${style.bg} ${style.shadow}`}
                         >
@@ -293,8 +223,8 @@ export default function Shop() {
                             </>
                           ) : null}
 
-                          {(isUltra || isShiny || isHolo || isSecret) && (
-                            <motion.div animate={{ x: ['-100%', '250%'] }} transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }} className="absolute inset-0 z-20 pointer-events-none -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                          {(isUltra || isShiny || isHolo) && (
+                            <motion.div animate={{ x: ['-100%', '200%'] }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }} className="absolute inset-0 z-20 pointer-events-none -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                           )}
                           
                           <img src={card.imageUrl} alt={card.name} className="w-full h-full object-contain rounded-lg relative z-10" />

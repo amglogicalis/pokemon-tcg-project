@@ -18,12 +18,11 @@ interface AlbumEntry {
 type SortOrder = 'recent' | 'id' | 'rarity' | 'hp';
 
 // 1. Definición de expansiones
-const EXPANSIONS = { 
-  sm3: { id: 'sm3', name: 'Burning Shadows', total: 177, color: 'text-red-950', bar: 'from-red-950 to-red-950' },
+const EXPANSIONS = {
   dp6: { id: 'card', name: 'Legends Awakened', total: 146, color: 'text-yellow-400', bar: 'from-yellow-600 to-yellow-200' },
   bw9: { id: 'bw9', name: 'Plasma Blast', total: 122, color: 'text-blue-400', bar: 'from-blue-600 to-blue-300' },
   xyp: { id: 'xyp', name: 'XY Black Star Promos', total: 208, color: 'text-red-500', bar: 'from-red-700 to-red-400' },
-  zsv10pt5: { id: 'zsv10pt5', name: 'Black Bolt', total: 172, color: 'text-indigo-600', bar: 'from-indigo-600 to-indigo-300' }
+  zsv10pt5: { id: 'zsv10pt5', name: 'Black Bolt', total: 100, color: 'text-indigo-600', bar: 'from-indigo-600 to-indigo-300' }
 };
 
 export default function Album() {
@@ -34,7 +33,7 @@ export default function Album() {
   const [activeTab, setActiveTab] = useState<keyof typeof EXPANSIONS>('dp6');
 
   const rarityWeight: Record<string, number> = {
-    'secret': 6, 'shiny': 5, 'ultra-rare': 4, 'ultra rare': 4, 'holographic': 3, 'rare': 2, 'uncommon': 1, 'common': 0
+    'shiny': 5, 'ultra-rare': 4, 'ultra rare': 4, 'holographic': 3, 'rare': 2, 'uncommon': 1, 'common': 0
   };
 
   useEffect(() => {
@@ -65,9 +64,6 @@ export default function Album() {
       }
       if (activeTab === 'xyp') {
         return cardId.startsWith('xyp-') || cardId.startsWith('xy-') || cardId.startsWith('621-');
-      }
-      if (activeTab === 'sm3') {
-        return cardId.startsWith('sm3-');
       }
       if (activeTab === 'zsv10pt5') {
         return cardId.startsWith('zsv10pt5-');
@@ -102,7 +98,6 @@ export default function Album() {
   const currentBgEffect = useMemo(() => {
     if (!selectedEntry) return 'none';
     const rarity = selectedEntry.card.rarity.toLowerCase();
-    if (rarity.includes('secret')) return 'secret';
     if (rarity.includes('shiny')) return 'shiny';
     if (rarity.includes('ultra')) return 'ultra';
     return 'none';
@@ -139,60 +134,6 @@ export default function Album() {
             className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center"
           >
             <div className="w-full h-full scale-150 bg-[radial-gradient(circle,currentColor_10%,transparent_80%)]" />
-          </motion.div>
-        )}
-        {currentBgEffect === 'secret' && (
-          <motion.div
-            key="secret-bg"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0.4, 0.8, 0.4], scale: [1, 1.1, 1] }}
-            exit={{ opacity: 0, transition: { duration: 0.5 } }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center"
-          >
-            {/* Brillo Principal Azul Celeste */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(34,211,238,0.3)_0%,rgba(0,0,0,0)_70%)]" />
-            
-            {/* Brillo Secundario Fucsia/Naranja (EQUILIBRADO) */}
-            <motion.div 
-              animate={{ opacity: [0.3, 0.65, 0.3], scale: [0.9, 1.15, 0.9] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute inset-0 bg-[radial-gradient(circle,rgba(244,63,94,0.6)_0%,rgba(244,63,94,0.2)_25%,rgba(0,0,0,0)_50%)]" 
-            />
-            
-            {/* ESTRELLAS / PARTÍCULAS FUCSIA-NARANJA */}
-            {[...Array(15)].map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ 
-                  x: Math.random() * window.innerWidth - window.innerWidth/2, 
-                  y: Math.random() * window.innerHeight - window.innerHeight/2,
-                  scale: 0,
-                  opacity: 0
-                }}
-                animate={{ 
-                  x: [
-                    Math.random() * window.innerWidth - window.innerWidth/2, 
-                    Math.random() * window.innerWidth - window.innerWidth/2,
-                    Math.random() * window.innerWidth - window.innerWidth/2
-                  ],
-                  y: [
-                    Math.random() * window.innerHeight - window.innerHeight/2,
-                    Math.random() * window.innerHeight - window.innerHeight/2,
-                    Math.random() * window.innerHeight - window.innerHeight/2
-                  ],
-                  scale: [0, 1.5, 0],
-                  opacity: [0, 0.8, 0],
-                }}
-                transition={{ 
-                  duration: 4 + Math.random() * 4, 
-                  repeat: Infinity, 
-                  delay: Math.random() * 5,
-                  ease: "easeInOut"
-                }}
-                className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-fuchsia-500 via-red-500 to-orange-400 blur-[2px] shadow-[0_0_10px_#f43f5e]"
-              />
-            ))}
           </motion.div>
         )}
       </AnimatePresence>

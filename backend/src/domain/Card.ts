@@ -4,7 +4,8 @@ export type Rarity =
   | 'rare' 
   | 'holographic' 
   | 'ultra-rare' 
-  | 'shiny'; // Añadido promo por si acaso
+  | 'shiny'
+  | 'secret';
 
 export type PokemonType =
   | 'Fire' | 'Water' | 'Grass' | 'Electric' | 'Psychic' | 'Colorless'

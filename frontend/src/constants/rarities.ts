@@ -42,5 +42,12 @@ export const rarityStyles: Record<string, { border: string, bg: string, text: st
     bg: 'bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900',
     text: 'text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-yellow-400 via-green-400 via-blue-400 via-purple-400 to-red-400 bg-[length:200%_auto] animate-gradient-x font-black',
     shadow: 'shadow-[0_0_30px_rgba(255,255,255,0.4)]',
+  },
+  'secret': { 
+    border: 'border-cyan-400', 
+    bg: 'bg-gradient-to-br from-sky-900 via-cyan-700/40 to-indigo-950 animate-diamond-pulse', 
+    text: 'text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 via-red-500 to-orange-400 bg-[length:200%_auto] animate-text-fire font-black italic uppercase tracking-tighter',
+    shadow: 'shadow-[0_0_70px_rgba(34,211,238,0.7)]',
+    animate: 'animate-shimmer'
   }
 };
