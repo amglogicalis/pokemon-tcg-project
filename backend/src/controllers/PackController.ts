@@ -22,8 +22,8 @@ export class PackController {
       if (config) {
         ALL_CARDS = await repo.getCardsByExpansion(expansion);
       } else {
-        console.warn(`⚠️ Expansión [${expansion}] no encontrada en config. Usando 'base'.`);
-        ALL_CARDS = await repo.getCardsByExpansion('base');
+        console.warn(`⚠️ Expansión [${expansion}] no encontrada en config. Usando 'dp6'.`);
+        ALL_CARDS = await repo.getCardsByExpansion('dp6');
       }
 
       if (!ALL_CARDS || ALL_CARDS.length === 0) {

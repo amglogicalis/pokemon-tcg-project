@@ -14,9 +14,9 @@ export class LocalJsonRepository implements IUserRepository {
   async getCardsByExpansion(expansionId: string): Promise<Card[]> {
     const config = AVAILABLE_EXPANSIONS[expansionId];
     
-    // 1. Lógica de nombres: Si es 'base' -> cards.json. Si no, lo que diga la config o cards-ID.json
+    // 1. Lógica de nombres: Si es 'dp6' -> cards.json. Si no, lo que diga la config o cards-ID.json
     let fileName = 'cards.json';
-    if (expansionId !== 'base') {
+    if (expansionId !== 'dp6') {
         fileName = config?.fileName || `cards-${expansionId}.json`;
     }
 

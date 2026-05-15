@@ -4,14 +4,14 @@ import { Card } from '../domain/Card';
 import { UserModel } from '../models/UserModel';
 
 // Importación estática para eliminar dependencias de "fs" y asegurar compatibilidad en Render
-import baseCards from '../data/cards.json';
+import dp6Cards from '../data/cards.json';
 import bw9Cards from '../data/cards-bw9.json';
 import xypCards from '../data/cards-xyp.json';
 
 const expansionsData: Record<string, any> = {
-  'base': baseCards,
+  'dp6': dp6Cards,
   'bw9': bw9Cards,
-  'xyp': xypCards
+  '621': xypCards
 };
 
 export class MongoUserRepository implements IUserRepository {
@@ -19,8 +19,8 @@ export class MongoUserRepository implements IUserRepository {
   async getCardsByExpansion(expansionId: string): Promise<Card[]> {
     const data = expansionsData[expansionId];
     if (!data || !data.cards) {
-      console.warn(`⚠️ Expansión [${expansionId}] no encontrada o inválida. Fallback a 'base'.`);
-      return expansionsData['base'].cards || [];
+      console.warn(`⚠️ Expansión [${expansionId}] no encontrada o inválida. Fallback a 'dp6'.`);
+      return expansionsData['dp6'].cards || [];
     }
     return data.cards;
   }
