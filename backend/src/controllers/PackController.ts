@@ -14,6 +14,15 @@ export class PackController {
       const userId = req.user?.userId; 
       if (!userId) throw new Error("No autenticado");
 
+      // FIX: Obtener al usuario primero para verificar si tiene sobres disponibles
+      const user = await repo.findById(userId);
+      if (!user) throw new Error("Usuario no encontrado");
+      
+      if (user.packsAvailable <= 0) {
+        res.status(400).json({ error: "No tienes sobres disponibles" });
+        return;
+      }
+
       const { expansion } = req.body; 
 
       const config = AVAILABLE_EXPANSIONS[expansion];
@@ -44,3 +53,4 @@ export class PackController {
     }
   }
 }
+
