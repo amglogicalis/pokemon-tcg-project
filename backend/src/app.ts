@@ -21,12 +21,12 @@ if (!process.env.JWT_SECRET) {
     console.warn("⚠️  JWT_SECRET no definida. Usando 'dev_secret' solo en desarrollo.");
   }
 }
-if (!process.env.MONGODB_URI) {
+if (!process.env.MONGO_URI) {
   if (process.env.NODE_ENV === 'production') {
-    console.error("❌ ERROR CRÍTICO: MONGODB_URI no está configurada en producción.");
+    console.error("❌ ERROR CRÍTICO: MONGO_URI no está configurada en producción.");
     process.exit(1);
   } else {
-    console.warn("⚠️  MONGODB_URI no definida. Asegúrate de que .env esté configurado.");
+    console.warn("⚠️  MONGO_URI no definida. Asegúrate de que .env esté configurado.");
   }
 }
 
