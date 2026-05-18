@@ -573,7 +573,7 @@ export default function Shop() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-8 w-full">
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-8 w-full max-w-sm md:max-w-full mx-auto">
               {newCards.map((card, index) => {
                 const isRevealed = index < revealedCount;
                 const rKey = card.rarity.toLowerCase();

@@ -188,7 +188,7 @@ export default function App() {
 
               {/* Dropdown Notificaciones (Glassmorphism) */}
               {showNotifDropdown && (
-                <div className="absolute top-full right-0 mt-3 w-80 bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 z-50 flex flex-col gap-3">
+                <div className="absolute top-full right-0 mt-3 w-[calc(100vw-2rem)] max-w-[320px] sm:w-80 bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 z-50 flex flex-col gap-3 origin-top-right">
                   <div className="flex justify-between items-center mb-1 border-b border-white/10 pb-2">
                     <h3 className="text-xs font-black uppercase tracking-widest text-gray-400">Notificaciones</h3>
                     {notifications.length > 0 && (
@@ -240,7 +240,28 @@ export default function App() {
 
         {/* Mobile Nav Menu Dropdown */}
         {isMobileMenuOpen && (
-          <div className="md:hidden w-full flex flex-col gap-2 mt-2 pt-2 border-t border-white/10 animate-fadeIn">
+          <div className="md:hidden w-full flex flex-col gap-2 mt-2 pt-4 border-t border-white/10 animate-fadeIn">
+            {/* User Level for Mobile */}
+            {user && (
+              <div className="flex flex-col items-center gap-2 mb-4 bg-black/20 p-4 rounded-xl border border-white/5">
+                <span 
+                  style={getLevelTextStyle(user.level ?? 1)}
+                  className="text-base font-black uppercase tracking-wider leading-none animate-text-shimmer"
+                >
+                  Nivel {user.level ?? 1}
+                </span>
+                <div className="w-full max-w-[200px] h-2 bg-gray-700 rounded-full overflow-hidden border border-white/5 relative shadow-inner">
+                  <div 
+                    style={{ width: `${Math.min(100, Math.max(0, ((user.xp ?? 0) / (100 + ((user.level ?? 1) - 1) * 50)) * 100))}%` }}
+                    className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] transition-all duration-500 ease-out"
+                  />
+                </div>
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
+                  {user.xp ?? 0} / {100 + ((user.level ?? 1) - 1) * 50} XP
+                </span>
+              </div>
+            )}
+            
             <button 
               onClick={() => { playSelect(); setView('shop'); setIsMobileMenuOpen(false); }} 
               className={`px-4 py-2 rounded-lg text-left transition-colors ${
