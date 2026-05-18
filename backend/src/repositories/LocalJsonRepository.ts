@@ -87,13 +87,16 @@ export class LocalJsonRepository implements IUserRepository {
         packsAvailable: 10,
         album: [],
         passwordHash: "",
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        level: 1,
+        xp: 0
       };
       data.users.push(newUser);
       userIndex = data.users.length - 1;
     }
 
     const user = data.users[userIndex];
+    let newCardsCount = 0;
 
     newCards.forEach(card => {
       const cardId = String(card.id).trim();
@@ -102,6 +105,7 @@ export class LocalJsonRepository implements IUserRepository {
       if (existingEntry) {
         existingEntry.quantity += 1;
       } else {
+        newCardsCount += 1;
         user.album.push({
           card: { ...card, id: cardId },
           quantity: 1,
@@ -110,11 +114,35 @@ export class LocalJsonRepository implements IUserRepository {
       }
     });
 
+    // 1. Calcular XP obtenida:
+    const xpFromPack = 50;
+    const xpFromNewCards = newCardsCount * 20;
+    const totalXpGained = xpFromPack + xpFromNewCards;
+
+    // 2. Procesar progresión y subidas de nivel
+    let currentLevel = user.level ?? 1;
+    let currentXp = user.xp ?? 0;
+    let newXp = currentXp + totalXpGained;
+    let newLevel = currentLevel;
+
+    while (true) {
+      const xpNeeded = 100 + (newLevel - 1) * 50;
+      if (newXp >= xpNeeded) {
+        newXp -= xpNeeded;
+        newLevel += 1;
+      } else {
+        break;
+      }
+    }
+
+    user.level = newLevel;
+    user.xp = newXp;
+
     if (user.packsAvailable > 0) user.packsAvailable -= 1;
 
     this.writeData(data);
     
-    console.log(`💾 DB: Álbum de [${user.userId}] actualizado. Total: ${user.album.length} cartas.`);
+    console.log(`💾 DB: Álbum de [${user.userId}] actualizado. Total: ${user.album.length} cartas. Level: ${newLevel}, XP: ${newXp}`);
     return user;
   }
 

@@ -34,9 +34,12 @@ app.get('/health', (_req, res) => {
 app.post('/api/auth/register', (req, res) => authController.register(req, res));
 app.post('/api/auth/login', (req, res) => authController.login(req, res));
 
-// Rutas protegidas (Requieren token para que no cualquiera abra sobres)
+// Rutas protegidas (Requieren token para que no cualquiera abra sobres o reclame gratis)
 app.post('/api/packs/open', authMiddleware, (req, res) => packController.openPack(req as any, res));
+app.post('/api/packs/claim-daily', authMiddleware, (req, res) => packController.claimDailyPacks(req as any, res));
 app.get('/api/user/album', authMiddleware, (req, res) => albumController.getAlbum(req as any, res));
+app.post('/api/user/favorite', authMiddleware, (req, res) => albumController.setFavoriteCard(req as any, res));
+app.get('/api/mural', (req, res) => albumController.getMural(req, res));
 
 app.listen(PORT, () => {
   console.log(`🚀 TCG Backend corriendo en el puerto ${PORT}`);

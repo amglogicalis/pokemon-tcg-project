@@ -54,6 +54,8 @@ export class MongoUserRepository implements IUserRepository {
       throw new Error(`Usuario ${userId} no encontrado para añadir cartas.`);
     }
 
+    let newCardsCount = 0;
+
     newCards.forEach(card => {
       const cardId = String(card.id).trim();
       const existingEntry = userDoc.album.find(e => String(e.card.id).trim() === cardId);
@@ -61,6 +63,7 @@ export class MongoUserRepository implements IUserRepository {
       if (existingEntry) {
         existingEntry.quantity += 1;
       } else {
+        newCardsCount += 1;
         userDoc.album.push({
           card: { ...card, id: cardId },
           quantity: 1,
@@ -69,10 +72,36 @@ export class MongoUserRepository implements IUserRepository {
       }
     });
 
+    // 1. Calcular XP obtenida:
+    // - Abrir el sobre: 50 XP
+    // - Cada carta nueva coleccionada: 20 XP
+    const xpFromPack = 50;
+    const xpFromNewCards = newCardsCount * 20;
+    const totalXpGained = xpFromPack + xpFromNewCards;
+
+    // 2. Procesar progresión y subidas de nivel
+    let currentLevel = userDoc.level ?? 1;
+    let currentXp = userDoc.xp ?? 0;
+    let newXp = currentXp + totalXpGained;
+    let newLevel = currentLevel;
+
+    while (true) {
+      const xpNeeded = 100 + (newLevel - 1) * 50;
+      if (newXp >= xpNeeded) {
+        newXp -= xpNeeded;
+        newLevel += 1;
+      } else {
+        break;
+      }
+    }
+
+    userDoc.level = newLevel;
+    userDoc.xp = newXp;
+
     if (userDoc.packsAvailable > 0) userDoc.packsAvailable -= 1;
 
     await userDoc.save();
-    console.log(`💾 DB Mongo: Álbum de [${userId}] actualizado. Total: ${userDoc.album.length} cartas unicas.`);
+    console.log(`💾 DB Mongo: Álbum de [${userId}] actualizado. Total: ${userDoc.album.length} cartas unicas. Level: ${newLevel}, XP: ${newXp} (Gained: ${totalXpGained} XP)`);
     
     return userDoc.toObject() as User;
   }

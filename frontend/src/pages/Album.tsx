@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import api from '../services/api';
 import { rarityStyles } from '../constants/rarities';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuthStore } from '../store/useAuthStore';
 
 interface AlbumEntry {
   card: {
@@ -19,7 +20,7 @@ type SortOrder = 'recent' | 'id' | 'rarity' | 'hp';
 
 // 1. Definición de expansiones
 const EXPANSIONS = { 
-  sm3: { id: 'sm3', name: 'Burning Shadows', total: 177, color: 'text-red-950', bar: 'from-red-950 to-red-950' },
+  sm3: { id: 'sm3', name: 'Burning Shadows', total: 177, color: 'text-red-800', bar: 'from-red-900 to-red-600' },
   dp6: { id: 'card', name: 'Legends Awakened', total: 146, color: 'text-yellow-400', bar: 'from-yellow-600 to-yellow-200' },
   bw9: { id: 'bw9', name: 'Plasma Blast', total: 122, color: 'text-blue-400', bar: 'from-blue-600 to-blue-300' },
   xyp: { id: 'xyp', name: 'XY Black Star Promos', total: 208, color: 'text-red-500', bar: 'from-red-700 to-red-400' },
@@ -32,6 +33,8 @@ export default function Album() {
   const [sortBy, setSortBy] = useState<SortOrder>('recent');
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<keyof typeof EXPANSIONS>('dp6');
+  const [favoriteCardId, setFavoriteCardId] = useState<string | null>(null);
+  const [settingFavorite, setSettingFavorite] = useState(false);
 
   const albumMusicRef = useRef<HTMLAudioElement | null>(null);
 
@@ -64,7 +67,13 @@ export default function Album() {
     const fetchAlbum = async () => {
       try {
         const response = await api.get('/user/album');
-        setEntries(response.data.album || []); 
+        setEntries(response.data.album || []);
+        setFavoriteCardId(response.data.favoriteCardId || null);
+        
+        // Actualizar nivel y experiencia en el store global
+        if (response.data.level !== undefined && response.data.xp !== undefined) {
+          useAuthStore.getState().updateUserStats(response.data.level, response.data.xp);
+        }
       } catch (error) {
         console.error("Error cargando álbum:", error);
       } finally {
@@ -73,6 +82,27 @@ export default function Album() {
     };
     fetchAlbum();
   }, []);
+
+  const handleSetFavorite = async (cardId: string) => {
+    if (settingFavorite) return;
+    setSettingFavorite(true);
+    const isCurrentFavorite = favoriteCardId === cardId;
+    try {
+      // Si ya es la favorita, mandamos null para desmarcarla
+      await api.post('/user/favorite', { cardId: isCurrentFavorite ? null : cardId });
+      setFavoriteCardId(isCurrentFavorite ? null : cardId);
+      playSfx('/sounds/select.mp3');
+    } catch (error) {
+      console.error('Error al cambiar estado de favorita:', error);
+    } finally {
+      setSettingFavorite(false);
+    }
+  };
+
+  const playSfx = (path: string) => {
+    const audio = new Audio(path);
+    audio.play().catch(() => {});
+  };
 
   const stats = useMemo(() => {
     const currentExp = EXPANSIONS[activeTab];
@@ -136,7 +166,14 @@ export default function Album() {
   if (loading) return <div className="p-10 text-center text-white italic">Cargando colección...</div>;
 
   return (
-    <div className="p-10 min-h-screen bg-gray-900 text-white relative overflow-x-hidden">
+    <div 
+      className="p-10 min-h-screen bg-gray-900 text-white relative overflow-x-hidden"
+      onClick={() => {
+        if (albumMusicRef.current && albumMusicRef.current.paused) {
+          albumMusicRef.current.play().catch(() => {});
+        }
+      }}
+    >
       
       <AnimatePresence>
         {currentBgEffect === 'ultra' && (
@@ -545,16 +582,37 @@ export default function Album() {
                     </>
                   )}
 
+                  {/* Quantity badge */}
                   <div className="absolute -top-1 -right-1 bg-yellow-500 text-black font-black w-6 h-6 flex items-center justify-center rounded-full z-40 border-2 border-gray-900 text-[9px] shadow-xl">
                     x{entry.quantity}
                   </div>
 
-                  <img src={entry.card.imageUrl} alt={entry.card.name} className={`w-full h-auto aspect-[2/3] object-contain relative z-10 transition-all duration-500 ${!isSelected ? 'grayscale-[0.5] opacity-60' : 'drop-shadow-2xl grayscale-0 opacity-100'}`} />
+                  {/* Favorite star badge */}
+                  {favoriteCardId === entry.card.id && (
+                    <div className="absolute -top-1 -left-1 bg-yellow-500 text-black font-black w-6 h-6 flex items-center justify-center rounded-full z-40 border-2 border-gray-900 text-[10px] shadow-xl">
+                      ⭐
+                    </div>
+                  )}
 
-                  <div className="mt-auto text-center relative z-20">
-                    <p className={`font-bold text-[9px] uppercase truncate tracking-widest leading-none mb-1 ${isSelected ? 'text-white' : 'text-gray-500'}`}>{entry.card.name}</p>
+                  <img src={entry.card.imageUrl} alt={entry.card.name} className={`w-full flex-1 min-h-0 object-contain mb-3 relative z-10 transition-all duration-500 ${!isSelected ? 'grayscale-[0.5] opacity-60' : 'drop-shadow-2xl grayscale-0 opacity-100'}`} />
+
+                  <div className="mt-auto text-center relative z-20 pt-1">
+                    <p className={`font-bold text-[9px] uppercase truncate tracking-widest leading-none mb-2 ${isSelected ? 'text-white' : 'text-gray-500'}`}>{entry.card.name}</p>
                     {isSelected && (
-                      <span className={`text-[7px] px-2 py-0.5 rounded-full border ${style.border} ${style.text} bg-black/60 font-black tracking-tighter inline-block uppercase`}>{entry.card.rarity}</span>
+                      <>
+                        <span className={`text-[7px] px-2 py-0.5 rounded-full border ${style.border} ${style.text} bg-black/60 font-black tracking-tighter inline-block uppercase`}>{entry.card.rarity}</span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleSetFavorite(entry.card.id); }}
+                          disabled={settingFavorite}
+                          className={`mt-2 block w-full text-[8px] font-black uppercase tracking-widest py-1 px-2 rounded-full transition-all duration-200
+                            ${favoriteCardId === entry.card.id
+                              ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/50 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/50 cursor-pointer shadow-[0_0_10px_rgba(234,179,8,0.15)]'
+                              : 'bg-white/5 hover:bg-yellow-500/20 hover:text-yellow-400 text-gray-400 border border-white/10 hover:border-yellow-500/50 cursor-pointer'
+                            } disabled:opacity-50 disabled:cursor-wait`}
+                        >
+                          {favoriteCardId === entry.card.id ? '⭐ Favorita (Quitar)' : settingFavorite ? '...' : '☆ Marcar favorita'}
+                        </button>
+                      </>
                     )}
                   </div>
                 </motion.div>

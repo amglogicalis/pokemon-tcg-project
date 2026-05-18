@@ -36,6 +36,8 @@ export class AuthService {
       packsAvailable: INITIAL_PACKS,
       album: [],
       createdAt: new Date().toISOString(),
+      level: 1,
+      xp: 0
     };
 
     await this.userRepo.save(newUser);
@@ -74,6 +76,9 @@ export class AuthService {
       username: user.username,
       packsAvailable: user.packsAvailable,
       totalCards: user.album.reduce((sum, e) => sum + e.quantity, 0),
+      level: user.level ?? 1,
+      xp: user.xp ?? 0,
+      lastPackClaimedAt: user.lastPackClaimedAt
     };
   }
 }

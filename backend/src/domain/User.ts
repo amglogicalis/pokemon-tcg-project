@@ -7,6 +7,10 @@ export interface User {
   packsAvailable: number;
   album: AlbumEntry[];
   createdAt: string;    // ISO 8601
+  favoriteCardId?: string;
+  level?: number;
+  xp?: number;
+  lastPackClaimedAt?: string; // ISO 8601 de la última recarga diaria de 10 sobres
 }
 
 // Lo que devolvemos al cliente (sin datos sensibles)
@@ -15,6 +19,9 @@ export interface PublicUser {
   username: string;
   packsAvailable: number;
   totalCards: number;
+  level: number;
+  xp: number;
+  lastPackClaimedAt?: string;
 }
 
 // Payload dentro del JWT

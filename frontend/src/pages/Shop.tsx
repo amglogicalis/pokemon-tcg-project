@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import api from '../services/api';
 import { rarityStyles } from '../constants/rarities';
 import BoosterPack from '../components/BoosterPack';
 import { motion, AnimatePresence } from 'framer-motion';
+import { homeMusic, packMusic } from '../services/music';
+import { useAuthStore } from '../store/useAuthStore';
 
 const rarityWeight: Record<string, number> = {
   'common': 1, 'uncommon': 2, 'rare': 3, 'holographic': 4, 'ultra-rare': 5, 'ultra rare': 5, 'shiny': 6, 'secret': 7, 'super-secret': 8, 'super secret': 8, 'ultra-secret': 9, 'ultra secret': 9
 };
 
 const EXPANSIONS = [ 
-  { id: 'sm3', name: 'BURNING SHADOWS', color: 'text-red-950' }, 
+  { id: 'sm3', name: 'BURNING SHADOWS', color: 'text-red-800' }, 
   { id: 'dp6', name: 'Legends Awakened', color: 'text-yellow-500' },
   { id: 'bw9', name: 'Plasma Blast', color: 'text-blue-400' },
   { id: '621', name: 'XY Black Star Promos', color: 'text-red-500' },
@@ -23,8 +25,75 @@ export default function Shop() {
   const [revealedCount, setRevealedCount] = useState(0);
   const [selectedExp, setSelectedExp] = useState('dp6');
 
-  const homeMusicRef = useRef<HTMLAudioElement | null>(null);
-  const packMusicRef = useRef<HTMLAudioElement | null>(null);
+  // Daily pack claims integration
+  const user = useAuthStore((s) => s.user);
+  const updatePacksAvailable = useAuthStore((s) => s.updatePacksAvailable);
+  const [timeRemaining, setTimeRemaining] = useState<number>(0);
+  const [claimLoading, setClaimLoading] = useState(false);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user?.lastPackClaimedAt) {
+      setTimeRemaining(0);
+      return;
+    }
+
+    const calculateRemaining = () => {
+      const COOLDOWN_MS = 24 * 60 * 60 * 1000;
+      const lastClaimed = new Date(user.lastPackClaimedAt!).getTime();
+      const elapsed = Date.now() - lastClaimed;
+      const remaining = COOLDOWN_MS - elapsed;
+      return remaining > 0 ? remaining : 0;
+    };
+
+    setTimeRemaining(calculateRemaining());
+
+    const interval = setInterval(() => {
+      const remaining = calculateRemaining();
+      setTimeRemaining(remaining);
+      if (remaining <= 0) {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [user?.lastPackClaimedAt]);
+
+  const handleClaimDaily = async () => {
+    if (claimLoading || timeRemaining > 0) return;
+    setClaimLoading(true);
+    try {
+      playSfx('/sounds/select.mp3');
+      const response = await api.post('/packs/claim-daily');
+      
+      updatePacksAvailable(response.data.packsAvailable, response.data.lastPackClaimedAt);
+      
+      playSfx('/sounds/shiny-pull.mp3');
+      
+      setToastMsg('¡Energía cósmica canalizada! Has recibido +10 sobres.');
+      setTimeout(() => setToastMsg(null), 4000);
+    } catch (error: any) {
+      const errMsg = error.response?.data?.error || 'Error al recargar los sobres.';
+      setToastMsg(`⚠️ ${errMsg}`);
+      setTimeout(() => setToastMsg(null), 4000);
+    } finally {
+      setClaimLoading(false);
+    }
+  };
+
+  const formatTime = (ms: number) => {
+    const totalSeconds = Math.ceil(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return [
+      String(hours).padStart(2, '0'),
+      String(minutes).padStart(2, '0'),
+      String(seconds).padStart(2, '0')
+    ].join(':');
+  };
+
+  // Refs eliminados: ahora usamos el singleton de music.ts
 
   useEffect(() => {
     if (loading || (showCards && revealedCount < 5)) {
@@ -62,47 +131,26 @@ export default function Shop() {
     audio.play().catch(() => {});
   };
 
-  useEffect(() => {
-    homeMusicRef.current = new Audio('/sounds/home-music.mp3');
-    homeMusicRef.current.loop = true;
-    homeMusicRef.current.volume = 0.35;
-
-    packMusicRef.current = new Audio('/sounds/while-op-pack.mp3');
-    packMusicRef.current.loop = true;
-    packMusicRef.current.volume = 0.35;
-
-    return () => {
-      if (homeMusicRef.current) {
-        homeMusicRef.current.pause();
-        homeMusicRef.current = null;
-      }
-      if (packMusicRef.current) {
-        packMusicRef.current.pause();
-        packMusicRef.current = null;
-      }
-    };
-  }, []);
-
+  // Gestión de música usando el singleton de music.ts.
+  // Aquí gestionamos el switch home ↔ pack al abrir sobres.
   useEffect(() => {
     const isOpening = loading || showCards;
-    
+
     if (isOpening) {
-      if (homeMusicRef.current) {
-        homeMusicRef.current.pause();
-        homeMusicRef.current.currentTime = 0;
-      }
-      if (packMusicRef.current) {
-        packMusicRef.current.play().catch(err => console.log('Autoplay blocked:', err));
-      }
+      homeMusic.pause();
+      homeMusic.currentTime = 0;
+      packMusic.play().catch(() => {});
     } else {
-      if (packMusicRef.current) {
-        packMusicRef.current.pause();
-        packMusicRef.current.currentTime = 0;
-      }
-      if (homeMusicRef.current) {
-        homeMusicRef.current.play().catch(err => console.log('Autoplay blocked:', err));
-      }
+      packMusic.pause();
+      packMusic.currentTime = 0;
+      homeMusic.play().catch(() => {});
     }
+
+    return () => {
+      // Al desmontar (navegar a otra vista): pausar todo
+      homeMusic.pause();
+      packMusic.pause();
+    };
   }, [loading, showCards]);
 
   const handleOpenPack = async () => {
@@ -117,6 +165,15 @@ export default function Shop() {
 
     try {
       const response = await api.post('/packs/open', { expansion: selectedExp });
+      
+      // Actualizar nivel, experiencia y sobres restantes en el store global
+      if (response.data.level !== undefined && response.data.xp !== undefined) {
+        useAuthStore.getState().updateUserStats(response.data.level, response.data.xp);
+      }
+      if (response.data.packsRemaining !== undefined) {
+        updatePacksAvailable(response.data.packsRemaining);
+      }
+
       const cards = response.data.cards.sort((a: any, b: any) => 
         (rarityWeight[a.rarity.toLowerCase()] || 0) - (rarityWeight[b.rarity.toLowerCase()] || 0)
       );
@@ -201,7 +258,15 @@ export default function Shop() {
   return (
     <div 
       className="relative min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 select-none overflow-hidden"
-      onClick={() => showCards && revealedCount < 5 && nextCard()}
+      onClick={() => {
+        const isOpening = loading || showCards;
+        if (!isOpening && homeMusic.paused) {
+          homeMusic.play().catch(() => {});
+        }
+        if (showCards && revealedCount < 5) {
+          nextCard();
+        }
+      }}
     >
       {/* FONDO BASE LIMPIO */}
       <div className="fixed inset-0 pointer-events-none z-0 shadow-[inset_0_0_500px_rgba(0,0,0,0.8)] bg-gray-900" />
@@ -401,8 +466,63 @@ export default function Shop() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
-            className="flex flex-col items-center z-10"
+            className="flex flex-col items-center z-10 w-full"
           >
+            {/* Consola de Control de Sobres: Contador y Botón de Recarga Neutro y Elegante */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 bg-black/45 backdrop-blur-xl border border-white/10 p-4 px-6 rounded-2xl shadow-xl w-full max-w-xl mb-8">
+              
+              {/* Izquierda: Sobres Disponibles */}
+              <div className="flex flex-col items-center sm:items-start">
+                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 mb-0.5">
+                  Sobres Disponibles
+                </span>
+                <motion.span 
+                  key={user?.packsAvailable}
+                  initial={{ scale: 0.8, opacity: 0.5 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="text-3xl font-black bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(234,179,8,0.35)]"
+                >
+                  {user?.packsAvailable ?? 0}
+                </motion.span>
+              </div>
+
+              {/* Derecha: Botón de Recarga Neutro */}
+              <div className="flex flex-col items-center sm:items-end">
+                <motion.button
+                  onClick={handleClaimDaily}
+                  disabled={claimLoading || timeRemaining > 0}
+                  whileHover={timeRemaining === 0 ? { scale: 1.02 } : {}}
+                  whileTap={timeRemaining === 0 ? { scale: 0.98 } : {}}
+                  className={`relative px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-[0.1em] transition-all duration-300 flex items-center gap-2 border shadow-lg ${
+                    timeRemaining > 0
+                      ? 'bg-gray-800/40 border-white/5 text-gray-500 cursor-not-allowed min-w-[210px] justify-center'
+                      : 'bg-yellow-500 hover:bg-yellow-400 border-yellow-400 text-black shadow-[0_0_15px_rgba(234,179,8,0.25)] hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] active:scale-95'
+                  }`}
+                >
+                  {timeRemaining > 0 ? (
+                    <>
+                      <span>🔒</span>
+                      <span>Disponible en {formatTime(timeRemaining)}</span>
+                    </>
+                  ) : claimLoading ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                      <span>Recargando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>⚡</span>
+                      <span>Recargar +10 Sobres</span>
+                    </>
+                  )}
+                </motion.button>
+                <span className="text-[8px] text-gray-500 font-bold uppercase tracking-wider mt-1.5 text-center sm:text-right">
+                  {timeRemaining > 0 ? 'Una recarga cada 24 horas' : 'Recarga gratuita disponible ya'}
+                </span>
+              </div>
+
+            </div>
+
             <div className="flex gap-6 mb-12 bg-black/30 p-2 px-6 rounded-full border border-white/5 backdrop-blur-xl">
               {EXPANSIONS.map((exp) => (
                 <button
@@ -638,6 +758,24 @@ export default function Shop() {
                 );
               })}
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Floating Toast Notification Alert */}
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 p-4 px-6 rounded-2xl border text-xs font-black uppercase tracking-wider backdrop-blur-xl shadow-[0_15px_40px_rgba(0,0,0,0.6)] ${
+              toastMsg.startsWith('⚠️')
+                ? 'bg-red-950/80 border-red-500/30 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
+                : 'bg-emerald-950/80 border-emerald-500/30 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
+            }`}
+          >
+            {toastMsg}
           </motion.div>
         )}
       </AnimatePresence>

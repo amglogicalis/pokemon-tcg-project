@@ -17,8 +17,11 @@ const UserSchema = new Schema<IUserDocument>({
   passwordHash: { type: String, required: true },
   packsAvailable: { type: Number, required: true, default: 10 },
   album: { type: [AlbumEntrySchema], default: [] },
-  createdAt: { type: String, required: true, default: () => new Date().toISOString() }
+  createdAt: { type: String, required: true, default: () => new Date().toISOString() },
+  favoriteCardId: { type: String, required: false },
+  level: { type: Number, required: true, default: 1 },
+  xp: { type: Number, required: true, default: 0 },
+  lastPackClaimedAt: { type: String, required: false }
 });
 
 export const UserModel = mongoose.model<IUserDocument>('User', UserSchema);
-
