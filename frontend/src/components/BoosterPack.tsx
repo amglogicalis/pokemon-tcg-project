@@ -82,23 +82,79 @@ export default function BoosterPack({ onOpen, isLoading, expansionId }: BoosterP
         </>
       )}
 
-      {/* Efecto de explosión de luz cuando se abre el sobre */}
+      {/* Animación Épica del Vórtice de Invocación */}
       {isRipped && (
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 2 }}
-          className={`absolute inset-0 ${packConfig.glow} blur-3xl rounded-full z-40 opacity-40`}
-        />
-      )}
-      
-      {/* Rueda de carga mientras el backend genera las cartas */}
-      {isLoading && !isRipped && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] z-50 rounded-2xl">
-           <motion.div 
-             animate={{ rotate: 360 }}
-             transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-             className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full"
-           />
+        <div className="absolute inset-0 flex items-center justify-center z-40">
+          {/* Fogonazo inicial al romperse (enmascara la desaparición del sobre) */}
+          <motion.div 
+            initial={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: 0, scale: 4 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="absolute inset-0 bg-white rounded-full blur-2xl z-50 pointer-events-none"
+          />
+
+          {/* Anillo de energía exterior rotando (El Vórtice) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: [1, 1.15, 1], rotate: 360 }}
+            transition={{ 
+              opacity: { duration: 0.4 },
+              scale: { repeat: Infinity, duration: 1.5, ease: "easeInOut" },
+              rotate: { repeat: Infinity, duration: 3, ease: "linear" }
+            }}
+            className="absolute w-56 h-56 rounded-full border-[6px] border-dashed border-white/30 z-40"
+            style={{ borderTopColor: 'white', borderBottomColor: 'white' }}
+          />
+
+          {/* Anillo de energía interior rápido en sentido inverso */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: [1, 0.85, 1], rotate: -360 }}
+            transition={{ 
+              opacity: { duration: 0.4 },
+              scale: { repeat: Infinity, duration: 1.5, ease: "easeInOut", delay: 0.2 },
+              rotate: { repeat: Infinity, duration: 1.5, ease: "linear" }
+            }}
+            className="absolute w-40 h-40 rounded-full border-4 border-white/50 z-40"
+            style={{ borderLeftColor: 'transparent', borderRightColor: 'transparent' }}
+          />
+
+          {/* Núcleo de energía pulsante (Color de la expansión) */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: [0.5, 0.9, 0.5], scale: [0.8, 1.4, 0.8] }}
+            transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
+            className={`absolute w-32 h-32 rounded-full ${packConfig.glow} blur-2xl z-30`}
+          />
+
+          {/* Brillo intenso central (Núcleo caliente) */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.8, 1, 0.8], scale: [0.9, 1.2, 0.9] }}
+            transition={{ repeat: Infinity, duration: 0.6, ease: "easeInOut" }}
+            className="absolute w-16 h-16 bg-white rounded-full blur-md z-50"
+          />
+          
+          {/* Partículas de energía/chispas saliendo del vórtice */}
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={`spark-${i}`}
+              initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
+              animate={{ 
+                x: (Math.random() - 0.5) * 300, 
+                y: (Math.random() - 0.5) * 300, 
+                opacity: [0, 1, 0],
+                scale: [0, Math.random() * 1.5 + 0.5, 0]
+              }}
+              transition={{ 
+                repeat: Infinity, 
+                duration: 0.8 + Math.random(), 
+                delay: Math.random() * 0.5,
+                ease: "easeOut" 
+              }}
+              className="absolute w-2 h-2 bg-white rounded-full blur-[1px] z-50 shadow-[0_0_10px_#fff]"
+            />
+          ))}
         </div>
       )}
     </div>

@@ -466,7 +466,7 @@ export default function Shop() {
             key="setup"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
+            exit={{ opacity: 0, scale: 2, filter: 'blur(30px) brightness(200%)', transition: { duration: 0.4, ease: "easeIn" } }}
             className="flex flex-col items-center z-10 w-full"
           >
             {/* Consola de Control de Sobres: Contador y Botón de Recarga Neutro y Elegante */}
