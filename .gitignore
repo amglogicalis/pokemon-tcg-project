@@ -9,4 +9,10 @@ dist/
 # Archivos de sistema
 .DS_Store
 Thumbs.db
-pw.txt
+
+# Extra
+
+programs/
+backups/
+guia_comandos.txt
+
