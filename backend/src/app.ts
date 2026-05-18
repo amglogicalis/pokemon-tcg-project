@@ -34,13 +34,25 @@ const app = express();
 const PORT = process.env.PORT ?? 3001;
 const IS_PROD = process.env.NODE_ENV === 'production';
 
+// ─── CONFIANZA EN PROXIES (Necesario para Render) ────────────────────────────
+// Permite que el rate-limiter lea la IP real del usuario en lugar de la del balanceador
+app.set('trust proxy', 1);
+
 // ─── 1. CABECERAS DE SEGURIDAD HTTP (HELMET) ─────────────────────────────────
 app.use(helmet());
 
-// ─── 2. CONEXIÓN A MONGODB ────────────────────────────────────────────────────
+// ─── 2. CORS (solo orígenes autorizados) - DEBE IR ANTES DEL RATE LIMITER ────
+const allowedOrigins = [
+  'http://localhost:5173',
+  process.env.FRONTEND_URL || ''
+].filter(Boolean);
+
+app.use(cors({ origin: allowedOrigins, credentials: true }));
+
+// ─── 3. CONEXIÓN A MONGODB ────────────────────────────────────────────────────
 connectDB();
 
-// ─── 3. RATE LIMITERS (ANTI DDOS Y BRUTE FORCE) ──────────────────────────────
+// ─── 4. RATE LIMITERS (ANTI DDOS Y BRUTE FORCE) ──────────────────────────────
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 150,
@@ -58,14 +70,6 @@ const authLimiter = rateLimit({
 });
 
 app.use(globalLimiter);
-
-// ─── 4. CORS (solo orígenes autorizados) ─────────────────────────────────────
-const allowedOrigins = [
-  'http://localhost:5173',
-  process.env.FRONTEND_URL || ''
-].filter(Boolean);
-
-app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 // ─── 5. PARSERS ───────────────────────────────────────────────────────────────
 app.use(cookieParser());
