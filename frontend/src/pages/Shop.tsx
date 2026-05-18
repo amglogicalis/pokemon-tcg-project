@@ -524,12 +524,12 @@ export default function Shop() {
 
             </div>
 
-            <div className="flex gap-6 mb-12 bg-black/30 p-2 px-6 rounded-full border border-white/5 backdrop-blur-xl">
+            <div className="flex gap-6 mb-12 bg-black/30 p-2 px-6 rounded-full border border-white/5 backdrop-blur-xl overflow-x-auto whitespace-nowrap scrollbar-hide max-w-full">
               {EXPANSIONS.map((exp) => (
                 <button
                   key={exp.id}
                   onClick={() => { playSelect(); setSelectedExp(exp.id); }}
-                  className={`py-2 text-[10px] font-black uppercase tracking-widest transition-all ${
+                  className={`py-2 text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
                     selectedExp === exp.id ? exp.color : 'text-gray-500 hover:text-gray-300'
                   }`}
                 >

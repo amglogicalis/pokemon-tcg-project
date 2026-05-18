@@ -368,12 +368,12 @@ export default function Album() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         
-        <div className="flex gap-6 mb-8 justify-center md:justify-start">
+        <div className="flex gap-6 mb-8 justify-center md:justify-start overflow-x-auto whitespace-nowrap scrollbar-hide max-w-full">
           {(Object.keys(EXPANSIONS) as Array<keyof typeof EXPANSIONS>).map((key) => (
             <button
               key={key}
               onClick={() => { playSelect(); setActiveTab(key); setSelectedCardId(null); }}
-              className={`pb-2 px-4 font-black uppercase tracking-widest text-xs transition-all border-b-2 
+              className={`pb-2 px-4 font-black uppercase tracking-widest text-xs transition-all border-b-2 whitespace-nowrap
                 ${activeTab === key ? `${EXPANSIONS[key].color} border-current` : 'text-gray-600 border-transparent hover:text-gray-400'}`}
             >
               {EXPANSIONS[key].name}

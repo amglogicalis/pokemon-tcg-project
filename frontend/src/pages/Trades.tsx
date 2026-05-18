@@ -284,7 +284,7 @@ export default function Trades() {
         </div>
 
         {/* Pestanas de Navegacion */}
-        <div className="flex bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-md">
+        <div className="flex bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-md overflow-x-auto whitespace-nowrap scrollbar-hide max-w-full">
           <button
             onClick={() => { playSfx('/sounds/select.mp3'); setActiveTab('public'); }}
             className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all ${
@@ -609,7 +609,7 @@ export default function Trades() {
         <div className="space-y-6">
           
           {/* Sub-Tabs: Recibidas / Enviadas */}
-          <div className="flex gap-4 border-b border-white/5 pb-4">
+          <div className="flex gap-4 border-b border-white/5 pb-4 overflow-x-auto whitespace-nowrap scrollbar-hide max-w-full">
             <button
               onClick={() => { playSfx('/sounds/select.mp3'); setOffersTab('received'); }}
               className={`pb-1 text-xs font-black uppercase tracking-wider transition-all border-b-2 ${

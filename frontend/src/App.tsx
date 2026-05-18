@@ -14,6 +14,7 @@ export default function App() {
   const user = useAuthStore((s) => s.user);
   const updateUserStats = useAuthStore((s) => s.updateUserStats);
   const [view, setView] = useState<'shop' | 'album' | 'mural' | 'trades'>('shop');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // --- Sistema de Notificaciones ---
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -88,8 +89,19 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-900 text-white w-full font-sans">
       {/* Navbar con estilo mejorado para resaltar la navegación */}
-      <nav className="bg-gray-800/50 backdrop-blur-md sticky top-0 z-50 p-4 flex justify-between items-center border-b border-white/10 shadow-2xl">
-        <div className="flex gap-4">
+      <nav className="bg-gray-800/50 backdrop-blur-md sticky top-0 z-50 p-4 border-b border-white/10 shadow-2xl flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
+        <div className="flex justify-between items-center w-full md:w-auto">
+          {/* Mobile Hamburger Button */}
+          <button 
+            onClick={() => { playSelect(); setIsMobileMenuOpen(!isMobileMenuOpen); }}
+            className="md:hidden p-2 text-gray-400 hover:text-white transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"} /></svg>
+          </button>
+        </div>
+
+        {/* Desktop Nav */}
+        <div className="hidden md:flex gap-4">
           <button 
             onClick={() => { playSelect(); setView('shop'); }} 
             className={`px-6 py-2 rounded-full transition-all duration-300 ${
@@ -225,6 +237,44 @@ export default function App() {
             Salir
           </button>
         </div>
+
+        {/* Mobile Nav Menu Dropdown */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden w-full flex flex-col gap-2 mt-2 pt-2 border-t border-white/10 animate-fadeIn">
+            <button 
+              onClick={() => { playSelect(); setView('shop'); setIsMobileMenuOpen(false); }} 
+              className={`px-4 py-2 rounded-lg text-left transition-colors ${
+                view === 'shop' ? 'bg-yellow-500/20 text-yellow-500 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              Tienda
+            </button>
+            <button 
+              onClick={() => { playSelect(); setView('album'); setIsMobileMenuOpen(false); }} 
+              className={`px-4 py-2 rounded-lg text-left transition-colors ${
+                view === 'album' ? 'bg-yellow-500/20 text-yellow-500 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              Mi Álbum
+            </button>
+            <button 
+              onClick={() => { playSelect(); setView('mural'); setIsMobileMenuOpen(false); }} 
+              className={`px-4 py-2 rounded-lg text-left transition-colors ${
+                view === 'mural' ? 'bg-yellow-500/20 text-yellow-500 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              Mural
+            </button>
+            <button 
+              onClick={() => { playSelect(); setView('trades'); setIsMobileMenuOpen(false); }} 
+              className={`px-4 py-2 rounded-lg text-left transition-colors ${
+                view === 'trades' ? 'bg-yellow-500/20 text-yellow-500 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              Intercambios
+            </button>
+          </div>
+        )}
       </nav>
 
       <main className="container mx-auto p-4 animate-fadeIn">
