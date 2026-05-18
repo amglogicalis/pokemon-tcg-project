@@ -15,6 +15,48 @@ export default function App() {
   const updateUserStats = useAuthStore((s) => s.updateUserStats);
   const [view, setView] = useState<'shop' | 'album' | 'mural' | 'trades'>('shop');
 
+  // --- Sistema de Notificaciones ---
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+  
+  const unreadCount = notifications.filter(n => n.status === 'unread').length;
+
+  const fetchNotifications = async () => {
+    if (!isAuthenticated) return;
+    try {
+      const res = await api.get('/notifications');
+      setNotifications(res.data);
+    } catch (err) {
+      console.error("Error al obtener notificaciones:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 15000); // Polling cada 15 segundos
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await api.post('/notifications/read');
+      setNotifications(prev => prev.map(n => ({ ...n, status: 'read' })));
+    } catch (err) {
+      console.error("Error al marcar como leídas:", err);
+    }
+  };
+
+  const handleClearNotifications = async () => {
+    try {
+      await api.post('/notifications/clear');
+      setNotifications([]);
+      setShowNotifDropdown(false);
+    } catch (err) {
+      console.error("Error al borrar notificaciones:", err);
+    }
+  };
+  // ---------------------------------
+
   const playSelect = () => {
     const audio = new Audio('/sounds/select.mp3');
     audio.volume = 0.6;
@@ -110,6 +152,72 @@ export default function App() {
               </span>
             </div>
           )}
+
+          {/* Botón de Notificaciones */}
+          {user && (
+            <div className="relative">
+              <button
+                onClick={() => {
+                  playSelect();
+                  setShowNotifDropdown(!showNotifDropdown);
+                  if (unreadCount > 0 && !showNotifDropdown) {
+                    handleMarkAllAsRead();
+                  }
+                }}
+                className="relative p-2 rounded-full hover:bg-white/10 transition-colors"
+              >
+                <span className="text-xl">🔔</span>
+                {unreadCount > 0 && (
+                  <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border border-gray-900 text-[9px] font-black flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.8)]">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Dropdown Notificaciones (Glassmorphism) */}
+              {showNotifDropdown && (
+                <div className="absolute top-full right-0 mt-3 w-80 bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 z-50 flex flex-col gap-3">
+                  <div className="flex justify-between items-center mb-1 border-b border-white/10 pb-2">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-gray-400">Notificaciones</h3>
+                    {notifications.length > 0 && (
+                      <button 
+                        onClick={handleClearNotifications}
+                        className="text-[10px] text-red-400 hover:text-red-300 font-bold uppercase transition-colors"
+                      >
+                        Limpiar todo
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div className="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1">
+                    {notifications.length === 0 ? (
+                      <div className="text-center py-6 text-gray-500">
+                        <span className="text-2xl mb-2 block">📭</span>
+                        <p className="text-[10px] font-bold uppercase tracking-wider">No hay notificaciones</p>
+                      </div>
+                    ) : (
+                      notifications.map(notif => (
+                        <div 
+                          key={notif._id} 
+                          className={`p-3 rounded-xl text-xs leading-relaxed border ${
+                            notif.status === 'unread' 
+                            ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-100' 
+                            : 'bg-white/5 border-white/5 text-gray-300'
+                          }`}
+                        >
+                          {notif.message}
+                          <div className="text-[9px] text-gray-500 mt-1 uppercase font-bold text-right">
+                            {new Date(notif.createdAt).toLocaleString()}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <button 
             onClick={() => { playSelect(); logout(); }} 
             className="px-4 py-2 bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white rounded-lg transition-colors"

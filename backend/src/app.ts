@@ -5,6 +5,7 @@ import { AuthController } from './controllers/AuthController';
 import { PackController } from './controllers/PackController';
 import { AlbumController } from './controllers/AlbumController';
 import { TradeController } from './controllers/TradeController';
+import { NotificationController } from './controllers/NotificationController';
 import { authMiddleware } from './middleware/authMiddleware';
 import { connectDB } from './db';
 
@@ -27,6 +28,7 @@ const authController = new AuthController();
 const packController = new PackController(); 
 const albumController = new AlbumController();
 const tradeController = new TradeController();
+const notificationController = new NotificationController();
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -51,6 +53,11 @@ app.get('/api/trades/public', authMiddleware, (req, res) => tradeController.getP
 app.get('/api/trades/my-offers', authMiddleware, (req, res) => tradeController.getMyOffers(req as any, res));
 app.post('/api/trades/:id/accept', authMiddleware, (req, res) => tradeController.acceptTrade(req as any, res));
 app.post('/api/trades/:id/reject', authMiddleware, (req, res) => tradeController.rejectTrade(req as any, res));
+
+// Rutas de Notificaciones (Notifications)
+app.get('/api/notifications', authMiddleware, (req, res) => notificationController.getNotifications(req as any, res));
+app.post('/api/notifications/read', authMiddleware, (req, res) => notificationController.markAllAsRead(req as any, res));
+app.post('/api/notifications/clear', authMiddleware, (req, res) => notificationController.clearNotifications(req as any, res));
 
 app.listen(PORT, () => {
   console.log(`🚀 TCG Backend corriendo en el puerto ${PORT}`);

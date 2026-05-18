@@ -97,6 +97,7 @@ export default function Trades() {
   const [selectedReceiver, setSelectedReceiver] = useState<{ userId: string; username: string } | null>(null);
   const [selectedOfferCard, setSelectedOfferCard] = useState<any | null>(null);
   const [isPublicProposal, setIsPublicProposal] = useState(false);
+  const [offerSearchQuery, setOfferSearchQuery] = useState('');
 
   // Auxiliares de Sonidos
   const playSfx = (path: string) => {
@@ -507,9 +508,14 @@ export default function Trades() {
                           </div>
                           <div>
                             <h4 className="text-xs font-black text-white">{card.name}</h4>
-                            <span className={`text-[7px] font-black uppercase inline-block mt-0.5 px-2 py-0.5 rounded-full bg-black/60 border ${style.border} ${style.text}`}>
-                              {card.rarity}
-                            </span>
+                            <div className="flex gap-1.5 mt-0.5">
+                              <span className={`text-[7px] font-black uppercase inline-block px-2 py-0.5 rounded-full bg-black/60 border ${style.border} ${style.text}`}>
+                                {card.rarity}
+                              </span>
+                              <span className="text-[7px] font-black uppercase inline-block px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-400">
+                                {EXPANSIONS_LIST.find(e => e.id === card.expansion)?.name || card.expansion?.toUpperCase()}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       );
@@ -811,7 +817,12 @@ export default function Trades() {
             >
               {/* Botón cerrar */}
               <button
-                onClick={() => { playSfx('/sounds/select.mp3'); setSelectedReceiver(null); setIsPublicProposal(false); }}
+                onClick={() => {
+                  playSfx('/sounds/select.mp3');
+                  setSelectedReceiver(null);
+                  setIsPublicProposal(false);
+                  setOfferSearchQuery('');
+                }}
                 className="absolute right-4 top-4 text-gray-500 hover:text-white font-black uppercase tracking-wider text-xs"
               >
                 ✕ Cerrar
@@ -830,48 +841,66 @@ export default function Trades() {
                 </p>
               </div>
 
+              {/* Buscador de cartas a ofrecer */}
+              <div className="mb-4">
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar carta para ofrecer por nombre..."
+                  value={offerSearchQuery}
+                  onChange={(e) => setOfferSearchQuery(e.target.value)}
+                  className="w-full bg-black/50 border border-white/10 p-2.5 px-4 rounded-xl text-xs font-bold focus:border-yellow-500 focus:outline-none transition-colors text-white"
+                />
+              </div>
+
               {/* Grid de Cartas Disponibles para Ofrecer */}
               <div className="flex-1 overflow-y-auto min-h-[300px] pr-2 space-y-4">
-                {userAlbum.length === 0 ? (
+                {userAlbum.filter(entry => entry.card.name.toLowerCase().includes(offerSearchQuery.toLowerCase())).length === 0 ? (
                   <div className="text-center py-20 text-gray-500">
-                    <p className="text-xs font-bold uppercase tracking-wider">No tienes cartas en tu álbum para intercambiar</p>
+                    <p className="text-xs font-bold uppercase tracking-wider">No se encontraron cartas en tu álbum</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                    {userAlbum.map((entry) => {
-                      const card = entry.card;
-                      const quantity = entry.quantity;
-                      const style = rarityStyles[card.rarity.toLowerCase()] || rarityStyles.common;
-                      const isSelected = selectedOfferCard?.card.id === card.id;
+                    {userAlbum
+                      .filter(entry => entry.card.name.toLowerCase().includes(offerSearchQuery.toLowerCase()))
+                      .map((entry) => {
+                        const card = entry.card;
+                        const quantity = entry.quantity;
+                        const style = rarityStyles[card.rarity.toLowerCase()] || rarityStyles.common;
+                        const isSelected = selectedOfferCard?.card.id === card.id;
 
-                      return (
-                        <div
-                          key={card.id}
-                          onClick={() => { playSfx('/sounds/select.mp3'); setSelectedOfferCard(entry); }}
-                          className={`relative aspect-[2/3] p-2 border-2 rounded-xl flex flex-col justify-between cursor-pointer transition-all duration-300 ${
-                            isSelected
-                              ? 'border-yellow-500 bg-yellow-500/10 scale-105 shadow-[0_0_15px_rgba(234,179,8,0.25)]'
-                              : 'border-white/5 hover:border-white/20 bg-black/40'
-                          }`}
-                        >
-                          {/* Insignia de Cantidad */}
-                          <span className="absolute top-1 right-1 px-2 py-0.5 rounded-full bg-black/80 text-[7px] font-black text-white uppercase border border-white/10 z-20">
-                            x{quantity}
-                          </span>
-
-                          <div className="w-full aspect-[2/3] rounded overflow-hidden bg-black/60 relative border border-white/5">
-                            <img src={card.imageUrl} alt={card.name} className="w-full h-full object-contain" />
-                          </div>
-
-                          <div className="mt-2 text-center">
-                            <h4 className="text-[10px] font-black text-white truncate">{card.name}</h4>
-                            <span className={`text-[6px] font-black uppercase inline-block mt-0.5 px-1.5 py-0.5 rounded-full bg-black/60 border ${style.border} ${style.text}`}>
-                              {card.rarity}
+                        return (
+                          <div
+                            key={card.id}
+                            onClick={() => { playSfx('/sounds/select.mp3'); setSelectedOfferCard(entry); }}
+                            className={`relative aspect-[2/3] p-2 border-2 rounded-xl flex flex-col justify-between cursor-pointer transition-all duration-300 ${
+                              isSelected
+                                ? 'border-yellow-500 bg-yellow-500/10 scale-105 shadow-[0_0_15px_rgba(234,179,8,0.25)]'
+                                : 'border-white/5 hover:border-white/20 bg-black/40'
+                            }`}
+                          >
+                            {/* Insignia de Cantidad */}
+                            <span className="absolute top-1 right-1 px-2 py-0.5 rounded-full bg-black/80 text-[7px] font-black text-white uppercase border border-white/10 z-20">
+                              x{quantity}
                             </span>
+
+                            <div className="w-full aspect-[2/3] rounded overflow-hidden bg-black/60 relative border border-white/5">
+                              <img src={card.imageUrl} alt={card.name} className="w-full h-full object-contain" />
+                            </div>
+
+                            <div className="mt-2 text-center">
+                              <h4 className="text-[10px] font-black text-white truncate">{card.name}</h4>
+                              <div className="flex flex-wrap justify-center gap-1 mt-1">
+                                <span className={`text-[6px] font-black uppercase inline-block px-1.5 py-0.5 rounded-full bg-black/60 border ${style.border} ${style.text}`}>
+                                  {card.rarity}
+                                </span>
+                                <span className="text-[6px] font-black uppercase inline-block px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-400">
+                                  {EXPANSIONS_LIST.find(e => e.id === card.expansion)?.name || card.expansion?.toUpperCase()}
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
                   </div>
                 )}
               </div>
@@ -929,7 +958,7 @@ export default function Trades() {
                               }}
                               className="p-2.5 hover:bg-white/5 cursor-pointer text-xs font-black text-white border-b border-white/5 truncate"
                             >
-                              {card.name} ({card.rarity})
+                              {card.name} <span className="text-gray-400 font-bold ml-1">({card.rarity}) - {EXPANSIONS_LIST.find(e => e.id === card.expansion)?.name || card.expansion?.toUpperCase()}</span>
                             </div>
                           ))}
                         </motion.div>

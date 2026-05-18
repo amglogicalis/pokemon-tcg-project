@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { UserModel } from '../models/UserModel';
 import { TradeModel } from '../models/TradeModel';
+import { NotificationModel } from '../models/NotificationModel';
 
 // Estructura estática para catalogar todas las cartas y facilitar búsquedas instantáneas
 import baseCards from '../data/cards.json';
@@ -69,8 +70,7 @@ export class TradeController {
         userId: { $ne: activeUserId },
         album: {
           $elemMatch: {
-            "card.id": cleanCardId,
-            quantity: { $gt: 1 }
+            "card.id": cleanCardId
           }
         }
       }, { userId: 1, username: 1 }).lean();
@@ -157,6 +157,21 @@ export class TradeController {
       });
 
       await trade.save();
+
+      // Si es un intercambio directo, notificar al receptor
+      if (receiverId) {
+        try {
+          const newNotif = new NotificationModel({
+            userId: String(receiverId).trim(),
+            message: `📩 Has recibido una propuesta de intercambio directo de ${senderDoc.username}: te ofrece ${senderCardData.name} por tu ${receiverCardData.name}.`,
+            type: 'trade_received'
+          });
+          await newNotif.save();
+        } catch (notifErr) {
+          console.error("⚠️ Error al crear notificación de propuesta:", notifErr);
+        }
+      }
+
       res.status(201).json({ message: 'Propuesta de intercambio registrada.', trade });
     } catch (err: any) {
       console.error("❌ ERROR EN proposeTrade:", err);
@@ -391,6 +406,18 @@ export class TradeController {
         trade.save()
       ]);
 
+      // Notificar al emisor del intercambio (senderId)
+      try {
+        const acceptNotif = new NotificationModel({
+          userId: senderId,
+          message: `🤝 ¡${receiverUsername} ha aceptado tu propuesta de intercambio! Te ha enviado ${trade.receiverCardData.name} por tu ${trade.senderCardData.name}.`,
+          type: 'trade_accepted'
+        });
+        await acceptNotif.save();
+      } catch (notifErr) {
+        console.error("⚠️ Error al crear notificación de aceptación:", notifErr);
+      }
+
       res.status(200).json({ message: '¡Intercambio completado con éxito!', trade });
     } catch (err: any) {
       console.error("❌ ERROR EN acceptTrade:", err);
@@ -432,6 +459,35 @@ export class TradeController {
       }
 
       await trade.save();
+
+      // Si el emisor cancela una propuesta directa, notificar al receptor
+      if (trade.status === 'cancelled' && trade.receiverId) {
+        try {
+          const cancelNotif = new NotificationModel({
+            userId: trade.receiverId,
+            message: `🚫 ${req.user?.username} ha cancelado su propuesta de intercambio directo (ofrecía ${trade.senderCardData.name}).`,
+            type: 'trade_cancelled'
+          });
+          await cancelNotif.save();
+        } catch (notifErr) {
+          console.error("⚠️ Error al crear notificación de cancelación:", notifErr);
+        }
+      }
+
+      // Si el receptor rechaza la propuesta, notificar al emisor
+      if (trade.status === 'rejected') {
+        try {
+          const rejectNotif = new NotificationModel({
+            userId: trade.senderId,
+            message: `❌ ${req.user?.username} ha rechazado tu propuesta de intercambio (${trade.senderCardData.name} por ${trade.receiverCardData.name}).`,
+            type: 'trade_rejected'
+          });
+          await rejectNotif.save();
+        } catch (notifErr) {
+          console.error("⚠️ Error al crear notificación de rechazo:", notifErr);
+        }
+      }
+
       res.status(200).json({ message: 'Intercambio actualizado con éxito.', trade });
     } catch (err: any) {
       console.error("❌ ERROR EN rejectTrade:", err);
