@@ -16,7 +16,7 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   login: (user: User, token: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateUserStats: (level: number, xp: number) => void;
   updatePacksAvailable: (packs: number, lastPackClaimedAt?: string) => void;
 }
@@ -35,12 +35,24 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
         }),
 
-      logout: () =>
+      logout: async () => {
+        try {
+          // Llamar al endpoint de logout real para invalidar el token en el servidor
+          const token = useAuthStore.getState().token;
+          await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/auth/logout`, {
+            method: 'POST',
+            credentials: 'include', // envía la cookie httpOnly si existe
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          });
+        } catch (_) {
+          // Si falla la llamada al servidor, continuamos con el logout local igualmente
+        }
         set({
           user: null,
           token: null,
           isAuthenticated: false,
-        }),
+        });
+      },
 
       updateUserStats: (level, xp) =>
         set((state) => ({

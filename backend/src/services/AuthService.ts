@@ -5,9 +5,18 @@ import { IUserRepository } from '../repositories/IUserRepository';
 import { User, JwtPayload, PublicUser } from '../domain/User';
 
 const SALT_ROUNDS = 10;
-const JWT_SECRET = process.env.JWT_SECRET ?? 'dev_secret';
+
+// Control de JWT_SECRET al cargar el módulo: sin fallback inseguro en producción
+const JWT_SECRET = process.env.JWT_SECRET || (() => {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('ERROR CRÍTICO: JWT_SECRET no está configurada en producción. Deteniendo el servicio.');
+  }
+  return 'dev_secret';
+})();
+
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? '24h';
 const INITIAL_PACKS = 10;
+
 
 export class AuthService {
   constructor(private readonly userRepo: IUserRepository) {}
@@ -17,14 +26,14 @@ export class AuthService {
     if (!username || username.length < 3) {
       throw new Error('El nombre de usuario debe tener al menos 3 caracteres.');
     }
-    if (!password || password.length < 6) {
-      throw new Error('La contraseña debe tener al menos 6 caracteres.');
+    if (!password || password.length < 8 || !/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+      throw new Error('La contraseña debe tener al menos 8 caracteres e incluir al menos una letra y un número.');
     }
 
-    // Comprobar duplicado
+    // Comprobar duplicado — se devuelve mensaje genérico para evitar enumeración de usuarios
     const existing = await this.userRepo.findByUsername(username);
     if (existing) {
-      throw new Error('Ese nombre de usuario ya está en uso.');
+      throw new Error('No se pudo crear la cuenta. Revisa los datos introducidos.');
     }
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
