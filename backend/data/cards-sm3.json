@@ -1819,7 +1819,7 @@
             "id": "sm3-162",
             "pokemonId": 0,
             "name": "Choice Band",
-            "rarity": "secret",
+            "rarity": "shiny",
             "hp": 60,
             "type": "Normal",
             "attack": 20,

@@ -1,7 +1,7 @@
 import { Card, Rarity } from '../domain/Card';
 
 const RARITY_WEIGHTS: Record<Rarity, number> = {
-  'common': 0.5, 'uncommon': 25, 'rare': 10, 'holographic': 4, 'ultra-rare': 1.5, 'shiny': 1, 'secret': 58
+  'common': 58, 'uncommon': 25, 'rare': 10, 'holographic': 4, 'ultra-rare': 1.5, 'shiny': 1, 'secret': 0.5
 };
 
 const RARITY_ORDER: Record<string, number> = {
