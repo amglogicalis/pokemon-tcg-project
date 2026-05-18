@@ -368,7 +368,7 @@ export default function Album() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         
-        <div className="flex gap-6 mb-8 justify-center md:justify-start overflow-x-auto whitespace-nowrap scrollbar-hide max-w-full">
+        <div className="flex gap-6 mb-8 justify-start overflow-x-auto whitespace-nowrap scrollbar-hide max-w-full">
           {(Object.keys(EXPANSIONS) as Array<keyof typeof EXPANSIONS>).map((key) => (
             <button
               key={key}

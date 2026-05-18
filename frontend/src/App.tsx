@@ -196,7 +196,7 @@ export default function App() {
 
               {/* Dropdown Notificaciones (Glassmorphism) */}
               {showNotifDropdown && (
-                <div className="fixed sm:absolute top-[80px] sm:top-full left-1/2 sm:left-auto right-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 mt-0 sm:mt-3 w-[95vw] max-w-[340px] sm:w-80 bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 z-50 flex flex-col gap-3">
+                <div className="absolute top-full right-[-10px] sm:right-0 mt-3 w-[85vw] max-w-[320px] sm:w-80 bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 z-50 flex flex-col gap-3">
                   <div className="flex justify-between items-center mb-1 border-b border-white/10 pb-2">
                     <h3 className="text-xs font-black uppercase tracking-widest text-gray-400">Notificaciones</h3>
                     {notifications.length > 0 && (
