@@ -373,7 +373,7 @@ export default function Album() {
             <button
               key={key}
               onClick={() => { playSelect(); setActiveTab(key); setSelectedCardId(null); }}
-              className={`pb-2 px-4 font-black uppercase tracking-widest text-xs transition-all border-b-2 whitespace-nowrap
+              className={`shrink-0 pb-2 px-4 font-black uppercase tracking-widest text-xs transition-all border-b-2 whitespace-nowrap
                 ${activeTab === key ? `${EXPANSIONS[key].color} border-current` : 'text-gray-600 border-transparent hover:text-gray-400'}`}
             >
               {EXPANSIONS[key].name}
@@ -384,7 +384,7 @@ export default function Album() {
         <div className="mb-12 bg-gray-800/40 p-8 rounded-3xl border border-white/5 backdrop-blur-sm shadow-2xl">
           <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-6">
             <div>
-              <h2 className={`text-5xl font-black uppercase tracking-tighter italic leading-none mb-2 ${stats.currentExp.color}`}>
+              <h2 className={`text-3xl md:text-5xl font-black uppercase tracking-tighter italic leading-none mb-2 break-words ${stats.currentExp.color}`}>
                 {stats.currentExp.name}
               </h2>
               <p className="text-gray-400 font-medium tracking-widest uppercase text-xs font-sans">Colección de Expansión</p>

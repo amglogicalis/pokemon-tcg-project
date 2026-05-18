@@ -186,6 +186,14 @@ export default function App() {
                 )}
               </button>
 
+              {/* Overlay para cerrar notificaciones al hacer click fuera */}
+              {showNotifDropdown && (
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setShowNotifDropdown(false)}
+                />
+              )}
+
               {/* Dropdown Notificaciones (Glassmorphism) */}
               {showNotifDropdown && (
                 <div className="fixed sm:absolute top-[80px] sm:top-full left-1/2 sm:left-auto right-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 mt-0 sm:mt-3 w-[95vw] max-w-[340px] sm:w-80 bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 z-50 flex flex-col gap-3">

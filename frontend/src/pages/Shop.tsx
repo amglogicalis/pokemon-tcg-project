@@ -529,7 +529,7 @@ export default function Shop() {
                 <button
                   key={exp.id}
                   onClick={() => { playSelect(); setSelectedExp(exp.id); }}
-                  className={`py-2 text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                  className={`shrink-0 py-2 text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
                     selectedExp === exp.id ? exp.color : 'text-gray-500 hover:text-gray-300'
                   }`}
                 >
