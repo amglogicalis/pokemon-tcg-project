@@ -47,9 +47,11 @@ function createBackup() {
 function mapRarity(r) {
     if (!r) return "common";
     const lowR = r.toLowerCase();
+    if (lowR.includes('ultra secret') || lowR.includes('ultra-secret')) return "ultra-secret";
+    if (lowR.includes('super secret') || lowR.includes('super-secret')) return "super-secret";
+    if (lowR.includes('secret') || lowR.includes('hyper') || lowR.includes('gold')) return "secret";
     if (lowR.includes('common')) return "common";
     if (lowR.includes('uncommon')) return "uncommon";
-    if (lowR.includes('secret') || lowR.includes('hyper') || lowR.includes('gold')) return "secret";
     if (lowR.includes('rare holo') || lowR.includes('illustration') || lowR.includes('shiny') || lowR.includes('v') || lowR.includes('ex')) return "ultra-rare";
     return "rare";
 }

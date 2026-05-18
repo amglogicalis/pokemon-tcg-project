@@ -5,7 +5,9 @@ export type Rarity =
   | 'holographic' 
   | 'ultra-rare' 
   | 'shiny'
-  | 'secret';
+  | 'secret'
+  | 'super-secret'
+  | 'ultra-secret';
 
 export type PokemonType =
   | 'Fire' | 'Water' | 'Grass' | 'Electric' | 'Psychic' | 'Colorless'

@@ -107,6 +107,8 @@
                             <option value="ultra-rare" ${card.rarity === 'ultra-rare' ? 'selected' : ''}>Ultra Rare</option>
                             <option value="shiny" ${card.rarity === 'shiny' ? 'selected' : ''}>Shiny ✨</option>
                             <option value="secret" ${card.rarity === 'secret' ? 'selected' : ''}>Secret 🔒</option>
+                            <option value="super-secret" ${card.rarity === 'super-secret' ? 'selected' : ''}>Super Secret 🟢</option>
+                            <option value="ultra-secret" ${card.rarity === 'ultra-secret' ? 'selected' : ''}>Ultra Secret 🌌</option>
                         </select>
                     </td>
                     <td class="p-2"><input type="text" value="${card.type || ''}" onchange="updateCard(${index}, 'type', this.value)"></td>

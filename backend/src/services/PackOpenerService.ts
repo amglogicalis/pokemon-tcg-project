@@ -1,11 +1,30 @@
 import { Card, Rarity } from '../domain/Card';
 
 const RARITY_WEIGHTS: Record<Rarity, number> = {
-  'common': 58, 'uncommon': 25, 'rare': 10, 'holographic': 4, 'ultra-rare': 1.5, 'shiny': 1, 'secret': 0.5
+  'common': 50, 
+  'uncommon': 25, 
+  'rare': 15, 
+  'holographic': 4.75, 
+  'ultra-rare': 2, 
+  'shiny': 1.5, 
+  'secret': 1,
+  'super-secret': 0.5,
+  'ultra-secret': 0.25
 };
 
 const RARITY_ORDER: Record<string, number> = {
-  'common': 1, 'uncommon': 2, 'rare': 3, 'holographic': 4, 'ultra-rare': 5, 'ultra rare': 5, 'shiny': 6, 'secret': 7
+  'common': 1, 
+  'uncommon': 2, 
+  'rare': 3, 
+  'holographic': 4, 
+  'ultra-rare': 5, 
+  'ultra rare': 5, 
+  'shiny': 6, 
+  'secret': 7,
+  'super-secret': 8,
+  'super secret': 8,
+  'ultra-secret': 9,
+  'ultra secret': 9
 };
 
 function pickRarity(): Rarity {

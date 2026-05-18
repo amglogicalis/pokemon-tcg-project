@@ -49,5 +49,33 @@ export const rarityStyles: Record<string, { border: string, bg: string, text: st
     text: 'text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 via-red-500 to-orange-400 bg-[length:200%_auto] animate-text-fire font-black italic uppercase tracking-tighter',
     shadow: 'shadow-[0_0_70px_rgba(34,211,238,0.7)]',
     animate: 'animate-shimmer'
+  },
+  'super-secret': {
+    border: 'border-2 border-transparent animate-emerald-laser',
+    bg: 'bg-gradient-to-br from-emerald-950 via-teal-900/40 to-green-950 animate-super-plasma',
+    text: 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-yellow-300 via-cyan-400 to-emerald-400 bg-[length:200%_auto] animate-text-emerald-fire font-black italic uppercase tracking-tighter',
+    shadow: 'shadow-[0_0_80px_rgba(52,211,153,0.9),inset_0_0_20px_rgba(16,185,129,0.5)]',
+    animate: 'animate-shimmer'
+  },
+  'super secret': {
+    border: 'border-2 border-transparent animate-emerald-laser',
+    bg: 'bg-gradient-to-br from-emerald-950 via-teal-900/40 to-green-950 animate-super-plasma',
+    text: 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-yellow-300 via-cyan-400 to-emerald-400 bg-[length:200%_auto] animate-text-emerald-fire font-black italic uppercase tracking-tighter',
+    shadow: 'shadow-[0_0_80px_rgba(52,211,153,0.9),inset_0_0_20px_rgba(16,185,129,0.5)]',
+    animate: 'animate-shimmer'
+  },
+  'ultra-secret': {
+    border: 'border-2 border-transparent animate-neon-border-shift',
+    bg: 'bg-gradient-to-br from-indigo-950 via-purple-900/30 to-stone-950 animate-cosmic-void',
+    text: 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-rose-500 via-fuchsia-500 to-violet-400 bg-[length:200%_auto] animate-text-fire font-black italic uppercase tracking-widest',
+    shadow: 'shadow-[0_0_90px_rgba(234,179,8,0.9),0_0_40px_rgba(217,70,239,0.65)]',
+    animate: 'animate-shimmer'
+  },
+  'ultra secret': {
+    border: 'border-2 border-transparent animate-neon-border-shift',
+    bg: 'bg-gradient-to-br from-indigo-950 via-purple-900/30 to-stone-950 animate-cosmic-void',
+    text: 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-rose-500 via-fuchsia-500 to-violet-400 bg-[length:200%_auto] animate-text-fire font-black italic uppercase tracking-widest',
+    shadow: 'shadow-[0_0_90px_rgba(234,179,8,0.9),0_0_40px_rgba(217,70,239,0.65)]',
+    animate: 'animate-shimmer'
   }
 };
