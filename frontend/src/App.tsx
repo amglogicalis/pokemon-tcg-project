@@ -146,7 +146,7 @@ export default function App() {
         
         <div className="flex items-center gap-6">
           {user && (
-            <div className="hidden sm:flex flex-col items-end gap-1.5 min-w-[140px]">
+            <div className="flex flex-col items-end gap-1 sm:gap-1.5 min-w-[100px] sm:min-w-[140px]">
               <span 
                 style={getLevelTextStyle(user.level ?? 1)}
                 className="text-sm font-black uppercase tracking-wider leading-none animate-text-shimmer"
@@ -188,7 +188,7 @@ export default function App() {
 
               {/* Dropdown Notificaciones (Glassmorphism) */}
               {showNotifDropdown && (
-                <div className="absolute top-full right-0 mt-3 w-[calc(100vw-2rem)] max-w-[320px] sm:w-80 bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 z-50 flex flex-col gap-3 origin-top-right">
+                <div className="fixed sm:absolute top-[80px] sm:top-full left-1/2 sm:left-auto right-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 mt-0 sm:mt-3 w-[95vw] max-w-[340px] sm:w-80 bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 z-50 flex flex-col gap-3">
                   <div className="flex justify-between items-center mb-1 border-b border-white/10 pb-2">
                     <h3 className="text-xs font-black uppercase tracking-widest text-gray-400">Notificaciones</h3>
                     {notifications.length > 0 && (
