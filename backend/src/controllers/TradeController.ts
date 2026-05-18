@@ -5,6 +5,7 @@ import { TradeModel } from '../models/TradeModel';
 
 // Estructura estática para catalogar todas las cartas y facilitar búsquedas instantáneas
 import baseCards from '../data/cards.json';
+import swsh12Cards from '../data/cards-swsh12.json';
 import bw9Cards from '../data/cards-bw9.json';
 import xypCards from '../data/cards-xyp.json';
 import zsv10pt5Cards from '../data/cards-zsv10pt5.json';
@@ -23,6 +24,7 @@ const addCardsToMap = (cardsArray: any[], expansionId: string) => {
 };
 
 addCardsToMap(baseCards.cards, 'dp6');
+addCardsToMap(swsh12Cards.cards, 'swsh12');
 addCardsToMap(bw9Cards.cards, 'bw9');
 addCardsToMap(xypCards.cards, 'xyp');
 addCardsToMap(zsv10pt5Cards.cards, 'zsv10pt5');

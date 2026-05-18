@@ -26,7 +26,8 @@ interface Trade {
   createdAt: string;
 }
 
-const EXPANSIONS_LIST = [
+const EXPANSIONS_LIST = [ 
+  { id: 'swsh12', name: 'SILVER TEMPEST' },
   { id: '', name: 'Todas las expansiones' },
   { id: 'sm3', name: 'BURNING SHADOWS' },
   { id: 'dp6', name: 'Legends Awakened' },

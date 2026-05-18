@@ -20,6 +20,7 @@ type SortOrder = 'recent' | 'id' | 'rarity' | 'hp';
 
 // 1. Definición de expansiones
 const EXPANSIONS = { 
+  swsh12: { id: 'swsh12', name: 'Silver Tempest', total: 245, color: ' text-slate-400', bar: ' from-slate-400 to- slate-400' }, 
   sm3: { id: 'sm3', name: 'Burning Shadows', total: 177, color: 'text-red-800', bar: 'from-red-900 to-red-600' },
   dp6: { id: 'card', name: 'Legends Awakened', total: 146, color: 'text-yellow-400', bar: 'from-yellow-600 to-yellow-200' },
   bw9: { id: 'bw9', name: 'Plasma Blast', total: 122, color: 'text-blue-400', bar: 'from-blue-600 to-blue-300' },
@@ -109,6 +110,9 @@ export default function Album() {
     
     const filteredEntries = entries.filter(e => {
       const cardId = e.card.id.toLowerCase();
+      if (activeTab === 'swsh12') {
+        return cardId.startsWith('swsh12-');
+      }
       
       if (activeTab === 'dp6') {
         return cardId.startsWith('card-') || cardId.startsWith('dp6');

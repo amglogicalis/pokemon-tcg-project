@@ -4,6 +4,7 @@ import { MongoUserRepository } from '../repositories/MongoUserRepository';
 
 // Importación estática para asegurar compatibilidad
 import baseCards from '../data/cards.json';
+import swsh12Cards from '../data/cards-swsh12.json';
 import bw9Cards from '../data/cards-bw9.json';
 import xypCards from '../data/cards-xyp.json';
 import zsv10pt5Cards from '../data/cards-zsv10pt5.json';
@@ -42,6 +43,7 @@ export class AlbumController {
       };
 
       addCardsToMap(baseCards.cards, 'cards.json', 'dp6');
+      addCardsToMap(swsh12Cards.cards, 'cards-swsh12.json', 'swsh12');
       addCardsToMap(bw9Cards.cards, 'cards-bw9.json', 'bw9');
       addCardsToMap(xypCards.cards, 'cards-xyp.json', 'xyp');
       addCardsToMap(zsv10pt5Cards.cards, 'cards-zsv10pt5.json', 'zsv10pt5');

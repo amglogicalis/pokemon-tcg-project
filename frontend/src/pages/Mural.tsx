@@ -167,7 +167,8 @@ function CardVisualEffects({ rarity }: { rarity: string }) {
   );
 }
 
-const expansionNames: Record<string, { name: string; color: string }> = {
+const expansionNames: Record<string, { name: string; color: string }> = { 
+  swsh12: { name: 'Silver Tempest', color: ' text-slate-400' },
   dp6: { name: 'Legends Awakened', color: 'text-yellow-400' },
   bw9: { name: 'Plasma Blast', color: 'text-blue-400' },
   xyp: { name: 'XY Black Star Promos', color: 'text-red-500' },

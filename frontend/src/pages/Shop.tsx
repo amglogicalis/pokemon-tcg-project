@@ -11,6 +11,7 @@ const rarityWeight: Record<string, number> = {
 };
 
 const EXPANSIONS = [ 
+  { id: 'swsh12', name: 'SILVER TEMPEST', color: ' text-slate-400' }, 
   { id: 'sm3', name: 'BURNING SHADOWS', color: 'text-red-800' }, 
   { id: 'dp6', name: 'Legends Awakened', color: 'text-yellow-500' },
   { id: 'bw9', name: 'Plasma Blast', color: 'text-blue-400' },
