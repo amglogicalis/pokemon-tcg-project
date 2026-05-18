@@ -4,6 +4,7 @@ import cors from 'cors';
 import { AuthController } from './controllers/AuthController';
 import { PackController } from './controllers/PackController';
 import { AlbumController } from './controllers/AlbumController';
+import { TradeController } from './controllers/TradeController';
 import { authMiddleware } from './middleware/authMiddleware';
 import { connectDB } from './db';
 
@@ -25,6 +26,7 @@ app.use(express.json());
 const authController = new AuthController();
 const packController = new PackController(); 
 const albumController = new AlbumController();
+const tradeController = new TradeController();
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -40,6 +42,15 @@ app.post('/api/packs/claim-daily', authMiddleware, (req, res) => packController.
 app.get('/api/user/album', authMiddleware, (req, res) => albumController.getAlbum(req as any, res));
 app.post('/api/user/favorite', authMiddleware, (req, res) => albumController.setFavoriteCard(req as any, res));
 app.get('/api/mural', (req, res) => albumController.getMural(req, res));
+
+// Rutas de Intercambios (Trades)
+app.get('/api/trades/search-cards', authMiddleware, (req, res) => tradeController.searchCards(req as any, res));
+app.get('/api/trades/users-with-duplicate/:cardId', authMiddleware, (req, res) => tradeController.getUsersWithDuplicate(req as any, res));
+app.post('/api/trades/propose', authMiddleware, (req, res) => tradeController.proposeTrade(req as any, res));
+app.get('/api/trades/public', authMiddleware, (req, res) => tradeController.getPublicTrades(req as any, res));
+app.get('/api/trades/my-offers', authMiddleware, (req, res) => tradeController.getMyOffers(req as any, res));
+app.post('/api/trades/:id/accept', authMiddleware, (req, res) => tradeController.acceptTrade(req as any, res));
+app.post('/api/trades/:id/reject', authMiddleware, (req, res) => tradeController.rejectTrade(req as any, res));
 
 app.listen(PORT, () => {
   console.log(`🚀 TCG Backend corriendo en el puerto ${PORT}`);

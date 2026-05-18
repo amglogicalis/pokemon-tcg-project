@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import api from '../services/api';
 import { rarityStyles } from '../constants/rarities';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -179,6 +179,22 @@ export default function Mural() {
   const [entries, setEntries] = useState<MuralEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEntry, setSelectedEntry] = useState<MuralEntry | null>(null);
+  const muralMusicRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const audio = new Audio('/sounds/mural-music.mp3');
+    audio.loop = true;
+    audio.volume = 0.45;
+    muralMusicRef.current = audio;
+    audio.play().catch((err) => console.log('Autoplay blocked:', err));
+
+    return () => {
+      if (muralMusicRef.current) {
+        muralMusicRef.current.pause();
+        muralMusicRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const fetchMural = async () => {

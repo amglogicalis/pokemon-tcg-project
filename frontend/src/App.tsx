@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Shop from './pages/Shop';
 import Album from './pages/Album';
 import Mural from './pages/Mural';
+import Trades from './pages/Trades';
 import api from './services/api';
 import { getLevelTextStyle } from './constants/levels';
 
@@ -12,7 +13,7 @@ export default function App() {
   const logout = useAuthStore((s) => s.logout);
   const user = useAuthStore((s) => s.user);
   const updateUserStats = useAuthStore((s) => s.updateUserStats);
-  const [view, setView] = useState<'shop' | 'album' | 'mural'>('shop');
+  const [view, setView] = useState<'shop' | 'album' | 'mural' | 'trades'>('shop');
 
   const playSelect = () => {
     const audio = new Audio('/sounds/select.mp3');
@@ -77,6 +78,16 @@ export default function App() {
           >
             Mural
           </button>
+          <button 
+            onClick={() => { playSelect(); setView('trades')} } 
+            className={`px-6 py-2 rounded-full transition-all duration-300 ${
+              view === 'trades' 
+              ? 'bg-yellow-500 text-black font-bold shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
+              : 'text-gray-400 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            Intercambios
+          </button>
         </div>
         
         <div className="flex items-center gap-6">
@@ -109,7 +120,14 @@ export default function App() {
       </nav>
 
       <main className="container mx-auto p-4 animate-fadeIn">
-        {view === 'shop' ? <Shop /> : view === 'album' ? <Album /> : <Mural />}
+        {view === 'shop' 
+          ? <Shop /> 
+          : view === 'album' 
+            ? <Album /> 
+            : view === 'mural' 
+              ? <Mural /> 
+              : <Trades />
+        }
       </main>
     </div>
   );
