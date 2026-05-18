@@ -9,6 +9,12 @@ export default function App() {
   const logout = useAuthStore((s) => s.logout);
   const [view, setView] = useState<'shop' | 'album'>('shop');
 
+  const playSelect = () => {
+    const audio = new Audio('/sounds/select.mp3');
+    audio.volume = 0.6;
+    audio.play().catch(() => {});
+  };
+
   if (!isAuthenticated) {
     return <Login />;
   }
@@ -19,7 +25,7 @@ export default function App() {
       <nav className="bg-gray-800/50 backdrop-blur-md sticky top-0 z-50 p-4 flex justify-between items-center border-b border-white/10 shadow-2xl">
         <div className="flex gap-4">
           <button 
-            onClick={() => setView('shop')} 
+            onClick={() => { playSelect(); setView('shop'); }} 
             className={`px-6 py-2 rounded-full transition-all duration-300 ${
               view === 'shop' 
               ? 'bg-yellow-500 text-black font-bold shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
@@ -29,7 +35,7 @@ export default function App() {
             Tienda
           </button>
           <button 
-            onClick={() => setView('album')} 
+            onClick={() => { playSelect(); setView('album')} } 
             className={`px-6 py-2 rounded-full transition-all duration-300 ${
               view === 'album' 
               ? 'bg-yellow-500 text-black font-bold shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
@@ -46,7 +52,7 @@ export default function App() {
             <span className="text-sm font-medium text-yellow-500/80">Entrenador Pro</span>
           </div>
           <button 
-            onClick={logout} 
+            onClick={() => { playSelect(); logout(); }} 
             className="px-4 py-2 bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white rounded-lg transition-colors"
           >
             Salir

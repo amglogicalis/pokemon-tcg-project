@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import api from '../services/api';
 import { rarityStyles } from '../constants/rarities';
 import BoosterPack from '../components/BoosterPack';
@@ -22,6 +22,9 @@ export default function Shop() {
   const [showCards, setShowCards] = useState(false);
   const [revealedCount, setRevealedCount] = useState(0);
   const [selectedExp, setSelectedExp] = useState('dp6');
+
+  const homeMusicRef = useRef<HTMLAudioElement | null>(null);
+  const packMusicRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (loading || (showCards && revealedCount < 5)) {
@@ -53,12 +56,64 @@ export default function Shop() {
     audio.play().catch(() => {}); 
   };
 
+  const playSelect = () => {
+    const audio = new Audio('/sounds/select.mp3');
+    audio.volume = 0.6;
+    audio.play().catch(() => {});
+  };
+
+  useEffect(() => {
+    homeMusicRef.current = new Audio('/sounds/home-music.mp3');
+    homeMusicRef.current.loop = true;
+    homeMusicRef.current.volume = 0.35;
+
+    packMusicRef.current = new Audio('/sounds/while-op-pack.mp3');
+    packMusicRef.current.loop = true;
+    packMusicRef.current.volume = 0.35;
+
+    return () => {
+      if (homeMusicRef.current) {
+        homeMusicRef.current.pause();
+        homeMusicRef.current = null;
+      }
+      if (packMusicRef.current) {
+        packMusicRef.current.pause();
+        packMusicRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const isOpening = loading || showCards;
+    
+    if (isOpening) {
+      if (homeMusicRef.current) {
+        homeMusicRef.current.pause();
+        homeMusicRef.current.currentTime = 0;
+      }
+      if (packMusicRef.current) {
+        packMusicRef.current.play().catch(err => console.log('Autoplay blocked:', err));
+      }
+    } else {
+      if (packMusicRef.current) {
+        packMusicRef.current.pause();
+        packMusicRef.current.currentTime = 0;
+      }
+      if (homeMusicRef.current) {
+        homeMusicRef.current.play().catch(err => console.log('Autoplay blocked:', err));
+      }
+    }
+  }, [loading, showCards]);
+
   const handleOpenPack = async () => {
     if (loading) return;
     setNewCards([]);
     setShowCards(false);
     setRevealedCount(0);
     setLoading(true);
+
+    // Reproducir el sonido de sobre abierto (rasgado/animación) inmediatamente al iniciar
+    playSfx('/sounds/pack-opened.mp3');
 
     try {
       const response = await api.post('/packs/open', { expansion: selectedExp });
@@ -70,7 +125,35 @@ export default function Shop() {
       setTimeout(() => {
         setShowCards(true);
         setRevealedCount(1);
-        playSfx('/sounds/card-flip.mp3');
+        
+        // Reproducir sonido para la primera carta (índice 0)
+        const firstCard = cards[0];
+        if (firstCard) {
+          const rarity = firstCard.rarity.toLowerCase().trim();
+          let raritySfx = '';
+          if (rarity.includes('ultra-secret') || rarity.includes('ultra secret')) {
+            raritySfx = '/sounds/ultra-secret-pull.mp3';
+          } else if (rarity.includes('super-secret') || rarity.includes('super secret')) {
+            raritySfx = '/sounds/super-secret-pull.mp3';
+          } else if (rarity.includes('secret')) {
+            raritySfx = '/sounds/secret-pull.mp3';
+          } else if (rarity.includes('shiny')) {
+            raritySfx = '/sounds/shiny-pull.mp3';
+          } else if (rarity.includes('ultra')) {
+            raritySfx = '/sounds/ultra-rare-pull.mp3';
+          } else if (rarity.includes('holographic') || rarity.includes('holo')) {
+            raritySfx = '/sounds/hollographic-pull.mp3';
+          } else if (rarity.includes('rare')) {
+            raritySfx = '/sounds/rare-pull.mp3';
+          }
+
+          if (raritySfx) {
+            playSfx(raritySfx);
+          } else {
+            playSfx('/sounds/next-card.mp3'); // Sonido por defecto para comunes/infrecuentes
+          }
+        }
+
         setLoading(false);
       }, 800);
     } catch (error) {
@@ -81,20 +164,36 @@ export default function Shop() {
 
   const nextCard = () => {
     if (revealedCount < newCards.length) {
-      const nextRarity = newCards[revealedCount].rarity.toLowerCase();
-      if (nextRarity.includes('ultra-secret') || nextRarity.includes('ultra secret')) {
-        playSfx('/sounds/ultra-reveal.mp3');
-      } else if (nextRarity.includes('super-secret') || nextRarity.includes('super secret')) {
-        playSfx('/sounds/super-reveal.mp3');
-      } else if (nextRarity.includes('secret')) {
-        playSfx('/sounds/secret-reveal.mp3'); // Asumimos que el usuario podría añadirlo
-      } else if (nextRarity.includes('shiny')) {
-        playSfx('/sounds/shiny-sparkle.mp3');
-      } else if (nextRarity.includes('ultra')) {
-        playSfx('/sounds/epic-reveal.mp3');
-      } else {
-        playSfx('/sounds/card-flip.mp3');
+      // 1. Sonido de transición/click inmediato
+      playSfx('/sounds/next-card.mp3');
+
+      // 2. Determinar y reproducir sonido de rareza con un leve retraso para doble impacto sensorial
+      const nextCardObj = newCards[revealedCount];
+      const rarity = nextCardObj.rarity.toLowerCase().trim();
+      let raritySfx = '';
+
+      if (rarity.includes('ultra-secret') || rarity.includes('ultra secret')) {
+        raritySfx = '/sounds/ultra-secret-pull.mp3';
+      } else if (rarity.includes('super-secret') || rarity.includes('super secret')) {
+        raritySfx = '/sounds/super-secret-pull.mp3';
+      } else if (rarity.includes('secret')) {
+        raritySfx = '/sounds/secret-pull.mp3';
+      } else if (rarity.includes('shiny')) {
+        raritySfx = '/sounds/shiny-pull.mp3';
+      } else if (rarity.includes('ultra')) {
+        raritySfx = '/sounds/ultra-rare-pull.mp3';
+      } else if (rarity.includes('holographic') || rarity.includes('holo')) {
+        raritySfx = '/sounds/hollographic-pull.mp3';
+      } else if (rarity.includes('rare')) {
+        raritySfx = '/sounds/rare-pull.mp3';
       }
+
+      if (raritySfx) {
+        setTimeout(() => {
+          playSfx(raritySfx);
+        }, 150);
+      }
+
       setRevealedCount(prev => prev + 1);
     }
   };
@@ -308,7 +407,7 @@ export default function Shop() {
               {EXPANSIONS.map((exp) => (
                 <button
                   key={exp.id}
-                  onClick={() => setSelectedExp(exp.id)}
+                  onClick={() => { playSelect(); setSelectedExp(exp.id); }}
                   className={`py-2 text-[10px] font-black uppercase tracking-widest transition-all ${
                     selectedExp === exp.id ? exp.color : 'text-gray-500 hover:text-gray-300'
                   }`}
@@ -343,6 +442,7 @@ export default function Shop() {
                 <button 
                   onClick={(e) => { 
                     e.stopPropagation(); 
+                    playSelect();
                     setShowCards(false); 
                   }}
                   className="text-[10px] font-black uppercase tracking-[0.4em] hover:scale-105 transition-transform text-yellow-500"

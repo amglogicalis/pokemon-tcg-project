@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import api from '../services/api';
 import { rarityStyles } from '../constants/rarities';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,9 +33,32 @@ export default function Album() {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<keyof typeof EXPANSIONS>('dp6');
 
+  const albumMusicRef = useRef<HTMLAudioElement | null>(null);
+
   const rarityWeight: Record<string, number> = {
     'ultra-secret': 8, 'ultra secret': 8, 'super-secret': 7, 'super secret': 7, 'secret': 6, 'shiny': 5, 'ultra-rare': 4, 'ultra rare': 4, 'holographic': 3, 'rare': 2, 'uncommon': 1, 'common': 0
   };
+
+  const playSelect = () => {
+    const audio = new Audio('/sounds/select.mp3');
+    audio.volume = 0.6;
+    audio.play().catch(() => {});
+  };
+
+  useEffect(() => {
+    const audio = new Audio('/sounds/album-music.mp3');
+    audio.loop = true;
+    audio.volume = 0.45;
+    albumMusicRef.current = audio;
+    audio.play().catch((err) => console.log('Autoplay blocked:', err));
+
+    return () => {
+      if (albumMusicRef.current) {
+        albumMusicRef.current.pause();
+        albumMusicRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const fetchAlbum = async () => {
@@ -308,7 +331,7 @@ export default function Album() {
           {(Object.keys(EXPANSIONS) as Array<keyof typeof EXPANSIONS>).map((key) => (
             <button
               key={key}
-              onClick={() => { setActiveTab(key); setSelectedCardId(null); }}
+              onClick={() => { playSelect(); setActiveTab(key); setSelectedCardId(null); }}
               className={`pb-2 px-4 font-black uppercase tracking-widest text-xs transition-all border-b-2 
                 ${activeTab === key ? `${EXPANSIONS[key].color} border-current` : 'text-gray-600 border-transparent hover:text-gray-400'}`}
             >
@@ -339,7 +362,7 @@ export default function Album() {
         <div className="flex justify-end mb-8">
           <div className="flex items-center gap-3 bg-black/40 p-2 px-4 rounded-2xl border border-white/10 shadow-lg">
             <span className="text-[10px] font-black text-gray-500 uppercase italic tracking-wider">Ordenar por:</span>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortOrder)} className="bg-transparent text-yellow-500 font-bold text-sm outline-none cursor-pointer">
+            <select value={sortBy} onChange={(e) => { playSelect(); setSortBy(e.target.value as SortOrder); }} className="bg-transparent text-yellow-500 font-bold text-sm outline-none cursor-pointer">
               <option value="recent" className="bg-gray-900 text-white">Recientes</option>
               <option value="id" className="bg-gray-900 text-white">ID</option>
               <option value="rarity" className="bg-gray-900 text-white">Rareza</option>
@@ -362,7 +385,7 @@ export default function Album() {
 
             return (
               <div key={`${entry.card.id}-${index}`} className="relative aspect-[2/3] cursor-pointer"
-                onClick={() => setSelectedCardId(isSelected ? null : entry.card.id)}>
+                onClick={() => { playSelect(); setSelectedCardId(isSelected ? null : entry.card.id); }}>
                 
                 <motion.div 
                   animate={isSelected ? { scale: 1.05, zIndex: 50 } : { scale: 1 }}
