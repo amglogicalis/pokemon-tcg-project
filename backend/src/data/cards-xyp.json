@@ -2401,13 +2401,13 @@
         {
             "id": "xyp-divine",
             "pokemonId": 150,
-            "name": "Mewtwo EX (Divine)",
+            "name": "Charizard (Divine)",
             "rarity": "divine",
             "hp": 220,
             "type": "Psychic",
             "attack": 150,
             "defense": 100,
-            "imageUrl": "https://images.pokemontcg.io/xyp/XY107_hires.png"
+            "imageUrl": "https://pocket.pokemongohub.net/tcg-pocket/cards/a1/webp/cPK_20_000360_01_LIZARDONex_IM_M_M_en_US.webp"
         }
     ]
 }

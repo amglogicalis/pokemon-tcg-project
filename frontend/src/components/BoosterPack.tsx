@@ -15,7 +15,7 @@ const PACK_ASSETS: Record<string, { imagePath: string; glow: string }> = {
     glow: 'bg-yellow-500' // Legends Awakened
   },
   bw9: {
-    imagePath: 'bw9/packshots/BW9_Booster_Thundurus.webp',
+    imagePath: 'bw9/packshots/BW9_Booster_Deoxys.webp',
     glow: 'bg-cyan-500' // Plasma Blast
   },
   xyp: { 

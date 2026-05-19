@@ -1345,13 +1345,13 @@
         {
             "id": "bw9-divine",
             "pokemonId": 649,
-            "name": "Genesect EX (Divine)",
+            "name": "Deoxys (Divine)",
             "rarity": "divine",
             "hp": 230,
             "type": "Grass",
             "attack": 160,
             "defense": 110,
-            "imageUrl": "https://images.pokemontcg.io/bw9/11_hires.png"
+            "imageUrl": "https://raw.githubusercontent.com/amglogicalis/tcg-project-pers-cards/master/bw9/my-pocket-tcg-deoxys-concept-with-a-side-of-jirachi-v0-dv277wj2l6qf1.webp"
         }
     ]
 }

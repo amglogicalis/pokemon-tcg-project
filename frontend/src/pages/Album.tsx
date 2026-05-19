@@ -22,10 +22,10 @@ type SortOrder = 'recent' | 'id' | 'rarity' | 'hp';
 // 1. Definición de expansiones
 const EXPANSIONS = { 
   swsh12: { id: 'swsh12', name: 'Silver Tempest', total: 245, color: 'text-slate-400', bar: 'from-slate-400 to-slate-400' }, 
-  sm3: { id: 'sm3', name: 'Burning Shadows', total: 177, color: 'text-red-500', bar: 'from-red-900 to-red-600' },
+  sm3: { id: 'sm3', name: 'Burning Shadows', total: 175, color: 'text-red-500', bar: 'from-red-900 to-red-600' },
   dp6: { id: 'dp6', name: 'Legends Awakened', total: 146, color: 'text-yellow-400', bar: 'from-yellow-600 to-yellow-200' },
   bw9: { id: 'bw9', name: 'Plasma Blast', total: 122, color: 'text-blue-400', bar: 'from-blue-600 to-blue-300' },
-  xyp: { id: 'xyp', name: 'XY Black Star Promos', total: 208, color: 'text-red-500', bar: 'from-red-700 to-red-400' },
+  xyp: { id: 'xyp', name: 'XY Black Star Promos', total: 213, color: 'text-red-500', bar: 'from-red-700 to-red-400' },
   zsv10pt5: { id: 'zsv10pt5', name: 'Black Bolt', total: 172, color: 'text-indigo-400', bar: 'from-indigo-600 to-indigo-300' }
 };
 
@@ -191,27 +191,81 @@ export default function Album() {
           <motion.div
             key="divine-bg"
             initial={{ opacity: 0 }}
-            animate={{ opacity: [0.5, 0.9, 0.5], scale: [1, 1.05, 1] }}
+            animate={{ opacity: [0.6, 0.95, 0.6], scale: [1, 1.03, 1] }}
             exit={{ opacity: 0, transition: { duration: 0.5 } }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-            className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center bg-black/40"
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center bg-black/50"
           >
-            {/* Golden Auroras and Cosmic Stars */}
+            {/* Nebulosa cósmica celestial (Violeta/Púrpura y Oro) */}
+            <div className="absolute inset-0 opacity-[0.25] bg-[radial-gradient(circle_at_50%_50%,rgba(167,139,250,0.45)_0%,rgba(251,191,36,0.25)_40%,transparent_75%)] blur-[30px]" />
+
+            {/* Rayos divinos giratorios (God Rays principales) */}
             <motion.div
               animate={{ rotate: [0, 360] }}
-              transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-              className="absolute w-[160vmax] h-[160vmax] opacity-[0.35] bg-[conic-gradient(from_0deg,transparent_10%,rgba(251,191,36,0.3)_30%,transparent_50%,rgba(217,119,6,0.2)_70%,transparent_90%)] blur-[40px]"
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              className="absolute w-[180vmax] h-[180vmax] opacity-[0.45] bg-[conic-gradient(from_0deg,transparent_15%,rgba(251,191,36,0.35)_30%,transparent_45%,rgba(167,139,250,0.25)_60%,transparent_75%,rgba(217,119,6,0.25)_85%,transparent_100%)] blur-[35px]"
             />
-            <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(251,191,36,0.4)_0%,rgba(0,0,0,0)_65%)]" />
+
+            {/* Foco de luz sagrada en el centro */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(251,191,36,0.5)_0%,rgba(0,0,0,0)_60%)]" />
+            
+            {/* Pulsación dorada mística de fondo */}
             <motion.div 
-              animate={{ opacity: [0.35, 0.75, 0.35], scale: [0.96, 1.06, 0.96] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute inset-0 bg-[radial-gradient(circle,rgba(217,119,6,0.65)_0%,rgba(217,119,6,0.18)_25%,rgba(0,0,0,0)_50%)]" 
+              animate={{ opacity: [0.4, 0.8, 0.4], scale: [0.95, 1.05, 0.95] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-0 bg-[radial-gradient(circle,rgba(217,119,6,0.7)_0%,rgba(167,139,250,0.2)_30%,rgba(0,0,0,0)_60%)]" 
             />
-            {/* Shimmering Golden Stars */}
+
+            {/* Estrellas estelares de 4 puntas flotando en el fondo que cambian de color */}
+            {[...Array(25)].map((_, i) => {
+              const scale = 0.5 + Math.random() * 1.3;
+              const duration = 3.5 + Math.random() * 3;
+              return (
+                <motion.div
+                  key={`divine-star-${i}`}
+                  initial={{ 
+                    x: Math.random() * window.innerWidth - window.innerWidth/2, 
+                    y: Math.random() * window.innerHeight - window.innerHeight/2,
+                    scale: 0,
+                    opacity: 0,
+                    rotate: Math.random() * 360,
+                    color: '#fbbf24'
+                  }}
+                  animate={{ 
+                    x: [
+                      Math.random() * window.innerWidth - window.innerWidth/2, 
+                      Math.random() * window.innerWidth - window.innerWidth/2,
+                      Math.random() * window.innerWidth - window.innerWidth/2
+                    ],
+                    y: [
+                      Math.random() * window.innerHeight - window.innerHeight/2,
+                      Math.random() * window.innerHeight - window.innerHeight/2,
+                      Math.random() * window.innerHeight - window.innerHeight/2
+                    ],
+                    scale: [0, scale, 0],
+                    opacity: [0, 0.9, 0],
+                    rotate: [0, 180, 360],
+                    color: ['#fbbf24', '#a78bfa', '#ef4444', '#06b6d4', '#fbbf24']
+                  }}
+                  transition={{ 
+                    duration: duration, 
+                    repeat: Infinity, 
+                    delay: Math.random() * 2,
+                    ease: "easeInOut"
+                  }}
+                  className="absolute pointer-events-none"
+                >
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 10px currentColor)' }}>
+                    <path d="M12 0L15 9L24 12L15 15L12 24L9 15L0 12L9 9Z" />
+                  </svg>
+                </motion.div>
+              );
+            })}
+
+            {/* Esferas doradas originales restauradas en el fondo */}
             {[...Array(20)].map((_, i) => (
               <motion.div
-                key={i}
+                key={`divine-sphere-${i}`}
                 initial={{ 
                   x: Math.random() * window.innerWidth - window.innerWidth/2, 
                   y: Math.random() * window.innerHeight - window.innerHeight/2,
@@ -529,38 +583,60 @@ export default function Album() {
                           <motion.div 
                             animate={{ borderColor: ['#ff2000', '#cc0099', '#0066ff', '#00ff66', '#ffcc00', '#ff2000'] }} 
                             transition={{ duration: 6, repeat: Infinity, ease: "linear" }} 
-                            className="absolute inset-0 border-[2px] rounded-xl z-30 pointer-events-none opacity-70" 
+                            className="absolute inset-0 border-[2.5px] rounded-xl z-30 pointer-events-none opacity-100" 
                           />
-                          <motion.div animate={{ x: ['-100%', '200%'] }} transition={{ repeat: Infinity, duration: 3, ease: "linear" }} className="absolute inset-0 z-20 pointer-events-none -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                          <motion.div animate={{ x: ['-100%', '200%'] }} transition={{ repeat: Infinity, duration: 3, ease: "linear" }} className="absolute inset-0 z-20 pointer-events-none -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                         </>
                       ) : (
                         <>
                           {(isHolo || isUltra || isSecret || isSuperSecret || isUltraSecret || isDivine) && (
-                            <motion.div animate={{ x: ['-100%', '200%'] }} transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }} className="absolute inset-0 z-20 pointer-events-none -skew-x-12 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+                            <motion.div animate={{ x: ['-100%', '200%'] }} transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }} className="absolute inset-0 z-20 pointer-events-none -skew-x-12 bg-gradient-to-r from-transparent via-white/45 to-transparent" />
                           )}
                           {isUltra && !isUltraSecret && (
                             <>
                               <div className="absolute inset-0 z-20 pointer-events-none bg-[radial-gradient(circle,rgba(234,179,8,0.25)_0%,transparent_75%)]" />
-                              <motion.div animate={{ opacity: [0.3, 0.6, 0.3] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }} className="absolute inset-0 border-2 rounded-xl z-30 pointer-events-none border-yellow-400/40 shadow-[0_0_15px_rgba(234,179,8,0.3)]" />
+                              <motion.div animate={{ opacity: [0.4, 0.8, 0.4] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }} className="absolute inset-0 border-2 rounded-xl z-30 pointer-events-none border-yellow-400/85 shadow-[0_0_30px_rgba(234,179,8,0.85)]" />
                             </>
                           )}
                           {isSuperSecret && (
                             <>
                               <motion.div animate={{ backgroundColor: ['rgba(16,185,129,0.25)', 'rgba(234,179,8,0.25)', 'rgba(16,185,129,0.25)'] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 z-0 pointer-events-none" />
                               <motion.div animate={{ rotate: [0, 360] }} transition={{ repeat: Infinity, duration: 8, ease: "linear" }} className="absolute inset-0 z-0 pointer-events-none opacity-40 bg-[radial-gradient(circle,rgba(52,211,153,0.3)_0%,transparent_60%)]" />
-                              <motion.div animate={{ opacity: [0.7, 1.0, 0.7], scale: [0.98, 1.02, 0.98] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }} className="absolute inset-0 border-[2px] rounded-xl z-30 pointer-events-none border-emerald-400/80 shadow-[0_0_25px_rgba(52,211,153,0.7),inset_0_0_15px_rgba(52,211,153,0.5)]" />
+                              <motion.div animate={{ opacity: [0.8, 1.0, 0.8], scale: [0.98, 1.02, 0.98] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }} className="absolute inset-0 border-[2px] rounded-xl z-30 pointer-events-none border-emerald-400/95 shadow-[0_0_35px_rgba(52,211,153,0.95),inset_0_0_20px_rgba(52,211,153,0.8)]" />
                             </>
                           )}
                           {isUltraSecret && (
                             <>
                               <motion.div animate={{ backgroundColor: ['rgba(234,179,8,0.25)', 'rgba(244,63,94,0.25)', 'rgba(234,179,8,0.25)'] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 z-0 pointer-events-none" />
-                              <motion.div animate={{ scale: [0.98, 1.02, 0.98], opacity: [0.7, 1.0, 0.7] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }} className="absolute inset-0 border-[2px] rounded-xl z-30 pointer-events-none border-yellow-400/80 shadow-[0_0_30px_rgba(234,179,8,0.6)]" />
+                              <motion.div animate={{ scale: [0.98, 1.02, 0.98], opacity: [0.8, 1.0, 0.8] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }} className="absolute inset-0 border-[2px] rounded-xl z-30 pointer-events-none border-yellow-400/95 shadow-[0_0_40px_rgba(234,179,8,0.95)]" />
                             </>
                           )}
                           {isDivine && (
                             <>
-                              <motion.div animate={{ backgroundColor: ['rgba(251,191,36,0.25)', 'rgba(217,119,6,0.25)', 'rgba(251,191,36,0.25)'] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 z-0 pointer-events-none" />
-                              <motion.div animate={{ scale: [0.97, 1.03, 0.97], opacity: [0.8, 1.0, 0.8] }} transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }} className="absolute inset-0 border-[2.5px] rounded-xl z-30 pointer-events-none border-amber-400 shadow-[0_0_35px_rgba(251,191,36,0.85)]" />
+                              {/* Fondo de energía divina animado */}
+                              <motion.div animate={{ backgroundColor: ['rgba(251,191,36,0.25)', 'rgba(120,40,180,0.15)', 'rgba(217,119,6,0.25)', 'rgba(251,191,36,0.25)'] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 z-0 pointer-events-none" />
+                              
+                              {/* Aura sagrada giratoria (God Rays internos) */}
+                              <motion.div 
+                                animate={{ rotate: 360 }} 
+                                transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
+                                className="absolute w-[200%] h-[200%] -top-[50%] -left-[50%] z-0 opacity-70 pointer-events-none bg-[conic-gradient(from_0deg,transparent_10%,rgba(251,191,36,0.45)_25%,transparent_40%,rgba(251,191,36,0.45)_60%,transparent_75%,rgba(167,139,250,0.3)_90%,transparent_100%)] blur-[8px]"
+                              />
+
+                              {/* Resplandor del Borde Sagrado (Dorado y Místico) */}
+                              <motion.div 
+                                animate={{ 
+                                  scale: [0.97, 1.02, 0.97], 
+                                  opacity: [0.8, 1.0, 0.8],
+                                  boxShadow: [
+                                    '0 0 45px rgba(251,191,36,0.95), inset 0 0 20px rgba(251,191,36,0.65)',
+                                    '0 0 65px rgba(251,191,36,1.0), inset 0 0 30px rgba(251,191,36,0.85)',
+                                    '0 0 45px rgba(251,191,36,0.95), inset 0 0 20px rgba(251,191,36,0.65)'
+                                  ]
+                                }} 
+                                transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }} 
+                                className="absolute inset-0 border-[2.5px] rounded-xl z-30 pointer-events-none border-amber-400" 
+                              />
                             </>
                           )}
                         </>
@@ -571,77 +647,144 @@ export default function Album() {
                   {isSelected && (isShiny || isSecret || isSuperSecret || isUltraSecret || isDivine) && (
                     <>
                       {/* Holographic Foil Texture Overlay */}
-                      {[...Array(8)].map((_, i) => {
-                        // Para ultra-secret seguimos un patrón ordenado de cascada uniforme; para las otras es aleatorio
-                        const top = isUltraSecret 
-                          ? 5 + ((i * 12) % 65) 
-                          : 5 + Math.random() * 80;
-                        const left = isUltraSecret 
-                          ? 10 + (i * 10) 
-                          : 5 + Math.random() * 80;
-                        const scale = isUltraSecret ? 0.8 : 0.6 + Math.random() * 0.7;
-                        const delay = isUltraSecret ? i * 0.22 : i * 0.25;
-                        const duration = isUltraSecret ? 1.8 : 1.6 + Math.random() * 1.4;
-                        
-                        // Animación condicional ultra y rgb shiny (ahora shiny vuelve a ser blanco)
-                        const animateProps = isUltraSecret 
-                          ? {
-                              opacity: [0, 0.9, 0],
-                              scale: [0.3, scale, 0.3],
-                              x: [25, 0, -25],
-                              y: [-30, 0, 30],
-                              color: i % 2 === 0 
-                                ? [
-                                    'rgba(255,255,255,0.85)', 
-                                    'rgba(234,179,8,0.95)', 
-                                    'rgba(244,63,94,0.9)', 
-                                    'rgba(255,255,255,0.85)'
-                                  ]
-                                : ['rgba(255,255,255,0.85)', 'rgba(255,255,255,0.85)'],
-                              boxShadow: i % 2 === 0
-                                ? [
-                                    '0 0 8px rgba(255,255,255,0.5)',
-                                    '0 0 15px rgba(234,179,8,0.95)',
-                                    '0 0 15px rgba(244,63,94,0.9)',
-                                    '0 0 8px rgba(255,255,255,0.5)'
-                                  ]
-                                : [
-                                    '0 0 8px rgba(255,255,255,0.4)',
-                                    '0 0 8px rgba(255,255,255,0.4)'
-                                  ]
-                            }
-                          : {
-                              opacity: [0, 0.95, 0],
-                              scale: [0, scale, 0],
-                              x: [0, Math.random() * 16 - 8, 0],
-                              y: [0, Math.random() * 16 - 8, 0]
-                            };
-                        
-                        return (
-                          <motion.div
-                            key={i}
-                            initial={{ opacity: 0, scale: 0 }}
-                            animate={animateProps}
-                            transition={{ repeat: Infinity, duration, delay, ease: isUltraSecret ? "linear" : "easeInOut" }}
-                            style={{ top: `${top}%`, left: `${left}%` }}
-                            className="absolute z-20 pointer-events-none"
-                          >
-                            {isShiny ? (
-                              <svg className="w-3.5 h-3.5 text-white fill-current drop-shadow-[0_0_6px_rgba(255,255,255,0.9)]" viewBox="0 0 24 24">
-                                <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.6L12 0Z" />
-                              </svg>
-                            ) : isSecret ? (
-                              <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-fuchsia-300 via-rose-200 to-orange-300 blur-[0.3px] shadow-[0_0_7px_#f43f5e]" />
-                            ) : isSuperSecret ? (
-                              <div className="w-2.5 h-2.5 rotate-45 rounded-sm bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-200 blur-[0.3px] shadow-[0_0_7px_#34d399]" />
-                            ) : isUltraSecret ? (
-                              <div className="w-1 h-12 rounded-full -rotate-[35deg] bg-gradient-to-b from-current via-current/30 to-transparent" />
-                            ) : isDivine ? (
-                              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-500 blur-[0.2px] shadow-[0_0_10px_#fbbf24] rotate-45" />
-                            ) : null}
-                          </motion.div>
-                        );
-                      })}
+                      {isDivine ? (
+                        <>
+                          {/* 1. Esferas doradas independientes para Divine */}
+                          {[...Array(8)].map((_, i) => {
+                            const top = 5 + Math.random() * 80;
+                            const left = 5 + Math.random() * 80;
+                            const scale = 0.6 + Math.random() * 0.7;
+                            const delay = i * 0.25;
+                            const duration = 1.6 + Math.random() * 1.4;
+
+                            return (
+                              <motion.div
+                                key={`divine-card-sphere-${i}`}
+                                initial={{ opacity: 0, scale: 0 }}
+                                animate={{
+                                  opacity: [0, 0.95, 0],
+                                  scale: [0, scale, 0],
+                                  x: [0, Math.random() * 16 - 8, 0],
+                                  y: [0, Math.random() * 16 - 8, 0]
+                                }}
+                                transition={{ repeat: Infinity, duration, delay, ease: "easeInOut" }}
+                                style={{ top: `${top}%`, left: `${left}%` }}
+                                className="absolute z-20 pointer-events-none"
+                              >
+                                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-500 blur-[0.2px] shadow-[0_0_8px_#fbbf24] rotate-45" />
+                              </motion.div>
+                            );
+                          })}
+
+                          {/* 2. Estrellas de colores estables independientes para Divine */}
+                          {[...Array(8)].map((_, i) => {
+                            const top = 5 + Math.random() * 80;
+                            const left = 5 + Math.random() * 80;
+                            const scale = 0.6 + Math.random() * 0.7;
+                            const delay = i * 0.25 + 0.12; // Desfasado de las esferas para que aparezcan alternadas
+                            const duration = 1.6 + Math.random() * 1.4;
+
+                            // Asignamos un color estable del array de colores divinos según el índice i
+                            const DIVINE_COLORS = ['#fbbf24', '#a78bfa', '#ef4444', '#06b6d4'];
+                            const starColor = DIVINE_COLORS[i % DIVINE_COLORS.length];
+
+                            return (
+                              <motion.div
+                                key={`divine-card-star-${i}`}
+                                initial={{ opacity: 0, scale: 0 }}
+                                animate={{
+                                  opacity: [0, 0.95, 0],
+                                  scale: [0, scale, 0],
+                                  x: [0, Math.random() * 16 - 8, 0],
+                                  y: [0, Math.random() * 16 - 8, 0]
+                                }}
+                                transition={{ repeat: Infinity, duration, delay, ease: "easeInOut" }}
+                                style={{ top: `${top}%`, left: `${left}%` }}
+                                className="absolute z-20 pointer-events-none"
+                              >
+                                <motion.div 
+                                  animate={{ rotate: 360 }}
+                                  transition={{ repeat: Infinity, duration: 4 + Math.random() * 4, ease: "linear" }}
+                                >
+                                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" style={{ color: starColor, filter: `drop-shadow(0 0 6px ${starColor})` }}>
+                                    <path d="M12 0L14.8 9.2L24 12L14.8 14.8L12 24L9.2 14.8L0 12L9.2 9.2L12 0Z" />
+                                  </svg>
+                                </motion.div>
+                              </motion.div>
+                            );
+                          })}
+                        </>
+                      ) : (
+                        [...Array(8)].map((_, i) => {
+                          // Para ultra-secret seguimos un patrón ordenado de cascada uniforme; para las otras es aleatorio
+                          const top = isUltraSecret 
+                            ? 5 + ((i * 12) % 65) 
+                            : 5 + Math.random() * 80;
+                          const left = isUltraSecret 
+                            ? 10 + (i * 10) 
+                            : 5 + Math.random() * 80;
+                          const scale = isUltraSecret ? 0.8 : 0.6 + Math.random() * 0.7;
+                          const delay = isUltraSecret ? i * 0.22 : i * 0.25;
+                          const duration = isUltraSecret ? 1.8 : 1.6 + Math.random() * 1.4;
+                          
+                          // Animación condicional ultra y rgb shiny (ahora shiny vuelve a ser blanco)
+                          const animateProps = isUltraSecret 
+                            ? {
+                                opacity: [0, 0.9, 0],
+                                scale: [0.3, scale, 0.3],
+                                x: [25, 0, -25],
+                                y: [-30, 0, 30],
+                                color: i % 2 === 0 
+                                  ? [
+                                      'rgba(255,255,255,0.85)', 
+                                      'rgba(234,179,8,0.95)', 
+                                      'rgba(244,63,94,0.9)', 
+                                      'rgba(255,255,255,0.85)'
+                                    ]
+                                  : ['rgba(255,255,255,0.85)', 'rgba(255,255,255,0.85)'],
+                                boxShadow: i % 2 === 0
+                                  ? [
+                                      '0 0 8px rgba(255,255,255,0.5)',
+                                      '0 0 15px rgba(234,179,8,0.95)',
+                                      '0 0 15px rgba(244,63,94,0.9)',
+                                      '0 0 8px rgba(255,255,255,0.5)'
+                                    ]
+                                  : [
+                                      '0 0 8px rgba(255,255,255,0.4)',
+                                      '0 0 8px rgba(255,255,255,0.4)'
+                                    ]
+                              }
+                            : {
+                                opacity: [0, 0.95, 0],
+                                scale: [0, scale, 0],
+                                x: [0, Math.random() * 16 - 8, 0],
+                                y: [0, Math.random() * 16 - 8, 0]
+                              };
+                          
+                          return (
+                            <motion.div
+                              key={i}
+                              initial={{ opacity: 0, scale: 0 }}
+                              animate={animateProps}
+                              transition={{ repeat: Infinity, duration, delay, ease: isUltraSecret ? "linear" : "easeInOut" }}
+                              style={{ top: `${top}%`, left: `${left}%` }}
+                              className="absolute z-20 pointer-events-none"
+                            >
+                              {isShiny ? (
+                                <svg className="w-3.5 h-3.5 text-white fill-current drop-shadow-[0_0_6px_rgba(255,255,255,0.9)]" viewBox="0 0 24 24">
+                                  <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.6L12 0Z" />
+                                </svg>
+                              ) : isSecret ? (
+                                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-fuchsia-300 via-rose-200 to-orange-300 blur-[0.3px] shadow-[0_0_7px_#f43f5e]" />
+                              ) : isSuperSecret ? (
+                                <div className="w-2.5 h-2.5 rotate-45 rounded-sm bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-200 blur-[0.3px] shadow-[0_0_7px_#34d399]" />
+                              ) : isUltraSecret ? (
+                                <div className="w-1 h-12 rounded-full -rotate-[35deg] bg-gradient-to-b from-current via-current/30 to-transparent" />
+                              ) : null}
+                            </motion.div>
+                          );
+                        })
+                      )}
 
                       {/* Extra Holographic Diamond Sparkles (Ultra-Secret exclusive) */}
                       {isUltraSecret && (
@@ -696,7 +839,20 @@ export default function Album() {
                     <p className={`font-bold text-[9px] uppercase truncate tracking-widest leading-none mb-2 ${isSelected ? 'text-white' : 'text-gray-500'}`}>{entry.card.name}</p>
                     {isSelected && (
                       <>
-                        <span className={`text-[7px] px-2 py-0.5 rounded-full border ${style.border} ${style.text} bg-black/60 font-black tracking-tighter inline-block uppercase`}>{entry.card.rarity}</span>
+                        {entry.card.rarity.toLowerCase() === 'divine' ? (
+                          <motion.span 
+                            animate={{ 
+                              color: ['#fbbf24', '#a78bfa', '#ef4444', '#06b6d4', '#fbbf24'],
+                              borderColor: ['#fbbf24', '#a78bfa', '#ef4444', '#06b6d4', '#fbbf24']
+                            }}
+                            transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                            className="text-[7px] px-2 py-0.5 rounded-full border bg-black/60 font-black tracking-tighter inline-block uppercase"
+                          >
+                            {entry.card.rarity}
+                          </motion.span>
+                        ) : (
+                          <span className={`text-[7px] px-2 py-0.5 rounded-full border ${style.border} ${style.text} bg-black/60 font-black tracking-tighter inline-block uppercase`}>{entry.card.rarity}</span>
+                        )}
                         <button
                           onClick={(e) => { e.stopPropagation(); handleSetFavorite(entry.card.id); }}
                           disabled={settingFavorite}

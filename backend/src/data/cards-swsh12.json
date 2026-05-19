@@ -2698,13 +2698,13 @@
         {
             "id": "swsh12-divine",
             "pokemonId": 249,
-            "name": "Lugia VSTAR (Divine)",
+            "name": "Lugia (Divine)",
             "rarity": "divine",
             "hp": 280,
             "type": "Colorless",
             "attack": 220,
             "defense": 140,
-            "imageUrl": "https://images.pokemontcg.io/swsh12/139_hires.png"
+            "imageUrl": "https://pocket.pokemongohub.net/tcg-pocket/cards/a4/webp/PK_20_010050_01.webp"
         }
     ]
 }

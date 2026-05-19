@@ -1928,13 +1928,13 @@
         {
             "id": "sm3-divine",
             "pokemonId": 6,
-            "name": "Charizard GX (Divine)",
+            "name": "Ho-oh (Divine)",
             "rarity": "divine",
             "hp": 250,
             "type": "Fire",
             "attack": 300,
             "defense": 150,
-            "imageUrl": "https://images.pokemontcg.io/sm3/20_hires.png"
+            "imageUrl": "https://pocket.pokemongohub.net/tcg-pocket/cards/a4/webp/PK_20_008900_01.webp"
         }
     ]
 }

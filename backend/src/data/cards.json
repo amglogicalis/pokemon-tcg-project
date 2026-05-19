@@ -1609,13 +1609,13 @@
         {
             "id": "dp6-divine",
             "pokemonId": 487,
-            "name": "Giratina Star (Divine)",
+            "name": "Giratina (Divine)",
             "rarity": "divine",
             "hp": 250,
             "type": "Psychic",
             "attack": 180,
             "defense": 120,
-            "imageUrl": "https://images.pokemontcg.io/dp6/146_hires.png"
+            "imageUrl": "https://pocket.pokemongohub.net/tcg-pocket/cards/a2/webp/cPK_20_003590_00_ORIGINGIRATINA_AR_M_M_en_US.webp"
         }
     ]
 }
