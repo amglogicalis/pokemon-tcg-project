@@ -276,7 +276,7 @@ const expansionNames: Record<string, { name: string; color: string }> = {
   bw9: { name: 'Plasma Blast', color: 'text-blue-400' },
   xyp: { name: 'XY Black Star Promos', color: 'text-red-500' },
   zsv10pt5: { name: 'Black Bolt', color: 'text-indigo-600' },
-  sm3: { name: 'Burning Shadows', color: 'text-red-800' }
+  sm3: { name: 'Burning Shadows', color: 'text-rose-900' }
 };
 
 const medalConfig: Record<string, { label: string; icon: string; bg: string; border: string; text: string; imageUrl?: string }> = { 
@@ -664,7 +664,7 @@ export default function Mural() {
 
                       {/* Medallas Obtenidas */}
                       <div className="mt-4 pt-4 border-t border-white/10 w-full">
-                        <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-3">Medallas Obtenidas ({selectedEntry.completedExpansions?.length || 0}/6)</p>
+                        <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-3">Medallas Obtenidas ({selectedEntry.completedExpansions?.length || 0}/{Object.keys(medalConfig).length})</p>
                         {selectedEntry.completedExpansions && selectedEntry.completedExpansions.length > 0 ? (
                           <div className="flex flex-wrap gap-2 justify-center">
                             {selectedEntry.completedExpansions.map((medId) => {

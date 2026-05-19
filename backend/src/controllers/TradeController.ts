@@ -44,7 +44,7 @@ export class TradeController {
 
       const cardsList = Array.from(allCardsMap.values());
       const filtered = cardsList.filter((card: any) => 
-        card.name.toLowerCase().includes(searchStr)
+        card.name.toLowerCase().includes(searchStr) && card.rarity.toLowerCase() !== 'divine'
       ).slice(0, 15); // Límite de 15 resultados para máxima velocidad y optimización
 
       res.status(200).json(filtered);
@@ -105,6 +105,11 @@ export class TradeController {
 
       if (!senderCardData || !receiverCardData) {
         res.status(400).json({ error: 'Una de las cartas seleccionadas no existe.' });
+        return;
+      }
+
+      if (senderCardData.rarity.toLowerCase() === 'divine' || receiverCardData.rarity.toLowerCase() === 'divine') {
+        res.status(400).json({ error: 'Las cartas de rareza Divine no pueden ser intercambiadas.' });
         return;
       }
 

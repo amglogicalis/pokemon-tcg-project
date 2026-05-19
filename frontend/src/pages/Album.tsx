@@ -23,7 +23,7 @@ type SortOrder = 'recent' | 'id' | 'rarity' | 'hp';
 const EXPANSIONS = { 
   xy5: { id: 'xy5', name: 'Primal Clash', total: 164, color: 'text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-cyan-500 font-black drop-shadow-[0_2px_10px_rgba(220,38,38,0.25)] pr-4', bar: 'from-red-600 to-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)]' }, 
   swsh12: { id: 'swsh12', name: 'Silver Tempest', total: 245, color: 'text-slate-400', bar: 'from-slate-400 to-slate-400' }, 
-  sm3: { id: 'sm3', name: 'Burning Shadows', total: 175, color: 'text-red-500', bar: 'from-red-900 to-red-600' },
+  sm3: { id: 'sm3', name: 'Burning Shadows', total: 175, color: 'text-rose-900', bar: 'from-rose-950 to-rose-800' },
   dp6: { id: 'dp6', name: 'Legends Awakened', total: 146, color: 'text-yellow-400', bar: 'from-yellow-600 to-yellow-200' },
   bw9: { id: 'bw9', name: 'Plasma Blast', total: 122, color: 'text-blue-400', bar: 'from-blue-600 to-blue-300' },
   xyp: { id: 'xyp', name: 'XY Black Star Promos', total: 213, color: 'text-red-500', bar: 'from-red-700 to-red-400' },

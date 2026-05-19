@@ -343,6 +343,8 @@ export default function Trades() {
               <input
                 type="text"
                 placeholder="Buscar por nombre de carta..."
+                onFocus={(e) => e.target.placeholder = ''}
+                onBlur={(e) => e.target.placeholder = 'Buscar por nombre de carta...'}
                 value={publicFilters.search}
                 onChange={(e) => setPublicFilters({ ...publicFilters, search: e.target.value })}
                 className={`w-full bg-gray-950/70 border p-3 px-4 rounded-xl text-xs font-bold focus:outline-none transition-all focus:border-current ${currentTheme.textAccentClass}`}
@@ -494,6 +496,8 @@ export default function Trades() {
               <input
                 type="text"
                 placeholder="Escribe el nombre del pokémon (ej: Charizard, Giratina, Thundurus...)"
+                onFocus={(e) => e.target.placeholder = ''}
+                onBlur={(e) => e.target.placeholder = 'Escribe el nombre del pokémon (ej: Charizard, Giratina, Thundurus...)'}
                 value={cardSearchQuery}
                 onChange={(e) => setCardSearchQuery(e.target.value)}
                 className={`w-full bg-gray-950/70 border p-4 px-5 rounded-xl text-xs font-bold focus:outline-none transition-all focus:border-current ${currentTheme.textAccentClass}`}
@@ -859,10 +863,12 @@ export default function Trades() {
               </div>
 
               {/* Buscador de cartas a ofrecer */}
-              <div className="mb-4">
+              <div className="mb-4 relative">
                 <input
                   type="text"
                   placeholder="🔍 Buscar carta para ofrecer por nombre..."
+                  onFocus={(e) => e.target.placeholder = ''}
+                  onBlur={(e) => e.target.placeholder = '🔍 Buscar carta para ofrecer por nombre...'}
                   value={offerSearchQuery}
                   onChange={(e) => setOfferSearchQuery(e.target.value)}
                   className={`w-full bg-black/50 border p-2.5 px-4 rounded-xl text-xs font-bold focus:outline-none transition-all focus:border-current ${currentTheme.textAccentClass}`}
@@ -872,14 +878,14 @@ export default function Trades() {
 
               {/* Grid de Cartas Disponibles para Ofrecer */}
               <div className="flex-1 overflow-y-auto min-h-[300px] pr-2 space-y-4">
-                {userAlbum.filter(entry => entry.card.name.toLowerCase().includes(offerSearchQuery.toLowerCase())).length === 0 ? (
+                {userAlbum.filter(entry => entry.card.name.toLowerCase().includes(offerSearchQuery.toLowerCase()) && entry.card.rarity.toLowerCase() !== 'divine').length === 0 ? (
                   <div className="text-center py-20 text-gray-500">
                     <p className="text-xs font-bold uppercase tracking-wider">No se encontraron cartas en tu álbum</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
                     {userAlbum
-                      .filter(entry => entry.card.name.toLowerCase().includes(offerSearchQuery.toLowerCase()))
+                      .filter(entry => entry.card.name.toLowerCase().includes(offerSearchQuery.toLowerCase()) && entry.card.rarity.toLowerCase() !== 'divine')
                       .map((entry) => {
                         const card = entry.card;
                         const quantity = entry.quantity;
@@ -952,6 +958,8 @@ export default function Trades() {
                     <input
                       type="text"
                       placeholder="Escribe el pokémon que buscas..."
+                      onFocus={(e) => e.target.placeholder = ''}
+                      onBlur={(e) => e.target.placeholder = 'Escribe el pokémon que buscas...'}
                       value={cardSearchQuery}
                       onChange={(e) => setCardSearchQuery(e.target.value)}
                       className={`w-full bg-black border p-2.5 px-4 rounded-xl text-xs font-bold focus:outline-none transition-all focus:border-current ${currentTheme.textAccentClass}`}
