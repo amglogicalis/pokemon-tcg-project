@@ -12,6 +12,7 @@ const rarityWeight: Record<string, number> = {
 };
 
 const EXPANSIONS = [ 
+  { id: 'xy5', name: 'PRIMAL CLASH', color: 'text-blue-900', bg: 'bg-blue-900' }, 
   { id: 'swsh12', name: 'SILVER TEMPEST', color: 'text-slate-400', bg: 'bg-slate-400' }, 
   { id: 'sm3', name: 'BURNING SHADOWS', color: 'text-red-500', bg: 'bg-red-500' }, 
   { id: 'dp6', name: 'Legends Awakened', color: 'text-yellow-400', bg: 'bg-yellow-400' },
@@ -555,10 +556,10 @@ export default function Shop() {
                     className={`group relative shrink-0 py-2 px-4 transition-all duration-300 outline-none focus:outline-none select-none`}
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
-                    <span className={`relative z-10 text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors duration-300 ${isActive ? expColorClass : 'text-gray-500 group-hover:text-gray-300'}`}>
+                    <span className={`relative z-10 text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${isActive ? (exp.id === 'xy5' ? 'bg-gradient-to-r from-red-600 to-cyan-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(220,38,38,0.25)] pr-2' : expColorClass) : 'text-gray-500 group-hover:text-gray-300'}`}>
                       {exp.name}
                     </span>
-                    <div className={`absolute bottom-0 left-3 right-3 h-[2px] rounded-full transition-all duration-300 ${isActive ? `${bgColorClass} opacity-100` : 'bg-transparent opacity-0'}`} />
+                    <div className={`absolute bottom-0 left-3 right-3 h-[2px] rounded-full transition-all duration-300 ${isActive ? (exp.id === 'xy5' ? 'bg-gradient-to-r from-red-600 to-cyan-500 opacity-100 shadow-[0_0_8px_rgba(220,38,38,0.5)]' : `${bgColorClass} opacity-100`) : 'bg-transparent opacity-0'}`} />
                   </button>
                 );
               })}

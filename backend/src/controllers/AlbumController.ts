@@ -4,6 +4,7 @@ import { MongoUserRepository } from '../repositories/MongoUserRepository';
 
 // Importación estática para asegurar compatibilidad
 import baseCards from '../data/cards.json';
+import xy5Cards from '../data/cards-xy5.json';
 import swsh12Cards from '../data/cards-swsh12.json';
 import bw9Cards from '../data/cards-bw9.json';
 import xypCards from '../data/cards-xyp.json';
@@ -43,6 +44,7 @@ export class AlbumController {
       };
 
       addCardsToMap(baseCards.cards, 'cards.json', 'dp6');
+      addCardsToMap(xy5Cards.cards, 'cards-xy5.json', 'xy5');
       addCardsToMap(swsh12Cards.cards, 'cards-swsh12.json', 'swsh12');
       addCardsToMap(bw9Cards.cards, 'cards-bw9.json', 'bw9');
       addCardsToMap(xypCards.cards, 'cards-xyp.json', 'xyp');
@@ -231,7 +233,8 @@ export class AlbumController {
       }
 
       const { theme } = req.body;
-      const validThemes = [
+      const validThemes = [ 
+  'explosion-primigenia',
         'default',
         'aura-divina',
         'tormenta-glaciar',
@@ -252,7 +255,8 @@ export class AlbumController {
         return;
       }
 
-      const themeToExpansionMap: Record<string, string> = {
+      const themeToExpansionMap: Record<string, string> = { 
+  'explosion-primigenia': 'xy5',
         'aura-divina': 'dp6',
         'tormenta-glaciar': 'swsh12',
         'sobrecarga-plasma': 'bw9',

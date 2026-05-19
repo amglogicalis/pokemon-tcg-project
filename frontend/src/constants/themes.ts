@@ -16,7 +16,24 @@ export interface ThemeStyle {
   panelBgClass: string; // Color del panel de estadísticas del tema (círculo azul)
 }
 
-export const themes: Record<string, ThemeStyle> = {
+export const themes: Record<string, ThemeStyle> = { 
+  'explosion-primigenia': {
+    id: 'explosion-primigenia',
+    name: 'Choque Primigenio',
+    description: 'El colosal choque térmico entre el magma volcánico y el océano gélido antártico.',
+    unlockedBy: 'xy5',
+    bgClass: 'bg-gradient-to-br from-red-950/45 via-slate-950 to-cyan-950/20 text-rose-100',
+    textClass: 'text-cyan-400',
+    accentClass: 'bg-gradient-to-r from-red-600 to-cyan-500 hover:from-red-500 hover:to-cyan-400 text-white font-extrabold shadow-lg transition-all duration-300',
+    accentHoverClass: 'hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]',
+    navClass: 'bg-gradient-to-r from-red-950/40 via-slate-950/60 to-cyan-950/20 border-b border-red-600/20 backdrop-blur-md',
+    textAccentClass: 'text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-cyan-500 font-extrabold pr-4',
+    accentRgb: '220,38,38',
+    glowClass: 'shadow-[0_0_20px_rgba(220,38,38,0.35)]',
+    mobileActiveNavClass: 'bg-gradient-to-r from-red-600/15 to-cyan-500/15 text-cyan-400 font-black',
+    progressBarClass: 'bg-gradient-to-r from-red-600 to-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.6)]',
+    panelBgClass: 'bg-gradient-to-br from-red-950/30 to-cyan-950/15 border border-red-600/15',
+  },
   default: {
     id: 'default',
     name: 'Vacío Espacial',

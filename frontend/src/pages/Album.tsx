@@ -21,6 +21,7 @@ type SortOrder = 'recent' | 'id' | 'rarity' | 'hp';
 
 // 1. Definición de expansiones
 const EXPANSIONS = { 
+  xy5: { id: 'xy5', name: 'Primal Clash', total: 164, color: 'text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-cyan-500 font-black drop-shadow-[0_2px_10px_rgba(220,38,38,0.25)] pr-4', bar: 'from-red-600 to-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)]' }, 
   swsh12: { id: 'swsh12', name: 'Silver Tempest', total: 245, color: 'text-slate-400', bar: 'from-slate-400 to-slate-400' }, 
   sm3: { id: 'sm3', name: 'Burning Shadows', total: 175, color: 'text-red-500', bar: 'from-red-900 to-red-600' },
   dp6: { id: 'dp6', name: 'Legends Awakened', total: 146, color: 'text-yellow-400', bar: 'from-yellow-600 to-yellow-200' },
@@ -115,6 +116,9 @@ export default function Album() {
     
     const filteredEntries = entries.filter(e => {
       const cardId = e.card.id.toLowerCase();
+      if (activeTab === 'xy5') {
+        return cardId.startsWith('xy5-');
+      }
       if (activeTab === 'swsh12') {
         return cardId.startsWith('swsh12-');
       }
@@ -498,10 +502,10 @@ export default function Album() {
                 className={`group relative shrink-0 pb-2 px-4 transition-all duration-300 outline-none focus:outline-none select-none`}
                 style={{ WebkitTapHighlightColor: 'transparent' }}
               >
-                <span className={`relative z-10 font-black uppercase tracking-widest text-xs transition-colors duration-300 ${isActive ? expColorClass : 'text-gray-500 group-hover:text-gray-300'}`}>
+                <span className={`relative z-10 font-black uppercase tracking-widest text-xs transition-all duration-300 ${isActive ? (key === 'xy5' ? 'bg-gradient-to-r from-red-600 to-cyan-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(220,38,38,0.25)] pr-2' : expColorClass) : 'text-gray-500 group-hover:text-gray-300'}`}>
                   {EXPANSIONS[key].name}
                 </span>
-                <div className={`absolute bottom-0 left-0 right-0 h-[2px] transition-colors duration-300 ${isActive ? bgColorClass : 'bg-transparent'}`} />
+                <div className={`absolute bottom-0 left-0 right-0 h-[2px] transition-all duration-300 ${isActive ? (key === 'xy5' ? 'bg-gradient-to-r from-red-600 to-cyan-500 opacity-100 shadow-[0_0_8px_rgba(220,38,38,0.55)]' : bgColorClass) : 'bg-transparent'}`} />
               </button>
             );
           })}

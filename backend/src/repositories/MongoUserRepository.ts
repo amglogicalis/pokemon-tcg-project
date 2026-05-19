@@ -6,6 +6,7 @@ import { ProgressionService } from '../services/ProgressionService';
 
 // Importación estática para asegurar compatibilidad
 import dp6Cards from '../data/cards.json';
+import xy5Cards from '../data/cards-xy5.json';
 import swsh12Cards from '../data/cards-swsh12.json';
 import sm3Cards from '../data/cards-sm3.json';
 import bw9Cards from '../data/cards-bw9.json';
@@ -13,6 +14,7 @@ import xypCards from '../data/cards-xyp.json';
 import zsv10pt5Cards from '../data/cards-zsv10pt5.json';
 
 const expansionsData: Record<string, any> = { 
+  'xy5': xy5Cards, 
   'swsh12': swsh12Cards, 
   'sm3': sm3Cards, 
   'dp6': dp6Cards,

@@ -270,6 +270,7 @@ function CardVisualEffects({ rarity }: { rarity: string }) {
 }
 
 const expansionNames: Record<string, { name: string; color: string }> = { 
+  xy5: { name: 'Primal Clash', color: 'text-blue-900' }, 
   swsh12: { name: 'Silver Tempest', color: ' text-slate-400' },
   dp6: { name: 'Legends Awakened', color: 'text-yellow-400' },
   bw9: { name: 'Plasma Blast', color: 'text-blue-400' },
@@ -278,7 +279,15 @@ const expansionNames: Record<string, { name: string; color: string }> = {
   sm3: { name: 'Burning Shadows', color: 'text-red-800' }
 };
 
-const medalConfig: Record<string, { label: string; icon: string; bg: string; border: string; text: string; imageUrl?: string }> = {
+const medalConfig: Record<string, { label: string; icon: string; bg: string; border: string; text: string; imageUrl?: string }> = { 
+  'xy5': { 
+    label: 'Primal', 
+    icon: '🌋', 
+    bg: 'bg-blue-950/80', 
+    border: 'border-blue-500/50', 
+    text: 'text-blue-300', 
+    imageUrl: 'https://www.serebii.net/tcgpocket/emblems/megagardevoiremblem.png' 
+  },
   swsh12: { 
     label: 'Tempestad', 
     icon: '⛈️', 
@@ -787,7 +796,8 @@ export default function Mural() {
                 
                 <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
                   {[
-                    { id: 'default', name: 'Vacío Espacial (Predeterminado)', desc: 'Gris espacial y amarillo stelar', reqExp: '', emoji: '🌌' },
+                    { id: 'default', name: 'Vacío Espacial (Predeterminado)', desc: 'Gris espacial y amarillo stelar', reqExp: '', emoji: '🌌' }, 
+  { id: 'explosion-primigenia', name: 'Explosion Primigenia', desc: 'Rojo volcanico y azul artartico', reqExp: 'xy5', emoji: '🌋' },
                     { id: 'aura-divina', name: 'Aura Divina', desc: 'Dorado profundo y negro azabache', reqExp: 'dp6', emoji: '🌟' },
                     { id: 'tormenta-glaciar', name: 'Tormenta Glaciar', desc: 'Azul hielo y grises platinos', reqExp: 'swsh12', emoji: '⛈️' },
                     { id: 'sobrecarga-plasma', name: 'Sobrecarga Plasma', desc: 'Azul cobalto y cian eléctrico', reqExp: 'bw9', emoji: '⚡' },

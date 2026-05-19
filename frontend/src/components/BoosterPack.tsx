@@ -8,6 +8,7 @@ interface BoosterPackProps {
 }
 
 const PACK_ASSETS: Record<string, { imagePath: string; glow: string }> = { 
+  'xy5': { imagePath: 'xy5/packshots/XY5_Booster_Groudon.webp', glow: 'bg-blue-900' }, 
   'swsh12': { imagePath: 'swsh12/packshots/image_1_394x_f23c7f88-ca92-46a0-88bd-574db522aa80_394x.webp', glow: 'bg-slate-400' }, 
   'sm3': { imagePath: 'sm3/packshots/SM3_Booster_Ho-Oh.webp', glow: 'bg-red-600' }, 
   dp6: {

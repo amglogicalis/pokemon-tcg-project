@@ -28,6 +28,7 @@ interface Trade {
 }
 
 const EXPANSIONS_LIST = [ 
+  { id: 'xy5', name: 'PRIMAL CLASH' }, 
   { id: 'swsh12', name: 'SILVER TEMPEST' },
   { id: '', name: 'Todas las expansiones' },
   { id: 'sm3', name: 'BURNING SHADOWS' },

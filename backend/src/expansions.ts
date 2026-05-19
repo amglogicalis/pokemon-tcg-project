@@ -8,6 +8,7 @@ export interface ExpansionConfig {
 }
 
 export const AVAILABLE_EXPANSIONS: Record<string, ExpansionConfig> = { 
+  'xy5': { id: 'xy5', apiId: 'xy5', name: 'Primal Clash', fileName: 'cards-xy5.json' }, 
   'swsh12': { id: 'swsh12', apiId: 'swsh12', name: 'Silver Tempest', fileName: 'cards-swsh12.json' }, 
   'sm3': { id: 'sm3', apiId: 'sm3', name: 'Burning Shadows', fileName: 'cards-sm3.json' }, 
   'dp6': {
