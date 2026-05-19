@@ -73,7 +73,8 @@ export class AlbumController {
         xp: user.xp ?? 0,
         lastPackClaimedAt: user.lastPackClaimedAt,
         completedExpansions: user.completedExpansions || [],
-        showcasedMedals: user.showcasedMedals || []
+        showcasedMedals: user.showcasedMedals || [],
+        activeTheme: user.activeTheme || 'default'
       });
 
     } catch (err: any) {
