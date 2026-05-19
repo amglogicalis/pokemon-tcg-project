@@ -3,6 +3,7 @@ import api from '../services/api';
 import { rarityStyles } from '../constants/rarities';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../store/useAuthStore';
+import { themes } from '../constants/themes';
 
 interface AlbumEntry {
   card: {
@@ -20,15 +21,19 @@ type SortOrder = 'recent' | 'id' | 'rarity' | 'hp';
 
 // 1. Definición de expansiones
 const EXPANSIONS = { 
-  swsh12: { id: 'swsh12', name: 'Silver Tempest', total: 245, color: ' text-slate-400', bar: ' from-slate-400 to- slate-400' }, 
-  sm3: { id: 'sm3', name: 'Burning Shadows', total: 177, color: 'text-red-800', bar: 'from-red-900 to-red-600' },
-  dp6: { id: 'card', name: 'Legends Awakened', total: 146, color: 'text-yellow-400', bar: 'from-yellow-600 to-yellow-200' },
+  swsh12: { id: 'swsh12', name: 'Silver Tempest', total: 245, color: 'text-slate-400', bar: 'from-slate-400 to-slate-400' }, 
+  sm3: { id: 'sm3', name: 'Burning Shadows', total: 177, color: 'text-red-500', bar: 'from-red-900 to-red-600' },
+  dp6: { id: 'dp6', name: 'Legends Awakened', total: 146, color: 'text-yellow-400', bar: 'from-yellow-600 to-yellow-200' },
   bw9: { id: 'bw9', name: 'Plasma Blast', total: 122, color: 'text-blue-400', bar: 'from-blue-600 to-blue-300' },
   xyp: { id: 'xyp', name: 'XY Black Star Promos', total: 208, color: 'text-red-500', bar: 'from-red-700 to-red-400' },
-  zsv10pt5: { id: 'zsv10pt5', name: 'Black Bolt', total: 172, color: 'text-indigo-600', bar: 'from-indigo-600 to-indigo-300' }
+  zsv10pt5: { id: 'zsv10pt5', name: 'Black Bolt', total: 172, color: 'text-indigo-400', bar: 'from-indigo-600 to-indigo-300' }
 };
 
 export default function Album() {
+  const currentUser = useAuthStore((s) => s.user);
+  const activeThemeId = currentUser?.activeTheme || 'default';
+  const currentTheme = themes[activeThemeId] || themes.default;
+
   const [entries, setEntries] = useState<AlbumEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<SortOrder>('recent');
@@ -40,7 +45,7 @@ export default function Album() {
   const albumMusicRef = useRef<HTMLAudioElement | null>(null);
 
   const rarityWeight: Record<string, number> = {
-    'ultra-secret': 8, 'ultra secret': 8, 'super-secret': 7, 'super secret': 7, 'secret': 6, 'shiny': 5, 'ultra-rare': 4, 'ultra rare': 4, 'holographic': 3, 'rare': 2, 'uncommon': 1, 'common': 0
+    'divine': 9, 'ultra-secret': 8, 'ultra secret': 8, 'super-secret': 7, 'super secret': 7, 'secret': 6, 'shiny': 5, 'ultra-rare': 4, 'ultra rare': 4, 'holographic': 3, 'rare': 2, 'uncommon': 1, 'common': 0
   };
 
   const playSelect = () => {
@@ -73,7 +78,7 @@ export default function Album() {
         
         // Actualizar nivel y experiencia en el store global
         if (response.data.level !== undefined && response.data.xp !== undefined) {
-          useAuthStore.getState().updateUserStats(response.data.level, response.data.xp);
+          useAuthStore.getState().updateUserStats(response.data.level, response.data.xp, response.data.completedExpansions);
         }
       } catch (error) {
         console.error("Error cargando álbum:", error);
@@ -132,8 +137,9 @@ export default function Album() {
       return false;
     });
     
-    const uniqueCount = filteredEntries.length;
-    const progress = Math.round((uniqueCount / currentExp.total) * 100);
+    const standardEntries = filteredEntries.filter(e => e.card.rarity.toLowerCase() !== 'divine');
+    const uniqueCount = standardEntries.length;
+    const progress = Math.min(100, Math.round((uniqueCount / currentExp.total) * 100));
     
     const sorted = [...filteredEntries].sort((a, b) => {
       switch (sortBy) {
@@ -159,6 +165,7 @@ export default function Album() {
   const currentBgEffect = useMemo(() => {
     if (!selectedEntry) return 'none';
     const rarity = selectedEntry.card.rarity.toLowerCase();
+    if (rarity === 'divine') return 'divine';
     if (rarity.includes('ultra-secret') || rarity.includes('ultra secret')) return 'ultra-secret';
     if (rarity.includes('super-secret') || rarity.includes('super secret')) return 'super-secret';
     if (rarity.includes('secret')) return 'secret';
@@ -171,7 +178,7 @@ export default function Album() {
 
   return (
     <div 
-      className="p-10 min-h-screen bg-gray-900 text-white relative overflow-x-hidden"
+      className="p-10 min-h-screen bg-transparent text-white relative overflow-x-hidden"
       onClick={() => {
         if (albumMusicRef.current && albumMusicRef.current.paused) {
           albumMusicRef.current.play().catch(() => {});
@@ -180,6 +187,62 @@ export default function Album() {
     >
       
       <AnimatePresence>
+        {currentBgEffect === 'divine' && (
+          <motion.div
+            key="divine-bg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.5, 0.9, 0.5], scale: [1, 1.05, 1] }}
+            exit={{ opacity: 0, transition: { duration: 0.5 } }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+            className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center bg-black/40"
+          >
+            {/* Golden Auroras and Cosmic Stars */}
+            <motion.div
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
+              className="absolute w-[160vmax] h-[160vmax] opacity-[0.35] bg-[conic-gradient(from_0deg,transparent_10%,rgba(251,191,36,0.3)_30%,transparent_50%,rgba(217,119,6,0.2)_70%,transparent_90%)] blur-[40px]"
+            />
+            <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(251,191,36,0.4)_0%,rgba(0,0,0,0)_65%)]" />
+            <motion.div 
+              animate={{ opacity: [0.35, 0.75, 0.35], scale: [0.96, 1.06, 0.96] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-0 bg-[radial-gradient(circle,rgba(217,119,6,0.65)_0%,rgba(217,119,6,0.18)_25%,rgba(0,0,0,0)_50%)]" 
+            />
+            {/* Shimmering Golden Stars */}
+            {[...Array(20)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ 
+                  x: Math.random() * window.innerWidth - window.innerWidth/2, 
+                  y: Math.random() * window.innerHeight - window.innerHeight/2,
+                  scale: 0,
+                  opacity: 0
+                }}
+                animate={{ 
+                  x: [
+                    Math.random() * window.innerWidth - window.innerWidth/2, 
+                    Math.random() * window.innerWidth - window.innerWidth/2,
+                    Math.random() * window.innerWidth - window.innerWidth/2
+                  ],
+                  y: [
+                    Math.random() * window.innerHeight - window.innerHeight/2,
+                    Math.random() * window.innerHeight - window.innerHeight/2,
+                    Math.random() * window.innerHeight - window.innerHeight/2
+                  ],
+                  scale: [0, 1.6, 0],
+                  opacity: [0, 0.85, 0],
+                }}
+                transition={{ 
+                  duration: 2.5 + Math.random() * 2.5, 
+                  repeat: Infinity, 
+                  delay: Math.random() * 1.5,
+                  ease: "easeInOut"
+                }}
+                className="absolute w-2.5 h-2.5 rounded-full bg-gradient-to-r from-yellow-200 via-amber-300 to-yellow-500 blur-[1px] shadow-[0_0_12px_#fbbf24]"
+              />
+            ))}
+          </motion.div>
+        )}
         {currentBgEffect === 'ultra' && (
           <motion.div
             key="ultra-bg"
@@ -369,19 +432,28 @@ export default function Album() {
       <div className="max-w-7xl mx-auto relative z-10">
         
         <div className="flex gap-6 mb-8 justify-start overflow-x-auto whitespace-nowrap scrollbar-hide max-w-full">
-          {(Object.keys(EXPANSIONS) as Array<keyof typeof EXPANSIONS>).map((key) => (
-            <button
-              key={key}
-              onClick={() => { playSelect(); setActiveTab(key); setSelectedCardId(null); }}
-              className={`shrink-0 pb-2 px-4 font-black uppercase tracking-widest text-xs transition-all border-b-2 whitespace-nowrap
-                ${activeTab === key ? `${EXPANSIONS[key].color} border-current` : 'text-gray-600 border-transparent hover:text-gray-400'}`}
-            >
-              {EXPANSIONS[key].name}
-            </button>
-          ))}
+          {(Object.keys(EXPANSIONS) as Array<keyof typeof EXPANSIONS>).map((key) => {
+            const isActive = activeTab === key;
+            const expColorClass = EXPANSIONS[key].color;
+            const bgColorClass = expColorClass.replace('text-', 'bg-');
+            
+            return (
+              <button
+                key={key}
+                onClick={() => { playSelect(); setActiveTab(key); setSelectedCardId(null); }}
+                className={`group relative shrink-0 pb-2 px-4 transition-all duration-300 outline-none focus:outline-none select-none`}
+                style={{ WebkitTapHighlightColor: 'transparent' }}
+              >
+                <span className={`relative z-10 font-black uppercase tracking-widest text-xs transition-colors duration-300 ${isActive ? expColorClass : 'text-gray-500 group-hover:text-gray-300'}`}>
+                  {EXPANSIONS[key].name}
+                </span>
+                <div className={`absolute bottom-0 left-0 right-0 h-[2px] transition-colors duration-300 ${isActive ? bgColorClass : 'bg-transparent'}`} />
+              </button>
+            );
+          })}
         </div>
 
-        <div className="mb-12 bg-gray-800/40 p-8 rounded-3xl border border-white/5 backdrop-blur-sm shadow-2xl">
+        <div className={`mb-12 ${currentTheme.panelBgClass} p-8 rounded-3xl border backdrop-blur-sm shadow-2xl transition-colors duration-500`}>
           <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-6">
             <div>
               <h2 className={`text-3xl md:text-5xl font-black uppercase tracking-tighter italic leading-none mb-2 break-words ${stats.currentExp.color}`}>
@@ -392,18 +464,29 @@ export default function Album() {
             <div className="text-right">
               <span className="text-4xl font-black text-white">{stats.uniqueCount}</span>
               <span className="text-gray-500 font-bold text-xl"> / {stats.currentExp.total}</span>
-              <p className={`${stats.currentExp.color} font-black text-sm mt-1 uppercase italic`}>{stats.progress}% Completado</p>
+              {stats.progress >= 100 ? (
+                <div className="flex flex-col items-end gap-1 mt-1">
+                  <span className="text-yellow-400 font-black text-sm uppercase italic animate-pulse flex items-center gap-1.5">
+                    <span className="animate-bounce">🏆</span> ¡COLECCIÓN COMPLETA!
+                  </span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 font-black text-[10px] uppercase tracking-widest italic animate-pulse">
+                    ✨ RECOMPENSA DIVINA OBTENIDA ✨
+                  </span>
+                </div>
+              ) : (
+                <p className={`${stats.currentExp.color} font-black text-sm mt-1 uppercase italic`}>{stats.progress}% Completado</p>
+              )}
             </div>
           </div>
           <div className="w-full bg-black/50 rounded-full h-3 border border-white/5 overflow-hidden">
-            <motion.div initial={{ width: 0 }} animate={{ width: `${stats.progress}%` }} className={`bg-gradient-to-r h-full transition-all duration-1000 ${stats.currentExp.bar}`} />
+            <motion.div initial={{ width: 0 }} animate={{ width: `${stats.progress}%` }} className={`h-full transition-all duration-1000 bg-gradient-to-r ${stats.currentExp.bar} shadow-[0_0_8px_rgba(255,255,255,0.2)]`} />
           </div>
         </div>
 
         <div className="flex justify-end mb-8">
-          <div className="flex items-center gap-3 bg-black/40 p-2 px-4 rounded-2xl border border-white/10 shadow-lg">
+          <div className="flex items-center gap-3 bg-black/40 p-2 px-4 rounded-2xl border shadow-lg" style={{ borderColor: `rgba(${currentTheme.accentRgb}, 0.2)` }}>
             <span className="text-[10px] font-black text-gray-500 uppercase italic tracking-wider">Ordenar por:</span>
-            <select value={sortBy} onChange={(e) => { playSelect(); setSortBy(e.target.value as SortOrder); }} className="bg-transparent text-yellow-500 font-bold text-sm outline-none cursor-pointer">
+            <select value={sortBy} onChange={(e) => { playSelect(); setSortBy(e.target.value as SortOrder); }} className={`bg-transparent ${stats.currentExp.color} font-bold text-sm outline-none cursor-pointer`}>
               <option value="recent" className="bg-gray-900 text-white">Recientes</option>
               <option value="id" className="bg-gray-900 text-white">ID</option>
               <option value="rarity" className="bg-gray-900 text-white">Rareza</option>
@@ -423,6 +506,7 @@ export default function Album() {
             const isSecret = rKey.includes('secret') && !rKey.includes('super') && !rKey.includes('ultra');
             const isSuperSecret = rKey.includes('super-secret') || rKey.includes('super secret');
             const isUltraSecret = rKey.includes('ultra-secret') || rKey.includes('ultra secret');
+            const isDivine = rKey === 'divine';
 
             return (
               <div key={`${entry.card.id}-${index}`} className="relative aspect-[2/3] cursor-pointer"
@@ -451,7 +535,7 @@ export default function Album() {
                         </>
                       ) : (
                         <>
-                          {(isHolo || isUltra || isSecret || isSuperSecret || isUltraSecret) && (
+                          {(isHolo || isUltra || isSecret || isSuperSecret || isUltraSecret || isDivine) && (
                             <motion.div animate={{ x: ['-100%', '200%'] }} transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }} className="absolute inset-0 z-20 pointer-events-none -skew-x-12 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
                           )}
                           {isUltra && !isUltraSecret && (
@@ -473,12 +557,18 @@ export default function Album() {
                               <motion.div animate={{ scale: [0.98, 1.02, 0.98], opacity: [0.7, 1.0, 0.7] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }} className="absolute inset-0 border-[2px] rounded-xl z-30 pointer-events-none border-yellow-400/80 shadow-[0_0_30px_rgba(234,179,8,0.6)]" />
                             </>
                           )}
+                          {isDivine && (
+                            <>
+                              <motion.div animate={{ backgroundColor: ['rgba(251,191,36,0.25)', 'rgba(217,119,6,0.25)', 'rgba(251,191,36,0.25)'] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 z-0 pointer-events-none" />
+                              <motion.div animate={{ scale: [0.97, 1.03, 0.97], opacity: [0.8, 1.0, 0.8] }} transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }} className="absolute inset-0 border-[2.5px] rounded-xl z-30 pointer-events-none border-amber-400 shadow-[0_0_35px_rgba(251,191,36,0.85)]" />
+                            </>
+                          )}
                         </>
                       )}
                     </>
                   )}
 
-                  {isSelected && (isShiny || isSecret || isSuperSecret || isUltraSecret) && (
+                  {isSelected && (isShiny || isSecret || isSuperSecret || isUltraSecret || isDivine) && (
                     <>
                       {/* Holographic Foil Texture Overlay */}
                       {[...Array(8)].map((_, i) => {
@@ -546,6 +636,8 @@ export default function Album() {
                               <div className="w-2.5 h-2.5 rotate-45 rounded-sm bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-200 blur-[0.3px] shadow-[0_0_7px_#34d399]" />
                             ) : isUltraSecret ? (
                               <div className="w-1 h-12 rounded-full -rotate-[35deg] bg-gradient-to-b from-current via-current/30 to-transparent" />
+                            ) : isDivine ? (
+                              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-500 blur-[0.2px] shadow-[0_0_10px_#fbbf24] rotate-45" />
                             ) : null}
                           </motion.div>
                         );
@@ -587,13 +679,13 @@ export default function Album() {
                   )}
 
                   {/* Quantity badge */}
-                  <div className="absolute -top-1 -right-1 bg-yellow-500 text-black font-black w-6 h-6 flex items-center justify-center rounded-full z-40 border-2 border-gray-900 text-[9px] shadow-xl">
+                  <div className={`absolute -top-1 -right-1 ${currentTheme.accentClass} font-black w-6 h-6 flex items-center justify-center rounded-full z-40 border-2 border-gray-900 text-[9px] shadow-xl`}>
                     x{entry.quantity}
                   </div>
 
                   {/* Favorite star badge */}
                   {favoriteCardId === entry.card.id && (
-                    <div className="absolute -top-1 -left-1 bg-yellow-500 text-black font-black w-6 h-6 flex items-center justify-center rounded-full z-40 border-2 border-gray-900 text-[10px] shadow-xl">
+                    <div className={`absolute -top-1 -left-1 ${currentTheme.accentClass} font-black w-6 h-6 flex items-center justify-center rounded-full z-40 border-2 border-gray-900 text-[10px] shadow-xl`}>
                       ⭐
                     </div>
                   )}
@@ -610,8 +702,8 @@ export default function Album() {
                           disabled={settingFavorite}
                           className={`mt-2 block w-full text-[8px] font-black uppercase tracking-widest py-1 px-2 rounded-full transition-all duration-200
                             ${favoriteCardId === entry.card.id
-                              ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/50 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/50 cursor-pointer shadow-[0_0_10px_rgba(234,179,8,0.15)]'
-                              : 'bg-white/5 hover:bg-yellow-500/20 hover:text-yellow-400 text-gray-400 border border-white/10 hover:border-yellow-500/50 cursor-pointer'
+                              ? `${currentTheme.mobileActiveNavClass} border border-current/30 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/50 cursor-pointer ${currentTheme.glowClass}`
+                              : `bg-white/5 hover:${currentTheme.mobileActiveNavClass} text-gray-400 border border-white/10 hover:border-current/30 cursor-pointer`
                             } disabled:opacity-50 disabled:cursor-wait`}
                         >
                           {favoriteCardId === entry.card.id ? '⭐ Favorita (Quitar)' : settingFavorite ? '...' : '☆ Marcar favorita'}

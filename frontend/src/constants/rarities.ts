@@ -77,5 +77,12 @@ export const rarityStyles: Record<string, { border: string, bg: string, text: st
     text: 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-rose-500 via-fuchsia-500 to-violet-400 bg-[length:200%_auto] animate-text-fire font-black italic uppercase tracking-widest',
     shadow: 'shadow-[0_0_90px_rgba(234,179,8,0.9),0_0_40px_rgba(217,70,239,0.65)]',
     animate: 'animate-shimmer'
+  },
+  'divine': {
+    border: 'border-2 border-transparent animate-neon-border-shift',
+    bg: 'bg-gradient-to-br from-yellow-950 via-amber-900/30 to-zinc-950 animate-super-plasma',
+    text: 'text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 via-amber-200 to-yellow-500 bg-[length:200%_auto] animate-text-shimmer font-black italic uppercase tracking-widest',
+    shadow: 'shadow-[0_0_100px_rgba(251,191,36,0.95),inset_0_0_30px_rgba(251,191,36,0.6)]',
+    animate: 'animate-shimmer'
   }
 };

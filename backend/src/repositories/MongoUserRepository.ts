@@ -2,6 +2,7 @@ import { IUserRepository } from './IUserRepository';
 import { User } from '../domain/User';
 import { Card } from '../domain/Card';
 import { UserModel } from '../models/UserModel';
+import { ProgressionService } from '../services/ProgressionService';
 
 // Importación estática para asegurar compatibilidad
 import dp6Cards from '../data/cards.json';
@@ -16,7 +17,7 @@ const expansionsData: Record<string, any> = {
   'sm3': sm3Cards, 
   'dp6': dp6Cards,
   'bw9': bw9Cards,
-  '621': xypCards,
+  'xyp': xypCards,
   'zsv10pt5': zsv10pt5Cards
 };
 
@@ -81,29 +82,18 @@ export class MongoUserRepository implements IUserRepository {
     const xpFromNewCards = newCardsCount * 20;
     const totalXpGained = xpFromPack + xpFromNewCards;
 
-    // 2. Procesar progresión y subidas de nivel
-    let currentLevel = userDoc.level ?? 1;
-    let currentXp = userDoc.xp ?? 0;
-    let newXp = currentXp + totalXpGained;
-    let newLevel = currentLevel;
+    // 2. Procesar progresión y subidas de nivel usando ProgressionService
+    const oldPacks = userDoc.packsAvailable;
+    const oldLevel = userDoc.level ?? 1;
 
-    while (true) {
-      const xpNeeded = 100 + (newLevel - 1) * 50;
-      if (newXp >= xpNeeded) {
-        newXp -= xpNeeded;
-        newLevel += 1;
-      } else {
-        break;
-      }
+    ProgressionService.applyProgression(userDoc, totalXpGained);
+
+    if (userDoc.packsAvailable > 0) {
+      userDoc.packsAvailable -= 1; // Descontar el sobre abierto
     }
 
-    userDoc.level = newLevel;
-    userDoc.xp = newXp;
-
-    if (userDoc.packsAvailable > 0) userDoc.packsAvailable -= 1;
-
     await userDoc.save();
-    console.log(`💾 DB Mongo: Álbum de [${userId}] actualizado. Total: ${userDoc.album.length} cartas unicas. Level: ${newLevel}, XP: ${newXp} (Gained: ${totalXpGained} XP)`);
+    console.log(`💾 DB Mongo: Álbum de [${userId}] actualizado. Total: ${userDoc.album.length} cartas unicas. Level: ${userDoc.level}, XP: ${userDoc.xp} (Gained: ${totalXpGained} XP, Rewards: ${userDoc.packsAvailable - oldPacks + 1} packs)`);
     
     return userDoc.toObject() as User;
   }
@@ -113,3 +103,5 @@ export class MongoUserRepository implements IUserRepository {
     return users as User[];
   }
 }
+
+

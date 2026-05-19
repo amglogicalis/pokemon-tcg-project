@@ -22,8 +22,8 @@ export const AVAILABLE_EXPANSIONS: Record<string, ExpansionConfig> = {
     name: 'Plasma Blast',
     fileName: 'cards-bw9.json'
   },
-  '621': {
-    id: '621',
+  'xyp': {
+    id: 'xyp',
     apiId: 'xyp',
     name: 'XY Black Star Promos',
     fileName: 'cards-xyp.json'

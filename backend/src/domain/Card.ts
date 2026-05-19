@@ -7,7 +7,8 @@ export type Rarity =
   | 'shiny'
   | 'secret'
   | 'super-secret'
-  | 'ultra-secret';
+  | 'ultra-secret'
+  | 'divine';
 
 export type PokemonType =
   | 'Fire' | 'Water' | 'Grass' | 'Electric' | 'Psychic' | 'Colorless'

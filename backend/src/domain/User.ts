@@ -11,6 +11,9 @@ export interface User {
   level?: number;
   xp?: number;
   lastPackClaimedAt?: string; // ISO 8601 de la última recarga diaria de 10 sobres
+  completedExpansions?: string[]; // IDs de expansiones completadas para bonus de XP
+  showcasedMedals?: string[]; // IDs de medallas (expansiones) destacadas (máx 3)
+  activeTheme?: string;
 }
 
 // Lo que devolvemos al cliente (sin datos sensibles)
@@ -22,6 +25,9 @@ export interface PublicUser {
   level: number;
   xp: number;
   lastPackClaimedAt?: string;
+  completedExpansions?: string[];
+  showcasedMedals?: string[];
+  activeTheme?: string;
 }
 
 // Payload dentro del JWT

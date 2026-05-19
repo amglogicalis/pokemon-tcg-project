@@ -87,7 +87,10 @@ export class AuthService {
       totalCards: user.album.reduce((sum, e) => sum + e.quantity, 0),
       level: user.level ?? 1,
       xp: user.xp ?? 0,
-      lastPackClaimedAt: user.lastPackClaimedAt
+      lastPackClaimedAt: user.lastPackClaimedAt,
+      completedExpansions: user.completedExpansions || [],
+      showcasedMedals: user.showcasedMedals || [],
+      activeTheme: user.activeTheme || 'default'
     };
   }
 }

@@ -9,7 +9,8 @@ const RARITY_WEIGHTS: Record<Rarity, number> = {
   'shiny': 1.5, 
   'secret': 1,
   'super-secret': 0.5,
-  'ultra-secret': 0.25
+  'ultra-secret': 0.25,
+  'divine': 0
 };
 
 const RARITY_ORDER: Record<string, number> = {
@@ -20,11 +21,12 @@ const RARITY_ORDER: Record<string, number> = {
   'ultra-rare': 5, 
   'ultra rare': 5, 
   'shiny': 6, 
-  'secret': 7,
-  'super-secret': 8,
-  'super secret': 8,
-  'ultra-secret': 9,
-  'ultra secret': 9
+  'secret': 7, 
+  'super-secret': 8, 
+  'super secret': 8, 
+  'ultra-secret': 9, 
+  'ultra secret': 9,
+  'divine': 10
 };
 
 function pickRarity(): Rarity {

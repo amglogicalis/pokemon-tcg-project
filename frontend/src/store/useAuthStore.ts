@@ -9,6 +9,9 @@ interface User {
   level?: number;
   xp?: number;
   lastPackClaimedAt?: string;
+  completedExpansions?: string[];
+  showcasedMedals?: string[];
+  activeTheme?: string;
 }
 
 interface AuthState {
@@ -17,8 +20,9 @@ interface AuthState {
   isAuthenticated: boolean;
   login: (user: User, token: string) => void;
   logout: () => Promise<void>;
-  updateUserStats: (level: number, xp: number) => void;
+  updateUserStats: (level: number, xp: number, completedExpansions?: string[]) => void;
   updatePacksAvailable: (packs: number, lastPackClaimedAt?: string) => void;
+  updateActiveTheme: (theme: string) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -54,9 +58,16 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
-      updateUserStats: (level, xp) =>
+      updateUserStats: (level, xp, completedExpansions) =>
         set((state) => ({
-          user: state.user ? { ...state.user, level, xp } : null,
+          user: state.user
+            ? {
+                ...state.user,
+                level,
+                xp,
+                completedExpansions: completedExpansions !== undefined ? completedExpansions : state.user.completedExpansions
+              }
+            : null,
         })),
 
       updatePacksAvailable: (packs, lastPackClaimedAt) =>
@@ -66,6 +77,16 @@ export const useAuthStore = create<AuthState>()(
                 ...state.user,
                 packsAvailable: packs,
                 lastPackClaimedAt: lastPackClaimedAt !== undefined ? lastPackClaimedAt : state.user.lastPackClaimedAt
+              }
+            : null,
+        })),
+
+      updateActiveTheme: (theme) =>
+        set((state) => ({
+          user: state.user
+            ? {
+                ...state.user,
+                activeTheme: theme
               }
             : null,
         })),

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import api from '../services/api';
 import { rarityStyles } from '../constants/rarities';
 import { useAuthStore } from '../store/useAuthStore';
+import { themes } from '../constants/themes';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Card {
@@ -51,7 +52,19 @@ const RARITIES_LIST = [
 
 export default function Trades() {
   const user = useAuthStore((s) => s.user);
+  const activeThemeId = user?.activeTheme || 'default';
+  const currentTheme = themes[activeThemeId] || themes.default;
   const updatePacksAvailable = useAuthStore((s) => s.updatePacksAvailable);
+
+  const titleGradients: Record<string, string> = {
+    default: 'from-yellow-400 via-amber-500 to-yellow-600',
+    'aura-divina': 'from-amber-400 via-amber-600 to-yellow-500',
+    'tormenta-glaciar': 'from-sky-400 via-blue-500 to-sky-600',
+    'sobrecarga-plasma': 'from-cyan-400 via-teal-500 to-blue-500',
+    'estrella-carmesi': 'from-rose-400 via-red-500 to-rose-600',
+    'cenizas-ardientes': 'from-orange-400 via-red-500 to-orange-600',
+    'vacio-trueno': 'from-indigo-400 via-purple-500 to-violet-600'
+  };
 
   const [activeTab, setActiveTab] = useState<'public' | 'direct' | 'my-offers'>('public');
   const [offersTab, setOffersTab] = useState<'received' | 'sent'>('received');
@@ -275,7 +288,7 @@ export default function Trades() {
       {/* Cabecera Principal */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-black bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text text-transparent drop-shadow-md">
+          <h1 className={`text-3xl font-black bg-gradient-to-r ${titleGradients[activeThemeId] || titleGradients.default} bg-clip-text text-transparent drop-shadow-md`}>
             Centro de Intercambios
           </h1>
           <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mt-1">
@@ -289,7 +302,7 @@ export default function Trades() {
             onClick={() => { playSfx('/sounds/select.mp3'); setActiveTab('public'); }}
             className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all ${
               activeTab === 'public'
-                ? 'bg-yellow-500 text-black shadow-lg font-black'
+                ? `${currentTheme.accentClass} ${currentTheme.glowClass}`
                 : 'text-gray-400 hover:text-white'
             }`}
           >
@@ -299,7 +312,7 @@ export default function Trades() {
             onClick={() => { playSfx('/sounds/select.mp3'); setActiveTab('direct'); }}
             className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all ${
               activeTab === 'direct'
-                ? 'bg-yellow-500 text-black shadow-lg font-black'
+                ? `${currentTheme.accentClass} ${currentTheme.glowClass}`
                 : 'text-gray-400 hover:text-white'
             }`}
           >
@@ -309,7 +322,7 @@ export default function Trades() {
             onClick={() => { playSfx('/sounds/select.mp3'); setActiveTab('my-offers'); }}
             className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all ${
               activeTab === 'my-offers'
-                ? 'bg-yellow-500 text-black shadow-lg font-black'
+                ? `${currentTheme.accentClass} ${currentTheme.glowClass}`
                 : 'text-gray-400 hover:text-white'
             }`}
           >
@@ -322,7 +335,7 @@ export default function Trades() {
       {activeTab === 'public' && (
         <div className="space-y-6">
           {/* Panel de Filtros */}
-          <div className="bg-black/30 backdrop-blur-xl border border-white/5 p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center">
+          <div className="bg-black/30 backdrop-blur-xl border p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center transition-colors duration-500" style={{ borderColor: `rgba(${currentTheme.accentRgb}, 0.1)` }}>
             
             {/* Buscador de Cartas */}
             <div className="w-full md:w-1/3 relative">
@@ -331,7 +344,8 @@ export default function Trades() {
                 placeholder="Buscar por nombre de carta..."
                 value={publicFilters.search}
                 onChange={(e) => setPublicFilters({ ...publicFilters, search: e.target.value })}
-                className="w-full bg-gray-950/70 border border-white/10 p-3 px-4 rounded-xl text-xs font-bold focus:border-yellow-500 focus:outline-none transition-colors"
+                className={`w-full bg-gray-950/70 border p-3 px-4 rounded-xl text-xs font-bold focus:outline-none transition-all focus:border-current ${currentTheme.textAccentClass}`}
+                style={{ borderColor: `rgba(${currentTheme.accentRgb}, 0.2)` }}
               />
             </div>
 
@@ -339,10 +353,11 @@ export default function Trades() {
             <select
               value={publicFilters.expansion}
               onChange={(e) => setPublicFilters({ ...publicFilters, expansion: e.target.value })}
-              className="w-full md:w-1/4 bg-gray-950/70 border border-white/10 p-3 px-4 rounded-xl text-xs font-bold focus:border-yellow-500 focus:outline-none transition-colors text-white"
+              className={`w-full md:w-1/4 bg-gray-950/70 border p-3 px-4 rounded-xl text-xs font-bold focus:outline-none transition-all focus:border-current ${currentTheme.textAccentClass}`}
+              style={{ borderColor: `rgba(${currentTheme.accentRgb}, 0.2)` }}
             >
               {EXPANSIONS_LIST.map((exp) => (
-                <option key={exp.id} value={exp.id} className="bg-gray-950">{exp.name}</option>
+                <option key={exp.id} value={exp.id} className="bg-gray-950 text-white">{exp.name}</option>
               ))}
             </select>
 
@@ -350,17 +365,18 @@ export default function Trades() {
             <select
               value={publicFilters.rarity}
               onChange={(e) => setPublicFilters({ ...publicFilters, rarity: e.target.value })}
-              className="w-full md:w-1/4 bg-gray-950/70 border border-white/10 p-3 px-4 rounded-xl text-xs font-bold focus:border-yellow-500 focus:outline-none transition-colors text-white"
+              className={`w-full md:w-1/4 bg-gray-950/70 border p-3 px-4 rounded-xl text-xs font-bold focus:outline-none transition-all focus:border-current ${currentTheme.textAccentClass}`}
+              style={{ borderColor: `rgba(${currentTheme.accentRgb}, 0.2)` }}
             >
               {RARITIES_LIST.map((rarity) => (
-                <option key={rarity.id} value={rarity.id} className="bg-gray-950">{rarity.name}</option>
+                <option key={rarity.id} value={rarity.id} className="bg-gray-950 text-white">{rarity.name}</option>
               ))}
             </select>
 
             {/* Botón publicar en tablón */}
             <button
               onClick={() => { playSfx('/sounds/select.mp3'); setIsPublicProposal(true); setSelectedCardForDirect(null); }}
-              className="w-full md:w-auto ml-auto px-6 py-3 bg-gradient-to-r from-yellow-500 to-amber-600 border border-yellow-400 text-black font-black text-xs uppercase tracking-wider rounded-xl shadow-lg hover:shadow-yellow-500/20 hover:scale-[1.02] active:scale-95 transition-all"
+              className={`w-full md:w-auto ml-auto px-6 py-3 ${currentTheme.accentClass} border border-white/10 text-xs font-black uppercase tracking-wider rounded-xl hover:scale-[1.02] active:scale-95 transition-all ${currentTheme.glowClass}`}
             >
               + Publicar Oferta
             </button>
@@ -369,7 +385,7 @@ export default function Trades() {
           {/* Listado de Ofertas Públicas */}
           {loading ? (
             <div className="flex justify-center py-20">
-              <div className="w-8 h-8 border-4 border-white/20 border-t-yellow-500 rounded-full animate-spin" />
+              <div className={`w-8 h-8 border-4 border-white/20 border-t-current rounded-full animate-spin ${currentTheme.textAccentClass}`} />
             </div>
           ) : publicTrades.length === 0 ? (
             <div className="text-center py-20 bg-black/20 border border-white/5 rounded-2xl">
@@ -397,7 +413,7 @@ export default function Trades() {
                     <div className="flex justify-between items-center border-b border-white/5 pb-2">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-black uppercase text-gray-500">Ofrecido por:</span>
-                        <span className="text-xs font-black text-yellow-500">{trade.senderUsername}</span>
+                        <span className={`text-xs font-black ${currentTheme.textAccentClass}`}>{trade.senderUsername}</span>
                       </div>
                       <span className="text-[9px] text-gray-600 font-bold uppercase">
                         {new Date(trade.createdAt).toLocaleDateString()}
@@ -469,7 +485,7 @@ export default function Trades() {
       {activeTab === 'direct' && (
         <div className="space-y-6">
           <div className="bg-black/35 backdrop-blur-xl border border-white/5 p-6 rounded-2xl space-y-4">
-            <h3 className="text-sm font-black uppercase tracking-wider text-yellow-500 mb-2">
+            <h3 className={`text-sm font-black uppercase tracking-wider mb-2 ${currentTheme.textAccentClass}`}>
               1. Busca la carta que quieres obtener
             </h3>
             
@@ -479,7 +495,8 @@ export default function Trades() {
                 placeholder="Escribe el nombre del pokémon (ej: Charizard, Giratina, Thundurus...)"
                 value={cardSearchQuery}
                 onChange={(e) => setCardSearchQuery(e.target.value)}
-                className="w-full bg-gray-950/70 border border-white/10 p-4 px-5 rounded-xl text-xs font-bold focus:border-yellow-500 focus:outline-none transition-colors"
+                className={`w-full bg-gray-950/70 border p-4 px-5 rounded-xl text-xs font-bold focus:outline-none transition-all focus:border-current ${currentTheme.textAccentClass}`}
+                style={{ borderColor: `rgba(${currentTheme.accentRgb}, 0.2)` }}
               />
 
               {/* Autocomplete de Resultados */}
@@ -533,11 +550,10 @@ export default function Trades() {
               animate={{ opacity: 1, y: 0 }}
               className="grid grid-cols-1 md:grid-cols-3 gap-6"
             >
-              
-              {/* Carta Buscada */}
+              {/* Carta Buscado */}
               <div className="bg-black/35 backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-between text-center min-h-[350px]">
                 <div>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-yellow-500 block mb-1">Carta Solicitada</span>
+                  <span className={`text-[9px] font-black uppercase tracking-widest block mb-1 ${currentTheme.textAccentClass}`}>Carta Solicitada</span>
                   <h4 className="text-sm font-black text-white">{selectedCardForDirect.name}</h4>
                 </div>
                 
@@ -558,7 +574,7 @@ export default function Trades() {
 
                 {loadingDuplicates ? (
                   <div className="flex justify-center items-center h-48">
-                    <div className="w-6 h-6 border-3 border-white/20 border-t-yellow-500 rounded-full animate-spin" />
+                    <div className={`w-6 h-6 border-3 border-white/20 border-t-current rounded-full animate-spin ${currentTheme.textAccentClass}`} />
                   </div>
                 ) : usersWithDuplicate.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-48 text-center text-gray-500">
@@ -568,7 +584,7 @@ export default function Trades() {
                     </p>
                     <button
                       onClick={() => { setIsPublicProposal(true); setSelectedReceiver(null); }}
-                      className="mt-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black text-[10px] font-black uppercase rounded-lg shadow transition-all"
+                      className={`mt-4 px-4 py-2 ${currentTheme.accentClass} ${currentTheme.accentHoverClass} text-[10px] font-black uppercase rounded-lg shadow transition-all`}
                     >
                       Publicar como oferta abierta en el tablón
                     </button>
@@ -581,7 +597,7 @@ export default function Trades() {
                         className="bg-gray-950/60 border border-white/5 p-3 rounded-xl flex items-center justify-between hover:border-white/10 transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-7 h-7 rounded-full bg-gradient-to-r from-yellow-500 to-amber-600 flex items-center justify-center text-black font-black text-xs uppercase shadow">
+                          <div className={`w-7 h-7 rounded-full ${currentTheme.accentClass} flex items-center justify-center font-black text-xs uppercase shadow`}>
                             {u.username[0]}
                           </div>
                           <span className="text-xs font-black text-white">{u.username}</span>
@@ -589,7 +605,7 @@ export default function Trades() {
 
                         <button
                           onClick={() => { playSfx('/sounds/select.mp3'); setSelectedReceiver(u); }}
-                          className="px-4 py-1.5 bg-yellow-500 hover:bg-yellow-400 text-black text-[9px] font-black uppercase tracking-wider rounded-lg shadow transition-all active:scale-95"
+                          className={`px-4 py-1.5 ${currentTheme.accentClass} ${currentTheme.accentHoverClass} text-[9px] font-black uppercase tracking-wider rounded-lg shadow transition-all active:scale-95`}
                         >
                           Proponer Trato
                         </button>
@@ -614,7 +630,7 @@ export default function Trades() {
               onClick={() => { playSfx('/sounds/select.mp3'); setOffersTab('received'); }}
               className={`pb-1 text-xs font-black uppercase tracking-wider transition-all border-b-2 ${
                 offersTab === 'received'
-                  ? 'border-yellow-500 text-yellow-500'
+                  ? `border-current ${currentTheme.textAccentClass}`
                   : 'border-transparent text-gray-500 hover:text-gray-300'
               }`}
             >
@@ -624,7 +640,7 @@ export default function Trades() {
               onClick={() => { playSfx('/sounds/select.mp3'); setOffersTab('sent'); }}
               className={`pb-1 text-xs font-black uppercase tracking-wider transition-all border-b-2 ${
                 offersTab === 'sent'
-                  ? 'border-yellow-500 text-yellow-500'
+                  ? `border-current ${currentTheme.textAccentClass}`
                   : 'border-transparent text-gray-500 hover:text-gray-300'
               }`}
             >
@@ -634,7 +650,7 @@ export default function Trades() {
 
           {loading ? (
             <div className="flex justify-center py-20">
-              <div className="w-8 h-8 border-4 border-white/20 border-t-yellow-500 rounded-full animate-spin" />
+              <div className={`w-8 h-8 border-4 border-white/20 border-t-current rounded-full animate-spin ${currentTheme.textAccentClass}`} />
             </div>
           ) : offersTab === 'received' ? (
             myOffers.received.length === 0 ? (
@@ -657,7 +673,7 @@ export default function Trades() {
                       className="bg-black/35 backdrop-blur-xl border border-white/5 p-4 rounded-2xl flex flex-col justify-between gap-4 shadow-xl"
                     >
                       <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                        <span className="text-xs font-black text-yellow-500">{trade.senderUsername} te propone:</span>
+                        <span className={`text-xs font-black ${currentTheme.textAccentClass}`}>{trade.senderUsername} te propone:</span>
                         <span className="text-[9px] text-gray-600 font-bold uppercase">
                           {new Date(trade.createdAt).toLocaleDateString()}
                         </span>
@@ -830,7 +846,7 @@ export default function Trades() {
 
               {/* Título */}
               <div className="border-b border-white/10 pb-3 mb-4">
-                <h3 className="text-base font-black uppercase tracking-wider text-yellow-500">
+                <h3 className={`text-base font-black uppercase tracking-wider ${currentTheme.textAccentClass}`}>
                   {isPublicProposal 
                     ? "Crear propuesta para el tablón público" 
                     : `Proponer intercambio directo a: ${selectedReceiver?.username}`
@@ -848,7 +864,8 @@ export default function Trades() {
                   placeholder="🔍 Buscar carta para ofrecer por nombre..."
                   value={offerSearchQuery}
                   onChange={(e) => setOfferSearchQuery(e.target.value)}
-                  className="w-full bg-black/50 border border-white/10 p-2.5 px-4 rounded-xl text-xs font-bold focus:border-yellow-500 focus:outline-none transition-colors text-white"
+                  className={`w-full bg-black/50 border p-2.5 px-4 rounded-xl text-xs font-bold focus:outline-none transition-all focus:border-current ${currentTheme.textAccentClass}`}
+                  style={{ borderColor: `rgba(${currentTheme.accentRgb}, 0.2)` }}
                 />
               </div>
 
@@ -874,7 +891,7 @@ export default function Trades() {
                             onClick={() => { playSfx('/sounds/select.mp3'); setSelectedOfferCard(entry); }}
                             className={`relative aspect-[2/3] p-2 border-2 rounded-xl flex flex-col justify-between cursor-pointer transition-all duration-300 ${
                               isSelected
-                                ? 'border-yellow-500 bg-yellow-500/10 scale-105 shadow-[0_0_15px_rgba(234,179,8,0.25)]'
+                                ? `border-current ${currentTheme.mobileActiveNavClass} scale-105 ${currentTheme.glowClass}`
                                 : 'border-white/5 hover:border-white/20 bg-black/40'
                             }`}
                           >
@@ -930,13 +947,14 @@ export default function Trades() {
                 {/* Si es público, necesitamos seleccionar también la carta pedida en el asistente */}
                 {isPublicProposal && !selectedCardForDirect && (
                   <div className="w-full sm:w-auto relative min-w-[240px]">
-                    <span className="text-[8px] font-black uppercase text-amber-400 tracking-wider block mb-1">Carta que buscas a cambio:</span>
+                    <span className={`text-[8px] font-black uppercase tracking-wider block mb-1 ${currentTheme.textAccentClass}`}>Carta que buscas a cambio:</span>
                     <input
                       type="text"
                       placeholder="Escribe el pokémon que buscas..."
                       value={cardSearchQuery}
                       onChange={(e) => setCardSearchQuery(e.target.value)}
-                      className="w-full bg-black border border-white/10 p-2.5 px-4 rounded-xl text-xs font-bold focus:border-yellow-500 focus:outline-none transition-colors"
+                      className={`w-full bg-black border p-2.5 px-4 rounded-xl text-xs font-bold focus:outline-none transition-all focus:border-current ${currentTheme.textAccentClass}`}
+                      style={{ borderColor: `rgba(${currentTheme.accentRgb}, 0.2)` }}
                     />
 
                     {/* Autocomplete en asistente público */}
@@ -969,7 +987,7 @@ export default function Trades() {
 
                 {isPublicProposal && selectedCardForDirect && (
                   <div className="text-center sm:text-right shrink-0">
-                    <span className="text-[8px] font-black uppercase text-amber-400 tracking-wider">Carta buscada:</span>
+                    <span className={`text-[8px] font-black uppercase tracking-wider ${currentTheme.textAccentClass}`}>Carta buscada:</span>
                     <h4 className="text-xs font-black text-white">{selectedCardForDirect.name}</h4>
                     <button
                       onClick={() => setSelectedCardForDirect(null)}
@@ -986,7 +1004,7 @@ export default function Trades() {
                   disabled={actionLoading || !selectedOfferCard || (!selectedCardForDirect && !isPublicProposal)}
                   className={`px-8 py-3 rounded-xl text-xs font-black uppercase tracking-wider shrink-0 transition-all ${
                     selectedOfferCard && (selectedCardForDirect || (isPublicProposal && selectedCardForDirect))
-                      ? 'bg-yellow-500 hover:bg-yellow-400 text-black shadow-lg shadow-yellow-500/10 hover:scale-[1.02] active:scale-95'
+                      ? `${currentTheme.accentClass} ${currentTheme.accentHoverClass} hover:scale-[1.02] active:scale-95 ${currentTheme.glowClass}`
                       : 'bg-gray-800/40 text-gray-600 border border-white/5 cursor-not-allowed'
                   }`}
                 >

@@ -3,10 +3,14 @@ import api from '../services/api';
 import { rarityStyles } from '../constants/rarities';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getLevelTextStyle, getLevelStyle } from '../constants/levels';
+import { useAuthStore } from '../store/useAuthStore';
+import { themes } from '../constants/themes';
 
 interface MuralEntry {
   username: string;
   userLevel?: number;
+  completedExpansions?: string[];
+  showcasedMedals?: string[];
   card: {
     id: string;
     name: string;
@@ -27,8 +31,9 @@ function CardVisualEffects({ rarity }: { rarity: string }) {
   const isSecret = rKey.includes('secret') && !rKey.includes('super') && !rKey.includes('ultra');
   const isSuperSecret = rKey.includes('super-secret') || rKey.includes('super secret');
   const isUltraSecret = rKey.includes('ultra-secret') || rKey.includes('ultra secret');
+  const isDivine = rKey === 'divine';
 
-  if (!isUltra && !isHolo && !isShiny && !isSecret && !isSuperSecret && !isUltraSecret) {
+  if (!isUltra && !isHolo && !isShiny && !isSecret && !isSuperSecret && !isUltraSecret && !isDivine) {
     return null;
   }
 
@@ -50,7 +55,7 @@ function CardVisualEffects({ rarity }: { rarity: string }) {
         </>
       ) : (
         <>
-          {(isHolo || isUltra || isSecret || isSuperSecret || isUltraSecret) && (
+          {(isHolo || isUltra || isSecret || isSuperSecret || isUltraSecret || isDivine) && (
             <motion.div animate={{ x: ['-100%', '200%'] }} transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }} className="absolute inset-0 z-20 pointer-events-none -skew-x-12 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
           )}
           {isUltra && !isUltraSecret && (
@@ -72,11 +77,17 @@ function CardVisualEffects({ rarity }: { rarity: string }) {
               <motion.div animate={{ scale: [0.98, 1.02, 0.98], opacity: [0.7, 1.0, 0.7] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }} className="absolute inset-0 border-[2px] rounded-xl z-35 pointer-events-none border-yellow-400/80 shadow-[0_0_30px_rgba(234,179,8,0.6)]" />
             </>
           )}
+          {isDivine && (
+            <>
+              <motion.div animate={{ backgroundColor: ['rgba(251,191,36,0.25)', 'rgba(217,119,6,0.25)', 'rgba(251,191,36,0.25)'] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 z-0 pointer-events-none" />
+              <motion.div animate={{ scale: [0.97, 1.03, 0.97], opacity: [0.8, 1.0, 0.8] }} transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }} className="absolute inset-0 border-[2.5px] rounded-xl z-35 pointer-events-none border-amber-400 shadow-[0_0_35px_rgba(251,191,36,0.85)]" />
+            </>
+          )}
         </>
       )}
 
       {/* Capa de textura de brillo foil holográfico */}
-      {(isShiny || isSecret || isSuperSecret || isUltraSecret) && (
+      {(isShiny || isSecret || isSuperSecret || isUltraSecret || isDivine) && (
         <>
           {[...Array(8)].map((_, i) => {
             const top = isUltraSecret ? 5 + ((i * 12) % 65) : 5 + Math.random() * 80;
@@ -124,6 +135,8 @@ function CardVisualEffects({ rarity }: { rarity: string }) {
                   <div className="w-2.5 h-2.5 rotate-45 rounded-sm bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-200 blur-[0.3px] shadow-[0_0_7px_#34d399]" />
                 ) : isUltraSecret ? (
                   <div className="w-1 h-12 rounded-full -rotate-[35deg] bg-gradient-to-b from-current via-current/30 to-transparent" />
+                ) : isDivine ? (
+                  <div className="w-3 h-3 rounded-full bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-500 blur-[0.2px] shadow-[0_0_10px_#fbbf24] rotate-45" />
                 ) : null}
               </motion.div>
             );
@@ -176,11 +189,66 @@ const expansionNames: Record<string, { name: string; color: string }> = {
   sm3: { name: 'Burning Shadows', color: 'text-red-800' }
 };
 
+const medalConfig: Record<string, { label: string; icon: string; bg: string; border: string; text: string }> = {
+  swsh12: { label: 'Tempestad', icon: '⛈️', bg: 'bg-slate-800/80', border: 'border-slate-500/50', text: 'text-slate-200' },
+  dp6: { label: 'Leyenda', icon: '🌟', bg: 'bg-yellow-950/80', border: 'border-yellow-500/50', text: 'text-yellow-300' },
+  bw9: { label: 'Plasma', icon: '⚡', bg: 'bg-blue-950/80', border: 'border-blue-500/50', text: 'text-blue-300' },
+  xyp: { label: 'Estrella', icon: '💫', bg: 'bg-red-950/80', border: 'border-red-500/50', text: 'text-red-300' },
+  zsv10pt5: { label: 'Voltio', icon: '🔮', bg: 'bg-indigo-950/80', border: 'border-indigo-500/50', text: 'text-indigo-300' },
+  sm3: { label: 'Llama', icon: '🔥', bg: 'bg-rose-950/80', border: 'border-rose-500/50', text: 'text-rose-300' }
+};
+
 export default function Mural() {
   const [entries, setEntries] = useState<MuralEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEntry, setSelectedEntry] = useState<MuralEntry | null>(null);
   const muralMusicRef = useRef<HTMLAudioElement | null>(null);
+
+  const currentUser = useAuthStore((s) => s.user);
+  const activeThemeId = currentUser?.activeTheme || 'default';
+  const currentTheme = themes[activeThemeId] || themes.default;
+
+  const [showConfig, setShowConfig] = useState(false);
+  const [selectedMedals, setSelectedMedals] = useState<string[]>([]);
+  const [selectedTheme, setSelectedTheme] = useState<string>('default');
+
+  useEffect(() => {
+    if (currentUser) {
+      setSelectedMedals(currentUser.showcasedMedals || []);
+      setSelectedTheme(currentUser.activeTheme || 'default');
+    }
+  }, [showConfig, currentUser]);
+
+  const toggleMedal = (medId: string) => {
+    if (selectedMedals.includes(medId)) {
+      setSelectedMedals(selectedMedals.filter(id => id !== medId));
+    } else {
+      if (selectedMedals.length >= 3) {
+        return; // El modal controlará el aviso de límite visualmente o con disabled/alert
+      }
+      setSelectedMedals([...selectedMedals, medId]);
+    }
+  };
+
+  const handleSaveShowcase = async () => {
+    try {
+      // Guardar medallas
+      await api.post('/user/showcase-medals', { medals: selectedMedals });
+      useAuthStore.setState((state) => ({
+        user: state.user ? { ...state.user, showcasedMedals: selectedMedals } : null
+      }));
+
+      // Guardar tema
+      await api.post('/user/theme', { theme: selectedTheme });
+      useAuthStore.getState().updateActiveTheme(selectedTheme);
+
+      const response = await api.get('/mural');
+      setEntries(response.data.mural || []);
+      setShowConfig(false);
+    } catch (err: any) {
+      alert(err.response?.data?.error || "Error al guardar la configuración.");
+    }
+  };
 
   useEffect(() => {
     const audio = new Audio('/sounds/mural-music.mp3');
@@ -219,29 +287,40 @@ export default function Mural() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-          className="w-12 h-12 border-4 border-white/10 border-t-yellow-500 rounded-full"
+          className={`w-12 h-12 border-4 border-white/10 border-t-current rounded-full ${currentTheme.textAccentClass}`}
         />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8 relative overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-white p-8 relative overflow-x-hidden">
       {/* Header */}
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-14">
-          <p className="text-xs font-black uppercase tracking-[0.5em] text-yellow-500/60 mb-2">Colección Pública</p>
+          <p className={`text-xs font-black uppercase tracking-[0.5em] ${currentTheme.textAccentClass} opacity-60 mb-2`}>Colección Pública</p>
           <h1 className="text-6xl font-black uppercase tracking-tighter italic text-white leading-none">
             Mural de<br />
-            <span className="text-yellow-500">Cartas</span>
+            <span className={`${currentTheme.textAccentClass}`}>Cartas</span>
           </h1>
           <p className="text-gray-500 text-sm mt-4 max-w-md mx-auto">
             Las cartas favoritas de los entrenadores. Selecciona la tuya desde tu álbum.
           </p>
+          {currentUser && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => { playSelect(); setShowConfig(true); }}
+              className={`mt-6 px-5 py-2.5 ${currentTheme.panelBgClass} hover:bg-white/5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 mx-auto transition-all duration-300 shadow-md hover:shadow-lg`}
+            >
+              <span>⚙️</span>
+              <span>Personalizar Medallas</span>
+            </motion.button>
+          )}
         </div>
 
         {entries.length === 0 ? (
@@ -307,6 +386,29 @@ export default function Mural() {
                         );
                       })()}
                     </div>
+                    {(() => {
+                      const showcased = entry.showcasedMedals && entry.showcasedMedals.length > 0 
+                        ? entry.showcasedMedals 
+                        : (entry.completedExpansions || []).slice(0, 3);
+                      if (showcased.length === 0) return null;
+                      return (
+                        <div className="flex items-center gap-1 justify-center mt-1.5 mb-0.5">
+                          {showcased.map((medId) => {
+                            const config = medalConfig[medId];
+                            if (!config) return null;
+                            return (
+                              <span 
+                                key={medId} 
+                                title={config.label}
+                                className={`flex items-center justify-center w-5.5 h-5.5 rounded-full border text-[10px] ${config.bg} ${config.border} shadow-sm select-none transform hover:scale-110 transition-transform duration-200`}
+                              >
+                                {config.icon}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
                     <p className="text-gray-600 text-[9px] uppercase tracking-widest truncate max-w-[120px] mt-0.5">
                       {entry.card.name}
                     </p>
@@ -370,7 +472,7 @@ export default function Mural() {
                       })()}
                       <div className="mt-4 pt-4 border-t border-white/10">
                         <p className="text-gray-500 text-xs uppercase tracking-widest">Carta favorita de</p>
-                        <p className="text-yellow-500 font-black text-lg uppercase tracking-wide mt-1.5 flex items-center justify-center gap-2">
+                        <p className={`font-black text-lg uppercase tracking-wide mt-1.5 flex items-center justify-center gap-2 ${currentTheme.textAccentClass}`}>
                           <span>⭐ {selectedEntry.username}</span>
                           {(() => {
                             const lvl = selectedEntry.userLevel ?? 1;
@@ -390,6 +492,30 @@ export default function Mural() {
                           })()}
                         </p>
                       </div>
+
+                      {/* Medallas Obtenidas */}
+                      <div className="mt-4 pt-4 border-t border-white/10 w-full">
+                        <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-3">Medallas Obtenidas ({selectedEntry.completedExpansions?.length || 0}/6)</p>
+                        {selectedEntry.completedExpansions && selectedEntry.completedExpansions.length > 0 ? (
+                          <div className="flex flex-wrap gap-2 justify-center">
+                            {selectedEntry.completedExpansions.map((medId) => {
+                              const config = medalConfig[medId];
+                              if (!config) return null;
+                              return (
+                                <div 
+                                  key={medId} 
+                                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs ${config.bg} ${config.border} ${config.text} shadow-sm`}
+                                >
+                                  <span>{config.icon}</span>
+                                  <span className="font-black uppercase text-[9px] tracking-wide">{config.label}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <p className="text-gray-600 text-[9.5px] uppercase font-black tracking-widest mt-1">Ninguna medalla obtenida aún</p>
+                        )}
+                      </div>
                     </div>
                     <button
                       onClick={() => setSelectedEntry(null)}
@@ -400,6 +526,159 @@ export default function Mural() {
                   </>
                 );
               })()}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal de personalización de perfil */}
+      <AnimatePresence>
+        {showConfig && currentUser && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowConfig(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.7, opacity: 0 }}
+              transition={{ type: 'spring', damping: 20 }}
+              className="bg-gray-900 border border-white/10 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl flex flex-col max-h-[95vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+                <div>
+                  <h2 className="text-xl font-black uppercase tracking-tight text-white flex items-center gap-2">
+                    <span>⚙️</span> Personalizar Medallas
+                  </h2>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">Selecciona hasta 3 medallas a mostrar en el mural</p>
+                </div>
+                <button 
+                  onClick={() => setShowConfig(false)} 
+                  className="text-gray-500 hover:text-white transition-colors text-lg"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-3.5 mb-8">
+                {Object.entries(expansionNames).map(([medId, exp]) => {
+                  const hasCompleted = (currentUser.completedExpansions || []).includes(medId);
+                  const isSelected = selectedMedals.includes(medId);
+                  const config = medalConfig[medId];
+
+                  return (
+                    <div 
+                      key={medId}
+                      onClick={() => hasCompleted && toggleMedal(medId)}
+                      className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-200 ${
+                        hasCompleted 
+                          ? isSelected
+                            ? `bg-gray-800/40 border-current/40 cursor-pointer ${currentTheme.glowClass}`
+                            : 'bg-gray-800/20 border-white/5 hover:border-white/15 cursor-pointer'
+                          : 'bg-black/20 border-white/5 opacity-40 cursor-not-allowed'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`w-8 h-8 rounded-full border flex items-center justify-center text-sm ${config?.bg} ${config?.border}`}>
+                          {config?.icon || '🏅'}
+                        </span>
+                        <div>
+                          <p className="text-white text-xs font-black uppercase tracking-wide">{exp.name}</p>
+                          <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">
+                            {hasCompleted ? 'Desbloqueado (+1 sobre diario)' : 'Completa el 100% para desbloquear'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {hasCompleted ? (
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${
+                          isSelected ? `${currentTheme.accentClass} border-current` : 'border-white/20'
+                        }`}>
+                          {isSelected && <span className="text-[10px] font-black">✓</span>}
+                        </div>
+                      ) : (
+                        <span className="text-xs">🔒</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Tema Visual Global */}
+              <div className="border-t border-white/10 pt-5 mt-5 mb-8">
+                <h3 className="text-sm font-black uppercase tracking-tight text-white flex items-center gap-2 mb-1">
+                  <span>🎨</span> Tema Visual Global
+                </h3>
+                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-4">Cambia la atmósfera de toda la interfaz del juego</p>
+                
+                <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
+                  {[
+                    { id: 'default', name: 'Vacío Espacial (Predeterminado)', desc: 'Gris espacial y amarillo stelar', reqExp: '', emoji: '🌌' },
+                    { id: 'aura-divina', name: 'Aura Divina', desc: 'Dorado profundo y negro azabache', reqExp: 'dp6', emoji: '🌟' },
+                    { id: 'tormenta-glaciar', name: 'Tormenta Glaciar', desc: 'Azul hielo y grises platinos', reqExp: 'swsh12', emoji: '⛈️' },
+                    { id: 'sobrecarga-plasma', name: 'Sobrecarga Plasma', desc: 'Azul cobalto y cian eléctrico', reqExp: 'bw9', emoji: '⚡' },
+                    { id: 'estrella-carmesi', name: 'Estrella Carmesí', desc: 'Burdeos elegante y rojo rubí', reqExp: 'xyp', emoji: '💫' },
+                    { id: 'cenizas-ardientes', name: 'Cenizas Ardientes', desc: 'Negro con ascuas fuego y fucsia', reqExp: 'sm3', emoji: '🔥' },
+                    { id: 'vacio-trueno', name: 'Vacío Trueno', desc: 'Morado índigo y acentos intensos', reqExp: 'zsv10pt5', emoji: '🔮' }
+                  ].map((themeOpt) => {
+                    const isUnlocked = !themeOpt.reqExp || (currentUser.completedExpansions || []).includes(themeOpt.reqExp);
+                    const isSelected = selectedTheme === themeOpt.id;
+
+                    return (
+                      <div
+                        key={themeOpt.id}
+                        onClick={() => isUnlocked && setSelectedTheme(themeOpt.id)}
+                        className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-200 ${
+                          isUnlocked
+                            ? isSelected
+                              ? `${currentTheme.mobileActiveNavClass} border-current/30 cursor-pointer ${currentTheme.glowClass}`
+                              : 'bg-gray-800/20 border-white/5 hover:border-white/10 cursor-pointer'
+                            : 'bg-black/20 border-white/5 opacity-40 cursor-not-allowed'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg w-7 h-7 bg-white/5 rounded-lg border border-white/10 flex items-center justify-center">
+                            {themeOpt.emoji}
+                          </span>
+                          <div>
+                            <p className="text-white text-[11px] font-black uppercase tracking-wide">{themeOpt.name}</p>
+                            <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">{themeOpt.desc}</p>
+                          </div>
+                        </div>
+
+                        {isUnlocked ? (
+                          <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
+                            isSelected ? `${currentTheme.accentClass}` : 'border-white/20'
+                          }`}>
+                            {isSelected && <span className="text-[9px] font-black">✓</span>}
+                          </div>
+                        ) : (
+                          <span className="text-xs">🔒</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowConfig(false)}
+                  className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 text-xs uppercase font-bold tracking-wider transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSaveShowcase}
+                  className={`flex-1 py-3 rounded-xl ${currentTheme.accentClass} ${currentTheme.accentHoverClass} text-xs uppercase font-bold tracking-wider transition-all duration-300 ${currentTheme.glowClass}`}
+                >
+                  Guardar Cambios
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

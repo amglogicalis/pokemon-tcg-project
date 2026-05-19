@@ -13,7 +13,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #0f172a;
+  background-color: transparent;
 }
 
 #root {
@@ -165,5 +165,14 @@ body {
       border-color: rgba(34, 211, 238, 0.9); 
       box-shadow: 0 0 35px rgba(34, 211, 238, 0.85); 
     }
+  }
+
+  /* Hide scrollbar tracks for horizontal scrollable containers */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
   }
 }

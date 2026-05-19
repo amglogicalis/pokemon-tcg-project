@@ -6,7 +6,8 @@ import Album from './pages/Album';
 import Mural from './pages/Mural';
 import Trades from './pages/Trades';
 import api from './services/api';
-import { getLevelTextStyle } from './constants/levels';
+import { getLevelTextStyle, getXpNeededForLevel } from './constants/levels';
+import { themes } from './constants/themes';
 
 export default function App() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -70,10 +71,13 @@ export default function App() {
       api.get('/user/album')
         .then((res) => {
           if (res.data.level !== undefined && res.data.xp !== undefined) {
-            updateUserStats(res.data.level, res.data.xp);
+            updateUserStats(res.data.level, res.data.xp, res.data.completedExpansions);
           }
           if (res.data.packsAvailable !== undefined) {
             useAuthStore.getState().updatePacksAvailable(res.data.packsAvailable, res.data.lastPackClaimedAt);
+          }
+          if (res.data.activeTheme) {
+            useAuthStore.getState().updateActiveTheme(res.data.activeTheme);
           }
         })
         .catch((err) => {
@@ -82,14 +86,47 @@ export default function App() {
     }
   }, [isAuthenticated, updateUserStats]);
 
+  // --- Aplicar clases de tema dinámico al body del documento ---
+  useEffect(() => {
+    const activeThemeId = user?.activeTheme || 'default';
+    const currentTheme = themes[activeThemeId] || themes.default;
+    const bodyEl = document.body;
+    
+    // Forzar fondo transparente para que se muestre el gradiente de Tailwind
+    bodyEl.style.backgroundColor = 'transparent';
+    bodyEl.style.transition = 'background-color 500ms ease, background-image 500ms ease, color 500ms ease';
+    
+    // Limpiar clases de fondo anteriores
+    const classesToRemove: string[] = [];
+    bodyEl.classList.forEach((cls) => {
+      if (
+        cls.startsWith('bg-') || 
+        cls.startsWith('text-') || 
+        cls.startsWith('from-') || 
+        cls.startsWith('via-') || 
+        cls.startsWith('to-')
+      ) {
+        classesToRemove.push(cls);
+      }
+    });
+    classesToRemove.forEach((cls) => bodyEl.classList.remove(cls));
+
+    // Agregar las clases del tema actual
+    const classesToAdd = currentTheme.bgClass.split(' ');
+    classesToAdd.forEach((cls) => bodyEl.classList.add(cls));
+  }, [user?.activeTheme]);
+
   if (!isAuthenticated) {
     return <Login />;
   }
 
+  const activeThemeId = user?.activeTheme || 'default';
+  const currentTheme = themes[activeThemeId] || themes.default;
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white w-full font-sans">
+    <div className={`min-h-screen ${currentTheme.bgClass} w-full font-sans transition-colors duration-500`}>
       {/* Navbar con estilo mejorado para resaltar la navegación */}
-      <nav className="bg-gray-800/50 backdrop-blur-md sticky top-0 z-50 p-4 border-b border-white/10 shadow-2xl flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
+      <nav className={`backdrop-blur-md sticky top-0 z-50 p-4 border-b shadow-2xl flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0 ${currentTheme.navClass} transition-colors duration-500`}>
         <div className="flex justify-between items-center w-full md:w-auto">
           {/* Mobile Hamburger Button */}
           <button 
@@ -106,7 +143,7 @@ export default function App() {
             onClick={() => { playSelect(); setView('shop'); }} 
             className={`px-6 py-2 rounded-full transition-all duration-300 ${
               view === 'shop' 
-              ? 'bg-yellow-500 text-black font-bold shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
+              ? `${currentTheme.accentClass} font-bold ${currentTheme.glowClass}` 
               : 'text-gray-400 hover:bg-white/5 hover:text-white'
             }`}
           >
@@ -116,7 +153,7 @@ export default function App() {
             onClick={() => { playSelect(); setView('album')} } 
             className={`px-6 py-2 rounded-full transition-all duration-300 ${
               view === 'album' 
-              ? 'bg-yellow-500 text-black font-bold shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
+              ? `${currentTheme.accentClass} font-bold ${currentTheme.glowClass}` 
               : 'text-gray-400 hover:bg-white/5 hover:text-white'
             }`}
           >
@@ -126,7 +163,7 @@ export default function App() {
             onClick={() => { playSelect(); setView('mural')} } 
             className={`px-6 py-2 rounded-full transition-all duration-300 ${
               view === 'mural' 
-              ? 'bg-yellow-500 text-black font-bold shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
+              ? `${currentTheme.accentClass} font-bold ${currentTheme.glowClass}` 
               : 'text-gray-400 hover:bg-white/5 hover:text-white'
             }`}
           >
@@ -136,7 +173,7 @@ export default function App() {
             onClick={() => { playSelect(); setView('trades')} } 
             className={`px-6 py-2 rounded-full transition-all duration-300 ${
               view === 'trades' 
-              ? 'bg-yellow-500 text-black font-bold shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
+              ? `${currentTheme.accentClass} font-bold ${currentTheme.glowClass}` 
               : 'text-gray-400 hover:bg-white/5 hover:text-white'
             }`}
           >
@@ -155,12 +192,12 @@ export default function App() {
               </span>
               <div className="w-full h-1.5 bg-gray-700 rounded-full overflow-hidden border border-white/5 relative shadow-inner">
                 <div 
-                  style={{ width: `${Math.min(100, Math.max(0, ((user.xp ?? 0) / (100 + ((user.level ?? 1) - 1) * 50)) * 100))}%` }}
-                  className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] transition-all duration-500 ease-out"
+                  style={{ width: `${Math.min(100, Math.max(0, ((user.xp ?? 0) / getXpNeededForLevel(user.level ?? 1)) * 100))}%` }}
+                  className={`h-full ${currentTheme.progressBarClass} transition-all duration-500 ease-out`}
                 />
               </div>
               <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest leading-none">
-                {user.xp ?? 0} / {100 + ((user.level ?? 1) - 1) * 50} XP
+                {user.xp ?? 0} / {getXpNeededForLevel(user.level ?? 1)} XP
               </span>
             </div>
           )}
@@ -260,12 +297,12 @@ export default function App() {
                 </span>
                 <div className="w-full max-w-[200px] h-2 bg-gray-700 rounded-full overflow-hidden border border-white/5 relative shadow-inner">
                   <div 
-                    style={{ width: `${Math.min(100, Math.max(0, ((user.xp ?? 0) / (100 + ((user.level ?? 1) - 1) * 50)) * 100))}%` }}
-                    className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)] transition-all duration-500 ease-out"
+                    style={{ width: `${Math.min(100, Math.max(0, ((user.xp ?? 0) / getXpNeededForLevel(user.level ?? 1)) * 100))}%` }}
+                    className={`h-full ${currentTheme.progressBarClass} transition-all duration-500 ease-out`}
                   />
                 </div>
                 <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
-                  {user.xp ?? 0} / {100 + ((user.level ?? 1) - 1) * 50} XP
+                  {user.xp ?? 0} / {getXpNeededForLevel(user.level ?? 1)} XP
                 </span>
               </div>
             )}
@@ -273,7 +310,7 @@ export default function App() {
             <button 
               onClick={() => { playSelect(); setView('shop'); setIsMobileMenuOpen(false); }} 
               className={`px-4 py-2 rounded-lg text-left transition-colors ${
-                view === 'shop' ? 'bg-yellow-500/20 text-yellow-500 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                view === 'shop' ? `${currentTheme.mobileActiveNavClass}` : 'text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
               Tienda
@@ -281,7 +318,7 @@ export default function App() {
             <button 
               onClick={() => { playSelect(); setView('album'); setIsMobileMenuOpen(false); }} 
               className={`px-4 py-2 rounded-lg text-left transition-colors ${
-                view === 'album' ? 'bg-yellow-500/20 text-yellow-500 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                view === 'album' ? `${currentTheme.mobileActiveNavClass}` : 'text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
               Mi Álbum
@@ -289,7 +326,7 @@ export default function App() {
             <button 
               onClick={() => { playSelect(); setView('mural'); setIsMobileMenuOpen(false); }} 
               className={`px-4 py-2 rounded-lg text-left transition-colors ${
-                view === 'mural' ? 'bg-yellow-500/20 text-yellow-500 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                view === 'mural' ? `${currentTheme.mobileActiveNavClass}` : 'text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
               Mural
@@ -297,7 +334,7 @@ export default function App() {
             <button 
               onClick={() => { playSelect(); setView('trades'); setIsMobileMenuOpen(false); }} 
               className={`px-4 py-2 rounded-lg text-left transition-colors ${
-                view === 'trades' ? 'bg-yellow-500/20 text-yellow-500 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                view === 'trades' ? `${currentTheme.mobileActiveNavClass}` : 'text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
               Intercambios

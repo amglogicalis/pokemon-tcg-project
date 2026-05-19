@@ -1924,6 +1924,17 @@
             "attack": 130,
             "defense": 90,
             "imageUrl": "https://images.pokemontcg.io/sm3/88a_hires.png"
+        },
+        {
+            "id": "sm3-divine",
+            "pokemonId": 6,
+            "name": "Charizard GX (Divine)",
+            "rarity": "divine",
+            "hp": 250,
+            "type": "Fire",
+            "attack": 300,
+            "defense": 150,
+            "imageUrl": "https://images.pokemontcg.io/sm3/20_hires.png"
         }
     ]
 }

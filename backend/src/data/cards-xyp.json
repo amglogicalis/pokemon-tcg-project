@@ -2397,6 +2397,17 @@
             "attack": 40,
             "defense": 30,
             "imageUrl": "https://images.pokemontcg.io/xyp/XY99_hires.png"
+        },
+        {
+            "id": "xyp-divine",
+            "pokemonId": 150,
+            "name": "Mewtwo EX (Divine)",
+            "rarity": "divine",
+            "hp": 220,
+            "type": "Psychic",
+            "attack": 150,
+            "defense": 100,
+            "imageUrl": "https://images.pokemontcg.io/xyp/XY107_hires.png"
         }
     ]
 }

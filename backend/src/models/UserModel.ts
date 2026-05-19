@@ -21,7 +21,10 @@ const UserSchema = new Schema<IUserDocument>({
   favoriteCardId: { type: String, required: false },
   level: { type: Number, required: true, default: 1 },
   xp: { type: Number, required: true, default: 0 },
-  lastPackClaimedAt: { type: String, required: false }
+  lastPackClaimedAt: { type: String, required: false },
+  completedExpansions: { type: [String], default: [] },
+  showcasedMedals: { type: [String], default: [] },
+  activeTheme: { type: String, required: false, default: 'default' }
 });
 
 export const UserModel = mongoose.model<IUserDocument>('User', UserSchema);

@@ -3,6 +3,7 @@ import { AuthRequest } from '../middleware/authMiddleware';
 import { UserModel } from '../models/UserModel';
 import { TradeModel } from '../models/TradeModel';
 import { NotificationModel } from '../models/NotificationModel';
+import { ProgressionService } from '../services/ProgressionService';
 
 // Estructura estática para catalogar todas las cartas y facilitar búsquedas instantáneas
 import baseCards from '../data/cards.json';
@@ -358,6 +359,7 @@ export class TradeController {
       // --- EJECUCIÓN DEL SWAP DE CARTAS ---
 
       // A) Ajustes en el álbum del Emisor (A)
+      let senderXpGained = 0;
       // Restar carta ofrecida
       senderAlbumEntry.quantity -= 1;
       if (senderAlbumEntry.quantity <= 0) {
@@ -368,6 +370,7 @@ export class TradeController {
       if (senderNewEntry) {
         senderNewEntry.quantity += 1;
       } else {
+        senderXpGained = 20; // 20 XP por carta nueva descubierta en trade
         senderDoc.album.push({
           card: trade.receiverCardData,
           quantity: 1,
@@ -376,6 +379,7 @@ export class TradeController {
       }
 
       // B) Ajustes en el álbum del Receptor (B)
+      let receiverXpGained = 0;
       // Restar carta solicitada
       receiverAlbumEntry.quantity -= 1;
       if (receiverAlbumEntry.quantity <= 0) {
@@ -386,12 +390,18 @@ export class TradeController {
       if (receiverNewEntry) {
         receiverNewEntry.quantity += 1;
       } else {
+        receiverXpGained = 20; // 20 XP por carta nueva descubierta en trade
         receiverDoc.album.push({
           card: trade.senderCardData,
           quantity: 1,
           obtainedAt: new Date().toISOString()
         });
       }
+
+      // Aplicar progresión, hitos y colecciones completadas a ambos entrenadores
+      ProgressionService.applyProgression(senderDoc, senderXpGained);
+      ProgressionService.applyProgression(receiverDoc, receiverXpGained);
+
 
       // C) Guardar cambios en base de datos de manera atómica
       trade.status = 'accepted';

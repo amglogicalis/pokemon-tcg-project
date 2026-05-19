@@ -46,7 +46,8 @@ export class PackController {
         cards: drawnCards,
         packsRemaining: updatedUser.packsAvailable,
         level: updatedUser.level ?? 1,
-        xp: updatedUser.xp ?? 0
+        xp: updatedUser.xp ?? 0,
+        completedExpansions: updatedUser.completedExpansions || []
       });
 
     } catch (error: any) {
@@ -79,14 +80,16 @@ export class PackController {
         }
       }
 
-      // Añadir 10 sobres y actualizar marca de tiempo
-      user.packsAvailable = (user.packsAvailable || 0) + 10;
+      // Añadir sobres (10 base + 1 por cada expansión completada) y actualizar marca de tiempo
+      const completedCount = user.completedExpansions?.length || 0;
+      const packsToAward = 10 + completedCount;
+      user.packsAvailable = (user.packsAvailable || 0) + packsToAward;
       user.lastPackClaimedAt = new Date().toISOString();
 
       await repo.save(user);
 
       res.status(200).json({
-        message: "¡Sobres recargados correctamente! Has recibido 10 sobres.",
+        message: `¡Sobres recargados correctamente! Has recibido ${packsToAward} sobres.`,
         packsAvailable: user.packsAvailable,
         lastPackClaimedAt: user.lastPackClaimedAt
       });

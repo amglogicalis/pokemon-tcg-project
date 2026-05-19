@@ -2694,6 +2694,17 @@
             "attack": 220,
             "defense": 165,
             "imageUrl": "https://images.pokemontcg.io/swsh12tg/TG30_hires.png"
+        },
+        {
+            "id": "swsh12-divine",
+            "pokemonId": 249,
+            "name": "Lugia VSTAR (Divine)",
+            "rarity": "divine",
+            "hp": 280,
+            "type": "Colorless",
+            "attack": 220,
+            "defense": 140,
+            "imageUrl": "https://images.pokemontcg.io/swsh12/139_hires.png"
         }
     ]
 }

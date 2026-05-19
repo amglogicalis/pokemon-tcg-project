@@ -79,3 +79,17 @@ export function getLevelTextStyle(level: number): React.CSSProperties {
     display: 'inline-block'
   };
 }
+
+export function getXpNeededForLevel(level: number): number {
+  if (level <= 10) return 100;
+  if (level <= 50) return 100;
+  if (level <= 100) return 100;
+  if (level <= 250) return 150;
+  if (level <= 500) return 150;
+  if (level <= 1000) return 200;
+  if (level <= 2000) return 250;
+  if (level <= 5000) return 300;
+  if (level <= 10000) return 300;
+  return 600;
+}
+

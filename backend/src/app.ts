@@ -55,7 +55,7 @@ connectDB();
 // ─── 4. RATE LIMITERS (ANTI DDOS Y BRUTE FORCE) ──────────────────────────────
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 150,
+  limit: 300, // Límite seguro para producción
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Demasiadas peticiones desde esta IP. Inténtalo en 15 minutos.' }
@@ -63,7 +63,7 @@ const globalLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 15,
+  limit: 10, // Máximo 10 intentos por IP cada 15 min para evitar fuerza bruta
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Demasiados intentos de acceso. Inténtalo en 15 minutos.' }
@@ -129,6 +129,8 @@ app.post('/api/packs/open',        authMiddleware, (req, res) => packController.
 app.post('/api/packs/claim-daily', authMiddleware, (req, res) => packController.claimDailyPacks(req as any, res));
 app.get ('/api/user/album',        authMiddleware, (req, res) => albumController.getAlbum(req as any, res));
 app.post('/api/user/favorite',     authMiddleware, (req, res) => albumController.setFavoriteCard(req as any, res));
+app.post('/api/user/showcase-medals', authMiddleware, (req, res) => albumController.updateShowcasedMedals(req as any, res));
+app.post('/api/user/theme',           authMiddleware, (req, res) => albumController.updateActiveTheme(req as any, res));
 app.get ('/api/mural',                             (req, res) => albumController.getMural(req, res));
 
 // ─── RUTAS DE INTERCAMBIOS ────────────────────────────────────────────────────

@@ -1,0 +1,139 @@
+export interface ThemeStyle {
+  id: string;
+  name: string;
+  description: string;
+  unlockedBy: string; // ID de la expansión requerida (o '' para predeterminado)
+  bgClass: string;     // Clases de fondo
+  textClass: string;   // Clases de texto
+  accentClass: string; // Botones y destaques
+  accentHoverClass: string;
+  navClass: string;    // Fondo y bordes de la barra de navegación
+  textAccentClass: string; // Color de texto para destaques (ej: text-yellow-500)
+  accentRgb: string;   // Color RGB del acento para usar en rgba() inline (ej: '234,179,8')
+  glowClass: string; // Sombras con brillo (ej: shadow-[0_0_15px_rgba(234,179,8,0.4)])
+  mobileActiveNavClass: string; // Clases para menú móvil activo (ej: bg-yellow-500/20 text-yellow-500)
+  progressBarClass: string; // Clases para barras de progreso (ej: bg-gradient-to-r from-yellow-400 to-yellow-500 shadow-...)
+  panelBgClass: string; // Color del panel de estadísticas del tema (círculo azul)
+}
+
+export const themes: Record<string, ThemeStyle> = {
+  default: {
+    id: 'default',
+    name: 'Vacío Espacial',
+    description: 'Tema predeterminado del juego con tonos oscuros y amarillos estelares.',
+    unlockedBy: '',
+    bgClass: 'bg-gradient-to-br from-gray-900 via-gray-950 to-black text-gray-100',
+    textClass: 'text-white',
+    accentClass: 'bg-yellow-500 hover:bg-yellow-400 text-black',
+    accentHoverClass: 'hover:shadow-[0_0_20px_rgba(234,179,8,0.4)]',
+    navClass: 'bg-black/30 border-white/5',
+    textAccentClass: 'text-yellow-500',
+    accentRgb: '234,179,8',
+    glowClass: 'shadow-[0_0_15px_rgba(234,179,8,0.4)]',
+    mobileActiveNavClass: 'bg-yellow-500/20 text-yellow-500 font-bold',
+    progressBarClass: 'bg-gradient-to-r from-yellow-400 to-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]',
+    panelBgClass: 'bg-gray-800/40 border-white/5',
+  },
+  'aura-divina': {
+    id: 'aura-divina',
+    name: 'Aura Divina',
+    description: 'Tonos dorados profundos y negro azabache de la colección Legends Awakened.',
+    unlockedBy: 'dp6',
+    bgClass: 'bg-gradient-to-br from-black via-amber-950/20 to-black text-amber-100',
+    textClass: 'text-amber-300',
+    accentClass: 'bg-amber-500 hover:bg-amber-400 text-black',
+    accentHoverClass: 'hover:shadow-[0_0_20px_rgba(245,158,11,0.4)]',
+    navClass: 'bg-amber-950/20 border-amber-500/20',
+    textAccentClass: 'text-amber-500',
+    accentRgb: '245,158,11',
+    glowClass: 'shadow-[0_0_15px_rgba(245,158,11,0.4)]',
+    mobileActiveNavClass: 'bg-amber-500/20 text-amber-500 font-bold',
+    progressBarClass: 'bg-gradient-to-r from-amber-400 to-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]',
+    panelBgClass: 'bg-amber-950/20 border-amber-500/10',
+  },
+  'tormenta-glaciar': {
+    id: 'tormenta-glaciar',
+    name: 'Tormenta Glaciar',
+    description: 'Fríos tonos azulados y grises de la colección Silver Tempest.',
+    unlockedBy: 'swsh12',
+    bgClass: 'bg-gradient-to-br from-slate-900 via-sky-950/30 to-slate-950 text-sky-100',
+    textClass: 'text-sky-300',
+    accentClass: 'bg-sky-400 hover:bg-sky-300 text-slate-900',
+    accentHoverClass: 'hover:shadow-[0_0_20px_rgba(56,189,248,0.4)]',
+    navClass: 'bg-sky-950/20 border-sky-500/20',
+    textAccentClass: 'text-sky-400',
+    accentRgb: '56,189,248',
+    glowClass: 'shadow-[0_0_15px_rgba(56,189,248,0.4)]',
+    mobileActiveNavClass: 'bg-sky-400/20 text-sky-400 font-bold',
+    progressBarClass: 'bg-gradient-to-r from-sky-400 to-sky-500 shadow-[0_0_8px_rgba(56,189,248,0.5)]',
+    panelBgClass: 'bg-sky-950/20 border-sky-500/10',
+  },
+  'sobrecarga-plasma': {
+    id: 'sobrecarga-plasma',
+    name: 'Sobrecarga Plasma',
+    description: 'Bordes cian eléctricos y acentos de plasma de la colección Plasma Blast.',
+    unlockedBy: 'bw9',
+    bgClass: 'bg-gradient-to-br from-blue-950/40 via-gray-950 to-black text-cyan-100',
+    textClass: 'text-cyan-400',
+    accentClass: 'bg-cyan-500 hover:bg-cyan-400 text-black',
+    accentHoverClass: 'hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]',
+    navClass: 'bg-blue-950/35 border-cyan-500/20',
+    textAccentClass: 'text-cyan-400',
+    accentRgb: '6,182,212',
+    glowClass: 'shadow-[0_0_15px_rgba(6,182,212,0.4)]',
+    mobileActiveNavClass: 'bg-cyan-500/20 text-cyan-400 font-bold',
+    progressBarClass: 'bg-gradient-to-r from-cyan-400 to-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]',
+    panelBgClass: 'bg-blue-950/25 border-cyan-500/10',
+  },
+  'estrella-carmesi': {
+    id: 'estrella-carmesi',
+    name: 'Estrella Carmesí',
+    description: 'Profundo burdeos y brillos rubí de la colección XY Black Star Promos.',
+    unlockedBy: 'xyp',
+    bgClass: 'bg-gradient-to-br from-rose-950/30 via-neutral-950 to-black text-rose-100',
+    textClass: 'text-rose-400',
+    accentClass: 'bg-rose-600 hover:bg-rose-500 text-white',
+    accentHoverClass: 'hover:shadow-[0_0_20px_rgba(225,29,72,0.4)]',
+    navClass: 'bg-rose-950/20 border-rose-500/20',
+    textAccentClass: 'text-rose-500',
+    accentRgb: '225,29,72',
+    glowClass: 'shadow-[0_0_15px_rgba(225,29,72,0.4)]',
+    mobileActiveNavClass: 'bg-rose-600/20 text-rose-400 font-bold',
+    progressBarClass: 'bg-gradient-to-r from-rose-500 to-rose-600 shadow-[0_0_8px_rgba(225,29,72,0.5)]',
+    panelBgClass: 'bg-rose-950/20 border-rose-500/10',
+  },
+  'cenizas-ardientes': {
+    id: 'cenizas-ardientes',
+    name: 'Cenizas Ardientes',
+    description: 'Ascuas parpadeantes y fondos de fuego de la colección Burning Shadows.',
+    unlockedBy: 'sm3',
+    bgClass: 'bg-gradient-to-br from-red-950/40 via-stone-950 to-black text-orange-100',
+    textClass: 'text-orange-400',
+    accentClass: 'bg-orange-500 hover:bg-orange-400 text-black',
+    accentHoverClass: 'hover:shadow-[0_0_20px_rgba(249,115,22,0.4)]',
+    navClass: 'bg-red-950/20 border-orange-500/20',
+    textAccentClass: 'text-orange-500',
+    accentRgb: '249,115,22',
+    glowClass: 'shadow-[0_0_15px_rgba(249,115,22,0.4)]',
+    mobileActiveNavClass: 'bg-orange-500/20 text-orange-500 font-bold',
+    progressBarClass: 'bg-gradient-to-r from-orange-400 to-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]',
+    panelBgClass: 'bg-red-950/20 border-orange-500/10',
+  },
+  'vacio-trueno': {
+    id: 'vacio-trueno',
+    name: 'Vacío Trueno',
+    description: 'Púrpura tormenta e impacto estético de la colección Black Bolt.',
+    unlockedBy: 'zsv10pt5',
+    bgClass: 'bg-gradient-to-br from-indigo-950/40 via-slate-950 to-black text-indigo-100',
+    textClass: 'text-indigo-400',
+    accentClass: 'bg-indigo-500 hover:bg-indigo-400 text-white',
+    accentHoverClass: 'hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]',
+    navClass: 'bg-indigo-950/20 border-indigo-500/20',
+    textAccentClass: 'text-indigo-400',
+    accentRgb: '129,140,248',
+    glowClass: 'shadow-[0_0_15px_rgba(99,102,241,0.4)]',
+    mobileActiveNavClass: 'bg-indigo-500/20 text-indigo-400 font-bold',
+    progressBarClass: 'bg-gradient-to-r from-indigo-400 to-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]',
+    panelBgClass: 'bg-indigo-950/20 border-indigo-500/10',
+  }
+};

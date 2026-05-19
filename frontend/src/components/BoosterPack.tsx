@@ -8,8 +8,8 @@ interface BoosterPackProps {
 }
 
 const PACK_ASSETS: Record<string, { imagePath: string; glow: string }> = { 
-  'swsh12': { imagePath: 'swsh12/packshots/image_1_394x_f23c7f88-ca92-46a0-88bd-574db522aa80_394x.webp', glow: ' bg-slate-400' }, 
-  'sm3': { imagePath: 'sm3/packshots/SM3_Booster_Ho-Oh.webp', glow: 'bg-red-950' }, 
+  'swsh12': { imagePath: 'swsh12/packshots/image_1_394x_f23c7f88-ca92-46a0-88bd-574db522aa80_394x.webp', glow: 'bg-slate-400' }, 
+  'sm3': { imagePath: 'sm3/packshots/SM3_Booster_Ho-Oh.webp', glow: 'bg-red-600' }, 
   dp6: {
     imagePath: 'dp6/packshots/DP6_Booster_Giratina.webp',
     glow: 'bg-yellow-500' // Legends Awakened
@@ -17,6 +17,10 @@ const PACK_ASSETS: Record<string, { imagePath: string; glow: string }> = {
   bw9: {
     imagePath: 'bw9/packshots/BW9_Booster_Thundurus.webp',
     glow: 'bg-cyan-500' // Plasma Blast
+  },
+  xyp: { 
+    imagePath: 'g1/packshots/Generations_Booster_Charizard.webp',
+    glow: 'bg-red-600' // Generations (XYP Promos)
   },
   '621': { 
     imagePath: 'g1/packshots/Generations_Booster_Charizard.webp',

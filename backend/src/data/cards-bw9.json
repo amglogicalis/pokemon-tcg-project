@@ -1341,6 +1341,17 @@
             "attack": 40,
             "defense": 30,
             "imageUrl": "https://images.pokemontcg.io/bw9/122_hires.png"
+        },
+        {
+            "id": "bw9-divine",
+            "pokemonId": 649,
+            "name": "Genesect EX (Divine)",
+            "rarity": "divine",
+            "hp": 230,
+            "type": "Grass",
+            "attack": 160,
+            "defense": 110,
+            "imageUrl": "https://images.pokemontcg.io/bw9/11_hires.png"
         }
     ]
 }

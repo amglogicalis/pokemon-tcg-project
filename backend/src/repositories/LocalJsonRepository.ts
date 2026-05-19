@@ -4,6 +4,7 @@ import { IUserRepository } from './IUserRepository';
 import { User } from '../domain/User';
 import { Card } from '../domain/Card';
 import { AVAILABLE_EXPANSIONS } from '../expansions';
+import { ProgressionService } from '../services/ProgressionService';
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
@@ -119,30 +120,17 @@ export class LocalJsonRepository implements IUserRepository {
     const xpFromNewCards = newCardsCount * 20;
     const totalXpGained = xpFromPack + xpFromNewCards;
 
-    // 2. Procesar progresión y subidas de nivel
-    let currentLevel = user.level ?? 1;
-    let currentXp = user.xp ?? 0;
-    let newXp = currentXp + totalXpGained;
-    let newLevel = currentLevel;
+    // 2. Procesar progresión y subidas de nivel usando ProgressionService
+    const oldPacks = user.packsAvailable;
+    ProgressionService.applyProgression(user, totalXpGained);
 
-    while (true) {
-      const xpNeeded = 100 + (newLevel - 1) * 50;
-      if (newXp >= xpNeeded) {
-        newXp -= xpNeeded;
-        newLevel += 1;
-      } else {
-        break;
-      }
+    if (user.packsAvailable > 0) {
+      user.packsAvailable -= 1; // Descontar el sobre abierto
     }
-
-    user.level = newLevel;
-    user.xp = newXp;
-
-    if (user.packsAvailable > 0) user.packsAvailable -= 1;
 
     this.writeData(data);
     
-    console.log(`💾 DB: Álbum de [${user.userId}] actualizado. Total: ${user.album.length} cartas. Level: ${newLevel}, XP: ${newXp}`);
+    console.log(`💾 DB: Álbum de [${user.userId}] actualizado. Total: ${user.album.length} cartas. Level: ${user.level}, XP: ${user.xp} (Rewards: ${user.packsAvailable - oldPacks + 1} packs)`);
     return user;
   }
 
@@ -168,3 +156,4 @@ export class LocalJsonRepository implements IUserRepository {
     return data.users;
   }
 }
+

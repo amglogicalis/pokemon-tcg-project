@@ -1891,6 +1891,17 @@
             "attack": 130,
             "defense": 115,
             "imageUrl": "https://images.pokemontcg.io/zsv10pt5/172_hires.png"
+        },
+        {
+            "id": "zsv10pt5-divine",
+            "pokemonId": 644,
+            "name": "Zekrom (Divine)",
+            "rarity": "divine",
+            "hp": 260,
+            "type": "Lightning",
+            "attack": 200,
+            "defense": 130,
+            "imageUrl": "https://images.pokemontcg.io/zsv10pt5/zsv10pt5_060_hires.png"
         }
     ]
 }

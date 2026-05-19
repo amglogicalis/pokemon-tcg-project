@@ -5,18 +5,19 @@ import BoosterPack from '../components/BoosterPack';
 import { motion, AnimatePresence } from 'framer-motion';
 import { homeMusic, packMusic } from '../services/music';
 import { useAuthStore } from '../store/useAuthStore';
+import { themes } from '../constants/themes';
 
 const rarityWeight: Record<string, number> = {
-  'common': 1, 'uncommon': 2, 'rare': 3, 'holographic': 4, 'ultra-rare': 5, 'ultra rare': 5, 'shiny': 6, 'secret': 7, 'super-secret': 8, 'super secret': 8, 'ultra-secret': 9, 'ultra secret': 9
+  'common': 1, 'uncommon': 2, 'rare': 3, 'holographic': 4, 'ultra-rare': 5, 'ultra rare': 5, 'shiny': 6, 'secret': 7, 'super-secret': 8, 'super secret': 8, 'ultra-secret': 9, 'ultra secret': 9, 'divine': 10
 };
 
 const EXPANSIONS = [ 
-  { id: 'swsh12', name: 'SILVER TEMPEST', color: ' text-slate-400' }, 
-  { id: 'sm3', name: 'BURNING SHADOWS', color: 'text-red-800' }, 
-  { id: 'dp6', name: 'Legends Awakened', color: 'text-yellow-500' },
-  { id: 'bw9', name: 'Plasma Blast', color: 'text-blue-400' },
-  { id: '621', name: 'XY Black Star Promos', color: 'text-red-500' },
-  { id: 'zsv10pt5', name: 'BLACK BOLT', color: 'text-indigo-600' }
+  { id: 'swsh12', name: 'SILVER TEMPEST', color: 'text-slate-400', bg: 'bg-slate-400' }, 
+  { id: 'sm3', name: 'BURNING SHADOWS', color: 'text-red-500', bg: 'bg-red-500' }, 
+  { id: 'dp6', name: 'Legends Awakened', color: 'text-yellow-400', bg: 'bg-yellow-400' },
+  { id: 'bw9', name: 'Plasma Blast', color: 'text-blue-400', bg: 'bg-blue-400' },
+  { id: 'xyp', name: 'XY Black Star Promos', color: 'text-red-500', bg: 'bg-red-500' },
+  { id: 'zsv10pt5', name: 'BLACK BOLT', color: 'text-indigo-400', bg: 'bg-indigo-400' }
 ];
 
 export default function Shop() {
@@ -28,6 +29,8 @@ export default function Shop() {
 
   // Daily pack claims integration
   const user = useAuthStore((s) => s.user);
+  const activeThemeId = user?.activeTheme || 'default';
+  const currentTheme = themes[activeThemeId] || themes.default;
   const updatePacksAvailable = useAuthStore((s) => s.updatePacksAvailable);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [claimLoading, setClaimLoading] = useState(false);
@@ -71,7 +74,9 @@ export default function Shop() {
       
       playSfx('/sounds/shiny-pull.mp3');
       
-      setToastMsg('¡Energía cósmica canalizada! Has recibido +10 sobres.');
+      const completedCount = user?.completedExpansions?.length || 0;
+      const packsToAward = 10 + completedCount;
+      setToastMsg(`¡Energía cósmica canalizada! Has recibido +${packsToAward} sobres.`);
       setTimeout(() => setToastMsg(null), 4000);
     } catch (error: any) {
       const errMsg = error.response?.data?.error || 'Error al recargar los sobres.';
@@ -169,7 +174,7 @@ export default function Shop() {
       
       // Actualizar nivel, experiencia y sobres restantes en el store global
       if (response.data.level !== undefined && response.data.xp !== undefined) {
-        useAuthStore.getState().updateUserStats(response.data.level, response.data.xp);
+        useAuthStore.getState().updateUserStats(response.data.level, response.data.xp, response.data.completedExpansions);
       }
       if (response.data.packsRemaining !== undefined) {
         updatePacksAvailable(response.data.packsRemaining);
@@ -214,9 +219,14 @@ export default function Shop() {
 
         setLoading(false);
       }, 800);
-    } catch (error) {
-      alert('No te quedan sobres o hay un error de conexión');
+    } catch (error: any) {
+      const apiError = error.response?.data?.error || 'No te quedan sobres o hay un error de conexión';
+      setToastMsg(`⚠️ ${apiError}`);
       setLoading(false);
+      // Forzar refresh de la página tras 2.5 segundos para evitar que quede bloqueada
+      setTimeout(() => {
+        window.location.reload();
+      }, 2500);
     }
   };
 
@@ -256,9 +266,13 @@ export default function Shop() {
     }
   };
 
+  const activeExp = EXPANSIONS.find(e => e.id === selectedExp);
+  const activeColorClass = activeExp ? activeExp.color.trim() : currentTheme.textAccentClass;
+  const borderClass = activeColorClass.replace('text-', 'border-');
+
   return (
     <div 
-      className="relative min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 select-none overflow-hidden"
+      className="relative min-h-screen bg-transparent flex flex-col items-center justify-center p-4 select-none overflow-hidden"
       onClick={() => {
         const isOpening = loading || showCards;
         if (!isOpening && homeMusic.paused) {
@@ -270,7 +284,7 @@ export default function Shop() {
       }}
     >
       {/* FONDO BASE LIMPIO */}
-      <div className="fixed inset-0 pointer-events-none z-0 shadow-[inset_0_0_500px_rgba(0,0,0,0.8)] bg-gray-900" />
+      <div className="fixed inset-0 pointer-events-none z-0 shadow-[inset_0_0_500px_rgba(0,0,0,0.8)] bg-transparent" />
 
       {/* EFECTOS DE FONDO DINÁMICOS - AMPLIADOS */}
       <AnimatePresence>
@@ -281,7 +295,7 @@ export default function Shop() {
             animate={{ opacity: [0.2, 0.6, 0.2] }}
             exit={{ opacity: 0, transition: { duration: 0.5 } }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className="fixed inset-0 pointer-events-none z-0 text-yellow-500 flex items-center justify-center"
+            className={`fixed inset-0 pointer-events-none z-0 flex items-center justify-center ${currentTheme.textAccentClass}`}
           >
             <div className="w-full h-full scale-150 bg-[radial-gradient(circle,currentColor_10%,transparent_80%)]" />
           </motion.div>
@@ -470,7 +484,7 @@ export default function Shop() {
             className="flex flex-col items-center z-10 w-full"
           >
             {/* Consola de Control de Sobres: Contador y Botón de Recarga Neutro y Elegante */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 bg-black/45 backdrop-blur-xl border border-white/10 p-4 px-6 rounded-2xl shadow-xl w-full max-w-xl mb-8">
+            <div className={`flex flex-col sm:flex-row items-center justify-between gap-6 ${currentTheme.panelBgClass} backdrop-blur-xl p-4 px-6 rounded-2xl shadow-xl w-full max-w-xl mb-8 transition-colors duration-500`}>
               
               {/* Izquierda: Sobres Disponibles */}
               <div className="flex flex-col items-center sm:items-start">
@@ -481,7 +495,7 @@ export default function Shop() {
                   key={user?.packsAvailable}
                   initial={{ scale: 0.8, opacity: 0.5 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className="text-3xl font-black bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(234,179,8,0.35)]"
+                  className={`text-3xl font-black ${currentTheme.textAccentClass} drop-shadow-[0_0_12px_rgba(255,255,255,0.1)]`}
                 >
                   {user?.packsAvailable ?? 0}
                 </motion.span>
@@ -497,7 +511,7 @@ export default function Shop() {
                   className={`relative px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-[0.1em] transition-all duration-300 flex items-center gap-2 border shadow-lg ${
                     timeRemaining > 0
                       ? 'bg-gray-800/40 border-white/5 text-gray-500 cursor-not-allowed min-w-[210px] justify-center'
-                      : 'bg-yellow-500 hover:bg-yellow-400 border-yellow-400 text-black shadow-[0_0_15px_rgba(234,179,8,0.25)] hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] active:scale-95'
+                      : `${currentTheme.accentClass} border-transparent active:scale-95 ${currentTheme.accentHoverClass}`
                   }`}
                 >
                   {timeRemaining > 0 ? (
@@ -513,7 +527,7 @@ export default function Shop() {
                   ) : (
                     <>
                       <span>⚡</span>
-                      <span>Recargar +10 Sobres</span>
+                      <span>Recargar +{10 + (user?.completedExpansions?.length || 0)} Sobres</span>
                     </>
                   )}
                 </motion.button>
@@ -524,21 +538,31 @@ export default function Shop() {
 
             </div>
 
-            <div className="flex gap-6 mb-12 bg-black/30 p-2 px-6 rounded-full border border-white/5 backdrop-blur-xl overflow-x-auto whitespace-nowrap scrollbar-hide max-w-full">
-              {EXPANSIONS.map((exp) => (
-                <button
-                  key={exp.id}
-                  onClick={() => { playSelect(); setSelectedExp(exp.id); }}
-                  className={`shrink-0 py-2 text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                    selectedExp === exp.id ? exp.color : 'text-gray-500 hover:text-gray-300'
-                  }`}
-                >
-                  {exp.name}
-                  {selectedExp === exp.id && (
-                    <motion.div layoutId="activeExp" className="h-0.5 bg-current mt-1" />
-                  )}
-                </button>
-              ))}
+            <div
+              className="flex gap-4 mb-12 bg-black/80 px-6 py-3.5 rounded-full overflow-x-auto whitespace-nowrap scrollbar-hide max-w-full transition-all duration-500 border"
+              style={{ borderColor: `rgba(${currentTheme.accentRgb}, 0.15)` }}
+            >
+              <div className="shrink-0 w-2" />
+              {EXPANSIONS.map((exp) => {
+                const isActive = selectedExp === exp.id;
+                const expColorClass = exp.color;
+                const bgColorClass = exp.bg;
+                
+                return (
+                  <button
+                    key={exp.id}
+                    onClick={() => { playSelect(); setSelectedExp(exp.id); }}
+                    className={`group relative shrink-0 py-2 px-4 transition-all duration-300 outline-none focus:outline-none select-none`}
+                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                  >
+                    <span className={`relative z-10 text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors duration-300 ${isActive ? expColorClass : 'text-gray-500 group-hover:text-gray-300'}`}>
+                      {exp.name}
+                    </span>
+                    <div className={`absolute bottom-0 left-3 right-3 h-[2px] rounded-full transition-all duration-300 ${isActive ? `${bgColorClass} opacity-100` : 'bg-transparent opacity-0'}`} />
+                  </button>
+                );
+              })}
+              <div className="shrink-0 w-2" />
             </div>
 
             <BoosterPack 
@@ -566,7 +590,7 @@ export default function Shop() {
                     playSelect();
                     setShowCards(false); 
                   }}
-                  className="text-[10px] font-black uppercase tracking-[0.4em] hover:scale-105 transition-transform text-yellow-500"
+                  className={`text-[10px] font-black uppercase tracking-[0.4em] hover:scale-105 transition-transform ${currentTheme.textAccentClass}`}
                 >
                   — Abrir otro —
                 </button>
