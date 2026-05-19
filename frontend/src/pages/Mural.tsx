@@ -278,13 +278,55 @@ const expansionNames: Record<string, { name: string; color: string }> = {
   sm3: { name: 'Burning Shadows', color: 'text-red-800' }
 };
 
-const medalConfig: Record<string, { label: string; icon: string; bg: string; border: string; text: string }> = {
-  swsh12: { label: 'Tempestad', icon: '⛈️', bg: 'bg-slate-800/80', border: 'border-slate-500/50', text: 'text-slate-200' },
-  dp6: { label: 'Leyenda', icon: '🌟', bg: 'bg-yellow-950/80', border: 'border-yellow-500/50', text: 'text-yellow-300' },
-  bw9: { label: 'Plasma', icon: '⚡', bg: 'bg-blue-950/80', border: 'border-blue-500/50', text: 'text-blue-300' },
-  xyp: { label: 'Estrella', icon: '💫', bg: 'bg-red-950/80', border: 'border-red-500/50', text: 'text-red-300' },
-  zsv10pt5: { label: 'Voltio', icon: '🔮', bg: 'bg-indigo-950/80', border: 'border-indigo-500/50', text: 'text-indigo-300' },
-  sm3: { label: 'Llama', icon: '🔥', bg: 'bg-rose-950/80', border: 'border-rose-500/50', text: 'text-rose-300' }
+const medalConfig: Record<string, { label: string; icon: string; bg: string; border: string; text: string; imageUrl?: string }> = {
+  swsh12: { 
+    label: 'Tempestad', 
+    icon: '⛈️', 
+    bg: 'bg-slate-800/80', 
+    border: 'border-slate-500/50', 
+    text: 'text-slate-200',
+    imageUrl: 'https://www.serebii.net/tcgpocket/emblems/lugiaemblem.png'
+  },
+  dp6: { 
+    label: 'Leyenda', 
+    icon: '🌟', 
+    bg: 'bg-yellow-950/80', 
+    border: 'border-yellow-500/50', 
+    text: 'text-yellow-300',
+    imageUrl: 'https://www.serebii.net/tcgpocket/emblems/giratinaemblem.png'
+  },
+  bw9: { 
+    label: 'Plasma', 
+    icon: '⚡', 
+    bg: 'bg-blue-950/80', 
+    border: 'border-blue-500/50', 
+    text: 'text-blue-300',
+    imageUrl: 'https://www.serebii.net/tcgpocket/emblems/space-timesmackdownemblemeventgoldemblem.png'
+  },
+  xyp: { 
+    label: 'Estrella', 
+    icon: '💫', 
+    bg: 'bg-red-950/80', 
+    border: 'border-red-500/50', 
+    text: 'text-red-300',
+    imageUrl: 'https://www.serebii.net/tcgpocket/emblems/shinymegagengaremblem.png'
+  },
+  zsv10pt5: { 
+    label: 'Voltio', 
+    icon: '🔮', 
+    bg: 'bg-indigo-950/80', 
+    border: 'border-indigo-500/50', 
+    text: 'text-indigo-300',
+    imageUrl: 'https://www.serebii.net/tcgpocket/emblems/geneticapexemblemevent1goldemblem.png'
+  },
+  sm3: { 
+    label: 'Llama', 
+    icon: '🔥', 
+    bg: 'bg-rose-950/80', 
+    border: 'border-rose-500/50', 
+    text: 'text-rose-300',
+    imageUrl: 'https://www.serebii.net/tcgpocket/emblems/ho-ohemblem.png'
+  }
 };
 
 export default function Mural() {
@@ -488,6 +530,9 @@ export default function Mural() {
                         );
                       })()}
                     </div>
+                    <p className="text-gray-600 text-[9px] uppercase tracking-widest truncate max-w-[120px] mt-0.5">
+                      {entry.card.name}
+                    </p>
                     {(() => {
                       const showcased = entry.showcasedMedals && entry.showcasedMedals.length > 0 
                         ? entry.showcasedMedals 
@@ -502,18 +547,19 @@ export default function Mural() {
                               <span 
                                 key={medId} 
                                 title={config.label}
-                                className={`flex items-center justify-center w-5.5 h-5.5 rounded-full border text-[10px] ${config.bg} ${config.border} shadow-sm select-none transform hover:scale-110 transition-transform duration-200`}
+                                className={`flex items-center justify-center w-5.5 h-5.5 rounded-full border text-[10px] ${config.bg} ${config.border} shadow-sm select-none transform hover:scale-110 transition-transform duration-200 overflow-hidden`}
                               >
-                                {config.icon}
+                                {config.imageUrl ? (
+                                  <img src={config.imageUrl} alt={config.label} className="w-full h-full object-contain p-0.5" />
+                                ) : (
+                                  config.icon
+                                )}
                               </span>
                             );
                           })}
                         </div>
                       );
                     })()}
-                    <p className="text-gray-600 text-[9px] uppercase tracking-widest truncate max-w-[120px] mt-0.5">
-                      {entry.card.name}
-                    </p>
                   </div>
                 </motion.div>
               );
@@ -620,7 +666,13 @@ export default function Mural() {
                                   key={medId} 
                                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs ${config.bg} ${config.border} ${config.text} shadow-sm`}
                                 >
-                                  <span>{config.icon}</span>
+                                  <span className="w-4 h-4 flex items-center justify-center overflow-hidden">
+                                    {config.imageUrl ? (
+                                      <img src={config.imageUrl} alt={config.label} className="w-full h-full object-contain" />
+                                    ) : (
+                                      config.icon
+                                    )}
+                                  </span>
                                   <span className="font-black uppercase text-[9px] tracking-wide">{config.label}</span>
                                 </div>
                               );
@@ -697,8 +749,12 @@ export default function Mural() {
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className={`w-8 h-8 rounded-full border flex items-center justify-center text-sm ${config?.bg} ${config?.border}`}>
-                          {config?.icon || '🏅'}
+                         <span className={`w-8 h-8 rounded-full border flex items-center justify-center text-sm overflow-hidden ${config?.bg} ${config?.border}`}>
+                          {config?.imageUrl ? (
+                            <img src={config.imageUrl} alt={config?.label} className="w-full h-full object-contain p-1" />
+                          ) : (
+                            config?.icon || '🏅'
+                          )}
                         </span>
                         <div>
                           <p className="text-white text-xs font-black uppercase tracking-wide">{exp.name}</p>
