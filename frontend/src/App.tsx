@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 import Login from './pages/Login';
+import ForceChangePassword from './components/ForceChangePassword';
 import Shop from './pages/Shop';
 import Album from './pages/Album';
 import Mural from './pages/Mural';
@@ -169,6 +170,15 @@ export default function App() {
     return (
       <>
         <Login />
+        <MuteButton />
+      </>
+    );
+  }
+
+  if (user?.mustChangePassword) {
+    return (
+      <>
+        <ForceChangePassword />
         <MuteButton />
       </>
     );

@@ -30,10 +30,10 @@ export class AuthService {
       throw new Error('La contraseña debe tener al menos 8 caracteres e incluir al menos una letra y un número.');
     }
 
-    // Comprobar duplicado — se devuelve mensaje genérico para evitar enumeración de usuarios
+    // Comprobar duplicado — mensaje claro indicando que ya existe
     const existing = await this.userRepo.findByUsername(username);
     if (existing) {
-      throw new Error('No se pudo crear la cuenta. Revisa los datos introducidos.');
+      throw new Error('El nombre de usuario ya está registrado. Por favor, elige otro.');
     }
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -79,6 +79,25 @@ export class AuthService {
     return jwt.verify(token, JWT_SECRET) as JwtPayload;
   }
 
+  async changePasswordForce(userId: string, newPassword: string): Promise<PublicUser> {
+    if (!newPassword || newPassword.length < 8 || !/(?=.*[A-Za-z])(?=.*\d)/.test(newPassword)) {
+      throw new Error('La contraseña debe tener al menos 8 caracteres e incluir al menos una letra y un número.');
+    }
+
+    const user = await this.userRepo.findById(userId);
+    if (!user) {
+      throw new Error('Usuario no encontrado.');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    user.passwordHash = passwordHash;
+    user.mustChangePassword = false;
+
+    await this.userRepo.save(user);
+
+    return this.toPublicUser(user);
+  }
+
   private toPublicUser(user: User): PublicUser {
     return {
       userId: user.userId,
@@ -90,7 +109,8 @@ export class AuthService {
       lastPackClaimedAt: user.lastPackClaimedAt,
       completedExpansions: user.completedExpansions || [],
       showcasedMedals: user.showcasedMedals || [],
-      activeTheme: user.activeTheme || 'default'
+      activeTheme: user.activeTheme || 'default',
+      mustChangePassword: user.mustChangePassword
     };
   }
 }

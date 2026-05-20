@@ -24,7 +24,8 @@ const UserSchema = new Schema<IUserDocument>({
   lastPackClaimedAt: { type: String, required: false },
   completedExpansions: { type: [String], default: [] },
   showcasedMedals: { type: [String], default: [] },
-  activeTheme: { type: String, required: false, default: 'default' }
+  activeTheme: { type: String, required: false, default: 'default' },
+  mustChangePassword: { type: Boolean, required: false, default: false }
 });
 
 export const UserModel = mongoose.model<IUserDocument>('User', UserSchema);

@@ -14,6 +14,7 @@ export interface User {
   completedExpansions?: string[]; // IDs de expansiones completadas para bonus de XP
   showcasedMedals?: string[]; // IDs de medallas (expansiones) destacadas (máx 3)
   activeTheme?: string;
+  mustChangePassword?: boolean;
 }
 
 // Lo que devolvemos al cliente (sin datos sensibles)
@@ -28,6 +29,7 @@ export interface PublicUser {
   completedExpansions?: string[];
   showcasedMedals?: string[];
   activeTheme?: string;
+  mustChangePassword?: boolean;
 }
 
 // Payload dentro del JWT

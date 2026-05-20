@@ -125,6 +125,7 @@ app.post('/api/auth/register', authLimiter, (req, res) => authController.registe
 app.post('/api/auth/login',    authLimiter, (req, res) => authController.login(req, res));
 app.post('/api/auth/guest',    authLimiter, (req, res) => authController.guest(req, res));
 app.post('/api/auth/logout',               (req, res) => authController.logout(req, res));
+app.post('/api/auth/change-password-force', authMiddleware, guestBlocker, (req, res) => authController.changePasswordForce(req as any, res));
 
 // ─── RUTAS PROTEGIDAS POR JWT ─────────────────────────────────────────────────
 

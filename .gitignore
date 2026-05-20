@@ -16,4 +16,8 @@ programs/
 backups/
 guia_comandos.txt
 
-project_analysis.md
+passwords.txt
+
+# Scripts privados
+backend/src/scripts/*
+!backend/src/scripts/createAdmin.ts

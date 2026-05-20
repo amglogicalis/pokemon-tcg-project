@@ -117,4 +117,26 @@ export class AuthController {
       res.status(500).json({ error: 'Error al iniciar sesión de invitado.' });
     }
   }
+
+  async changePasswordForce(req: Request, res: Response): Promise<void> {
+    try {
+      const { newPassword } = req.body;
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({ error: 'No autorizado.' });
+        return;
+      }
+
+      if (!newPassword) {
+        res.status(400).json({ error: 'La nueva contraseña es obligatoria.' });
+        return;
+      }
+
+      const updatedUser = await authService.changePasswordForce(userId, newPassword);
+      res.status(200).json({ message: 'Contraseña actualizada correctamente.', user: updatedUser });
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  }
 }

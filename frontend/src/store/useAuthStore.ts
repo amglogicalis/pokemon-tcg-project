@@ -13,6 +13,7 @@ interface User {
   showcasedMedals?: string[];
   activeTheme?: string;
   isGuest?: boolean;
+  mustChangePassword?: boolean;
 }
 
 interface AuthState {
@@ -24,6 +25,7 @@ interface AuthState {
   updateUserStats: (level: number, xp: number, completedExpansions?: string[]) => void;
   updatePacksAvailable: (packs: number, lastPackClaimedAt?: string) => void;
   updateActiveTheme: (theme: string) => void;
+  updateUser: (updatedFields: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -90,6 +92,10 @@ export const useAuthStore = create<AuthState>()(
                 activeTheme: theme
               }
             : null,
+        })),
+      updateUser: (updatedFields) =>
+        set((state) => ({
+          user: state.user ? { ...state.user, ...updatedFields } : null,
         })),
     }),
     {
