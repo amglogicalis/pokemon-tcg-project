@@ -48,12 +48,37 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-400 via-red-500 to-pink-600 flex items-center justify-center p-4">
-      <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-md border border-white/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-black flex items-center justify-center p-4">
+      <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-8 w-full max-w-md border border-white/10">
         <div className="text-center mb-8">
-          <div className="text-6xl mb-3">{isForgot ? '🔑' : '⚡'}</div>
+          <div className="flex justify-center mb-4">
+            {isForgot ? (
+              <span className="text-6xl select-none">🔑</span>
+            ) : (
+              <svg 
+                className="w-16 h-16 drop-shadow-[0_0_15px_rgba(239,68,68,0.6)] hover:rotate-180 transition-transform duration-500 cursor-pointer select-none" 
+                viewBox="0 0 100 100" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Contorno exterior negro/gris oscuro */}
+                <circle cx="50" cy="50" r="46" fill="#1f2937" stroke="#374151" strokeWidth="2" />
+                {/* Mitad superior roja */}
+                <path d="M 8,50 A 42,42 0 0 1 92,50 Z" fill="#ef4444" />
+                {/* Mitad inferior blanca */}
+                <path d="M 8,50 A 42,42 0 0 0 92,50 Z" fill="#ffffff" />
+                {/* Línea central */}
+                <line x1="8" y1="50" x2="92" y2="50" stroke="#1f2937" strokeWidth="6" />
+                {/* Botón exterior central */}
+                <circle cx="50" cy="50" r="14" fill="#1f2937" />
+                {/* Botón interior blanco */}
+                <circle cx="50" cy="50" r="8" fill="#ffffff" />
+                {/* Brillo del botón */}
+                <circle cx="48" cy="48" r="3" fill="#e2e8f0" />
+              </svg>
+            )}
+          </div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            {isForgot ? 'Recuperar Clave' : 'Pokémon TCG'}
+            {isForgot ? 'Recuperar Clave' : 'The Tcg Project'}
           </h1>
           <p className="text-white/70 mt-1 text-sm">
             {isForgot
