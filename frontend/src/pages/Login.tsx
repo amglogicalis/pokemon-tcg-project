@@ -78,7 +78,7 @@ export default function Login() {
             )}
           </div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            {isForgot ? 'Recuperar Clave' : 'The Tcg Project'}
+            {isForgot ? 'Recuperar Clave' : 'The TCG Project'}
           </h1>
           <p className="text-white/70 mt-1 text-sm">
             {isForgot
