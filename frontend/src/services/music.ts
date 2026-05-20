@@ -13,3 +13,13 @@ homeMusic.volume = 0.35;
 export const packMusic = new Audio('/sounds/while-op-pack.mp3');
 packMusic.loop = true;
 packMusic.volume = 0.35;
+
+export const unlockAllAudio = () => {
+  [homeMusic, packMusic].forEach(audio => {
+    if (audio.paused) {
+      audio.play().then(() => {
+        audio.pause();
+      }).catch(() => {});
+    }
+  });
+};

@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import api from '../services/api';
+import { unlockAllAudio } from '../services/music';
 
 export default function Login() {
   const [isRegister, setIsRegister] = useState(false);
@@ -96,6 +97,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
+            onPointerDown={unlockAllAudio}
             className="w-full py-3 rounded-lg bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold text-sm tracking-wide transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-yellow-400/40"
           >
             {loading ? '...' : isRegister ? 'Crear cuenta' : 'Entrar'}
@@ -105,6 +107,7 @@ export default function Login() {
             <button
               type="button"
               disabled={loading}
+              onPointerDown={unlockAllAudio}
               onClick={handleGuestLogin}
               className="w-full py-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-sm tracking-wide transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center justify-center gap-2"
             >
