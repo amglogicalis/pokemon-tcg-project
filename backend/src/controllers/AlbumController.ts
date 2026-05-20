@@ -44,6 +44,25 @@ export class AlbumController {
         return;
       }
       
+      if (userId === 'guest') {
+        res.status(200).json({
+          username: 'Invitado',
+          packsAvailable: 0,
+          totalCards: 0,
+          uniqueCards: 0,
+          album: [],
+          allCards: Array.from(allCardsMap.values()),
+          favoriteCardId: undefined,
+          level: 1,
+          xp: 0,
+          lastPackClaimedAt: undefined,
+          completedExpansions: [],
+          showcasedMedals: [],
+          activeTheme: 'default'
+        });
+        return;
+      }
+
       const user = await repo.findById(userId);
 
       if (!user) {

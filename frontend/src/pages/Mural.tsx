@@ -453,7 +453,7 @@ export default function Mural() {
           <p className="text-gray-500 text-sm mt-4 max-w-md mx-auto">
             Las cartas favoritas de los entrenadores. Selecciona la tuya desde tu álbum.
           </p>
-          {currentUser && (
+          {currentUser && !currentUser.isGuest && (
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

@@ -10,6 +10,7 @@ import { AlbumController } from './controllers/AlbumController';
 import { TradeController } from './controllers/TradeController';
 import { NotificationController } from './controllers/NotificationController';
 import { authMiddleware } from './middleware/authMiddleware';
+import { guestBlocker } from './middleware/guestBlocker';
 import { connectDB } from './db';
 
 // ─── CONTROL DE VARIABLES CRÍTICAS AL INICIO ─────────────────────────────────
@@ -122,6 +123,7 @@ app.get('/health', (_req, res) => {
 // ─── RUTAS DE AUTENTICACIÓN (rate limiter estricto) ──────────────────────────
 app.post('/api/auth/register', authLimiter, (req, res) => authController.register(req, res));
 app.post('/api/auth/login',    authLimiter, (req, res) => authController.login(req, res));
+app.post('/api/auth/guest',    authLimiter, (req, res) => authController.guest(req, res));
 app.post('/api/auth/logout',               (req, res) => authController.logout(req, res));
 
 // ─── RUTAS PROTEGIDAS POR JWT ─────────────────────────────────────────────────
@@ -133,28 +135,28 @@ const packLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'Estás abriendo sobres demasiado rápido. Espera un momento.' }
 });
-app.post('/api/packs/open',        authMiddleware, packLimiter, (req, res) => packController.openPack(req as any, res));
+app.post('/api/packs/open',        authMiddleware, guestBlocker, packLimiter, (req, res) => packController.openPack(req as any, res));
 
-app.post('/api/packs/claim-daily', authMiddleware, (req, res) => packController.claimDailyPacks(req as any, res));
+app.post('/api/packs/claim-daily', authMiddleware, guestBlocker, (req, res) => packController.claimDailyPacks(req as any, res));
 app.get ('/api/user/album',        authMiddleware, (req, res) => albumController.getAlbum(req as any, res));
-app.post('/api/user/favorite',     authMiddleware, (req, res) => albumController.setFavoriteCard(req as any, res));
-app.post('/api/user/showcase-medals', authMiddleware, (req, res) => albumController.updateShowcasedMedals(req as any, res));
-app.post('/api/user/theme',           authMiddleware, (req, res) => albumController.updateActiveTheme(req as any, res));
+app.post('/api/user/favorite',     authMiddleware, guestBlocker, (req, res) => albumController.setFavoriteCard(req as any, res));
+app.post('/api/user/showcase-medals', authMiddleware, guestBlocker, (req, res) => albumController.updateShowcasedMedals(req as any, res));
+app.post('/api/user/theme',           authMiddleware, guestBlocker, (req, res) => albumController.updateActiveTheme(req as any, res));
 app.get ('/api/mural',                             (req, res) => albumController.getMural(req, res));
 
 // ─── RUTAS DE INTERCAMBIOS ────────────────────────────────────────────────────
 app.get ('/api/trades/search-cards',                     authMiddleware, (req, res) => tradeController.searchCards(req as any, res));
 app.get ('/api/trades/users-with-duplicate/:cardId',     authMiddleware, (req, res) => tradeController.getUsersWithDuplicate(req as any, res));
-app.post('/api/trades/propose',                          authMiddleware, (req, res) => tradeController.proposeTrade(req as any, res));
+app.post('/api/trades/propose',                          authMiddleware, guestBlocker, (req, res) => tradeController.proposeTrade(req as any, res));
 app.get ('/api/trades/public',                           authMiddleware, (req, res) => tradeController.getPublicTrades(req as any, res));
 app.get ('/api/trades/my-offers',                        authMiddleware, (req, res) => tradeController.getMyOffers(req as any, res));
-app.post('/api/trades/:id/accept',                       authMiddleware, (req, res) => tradeController.acceptTrade(req as any, res));
-app.post('/api/trades/:id/reject',                       authMiddleware, (req, res) => tradeController.rejectTrade(req as any, res));
+app.post('/api/trades/:id/accept',                       authMiddleware, guestBlocker, (req, res) => tradeController.acceptTrade(req as any, res));
+app.post('/api/trades/:id/reject',                       authMiddleware, guestBlocker, (req, res) => tradeController.rejectTrade(req as any, res));
 
 // ─── RUTAS DE NOTIFICACIONES ──────────────────────────────────────────────────
 app.get ('/api/notifications',       authMiddleware, (req, res) => notificationController.getNotifications(req as any, res));
-app.post('/api/notifications/read',  authMiddleware, (req, res) => notificationController.markAllAsRead(req as any, res));
-app.post('/api/notifications/clear', authMiddleware, (req, res) => notificationController.clearNotifications(req as any, res));
+app.post('/api/notifications/read',  authMiddleware, guestBlocker, (req, res) => notificationController.markAllAsRead(req as any, res));
+app.post('/api/notifications/clear', authMiddleware, guestBlocker, (req, res) => notificationController.clearNotifications(req as any, res));
 
 // ─── ARRANQUE ─────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {

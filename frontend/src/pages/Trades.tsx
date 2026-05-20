@@ -283,6 +283,26 @@ export default function Trades() {
     return entry && entry.quantity >= 1;
   };
 
+  if (user?.isGuest) {
+    return (
+      <div className="w-full max-w-4xl mx-auto py-12 px-4 text-center">
+        <div className="bg-black/35 backdrop-blur-xl border border-yellow-500/20 p-8 sm:p-12 rounded-3xl shadow-2xl flex flex-col items-center justify-center">
+          <span className="text-6xl mb-6">🔒</span>
+          <h2 className="text-2xl font-black text-white uppercase tracking-wider mb-2">Intercambios Bloqueados</h2>
+          <p className="text-sm text-gray-400 max-w-md mb-8 font-semibold">
+            El Centro de Intercambios permite a los entrenadores intercambiar cartas repetidas con la comunidad. Registra tu cuenta para unirte al club de intercambio.
+          </p>
+          <button
+            onClick={() => { playSfx('/sounds/select.mp3'); useAuthStore.getState().logout(); }}
+            className="px-8 py-3 bg-yellow-400 hover:bg-yellow-300 text-gray-950 font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md hover:shadow-yellow-400/20 active:scale-95"
+          >
+            Registrarse / Entrar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-7xl mx-auto py-4 px-2">
       

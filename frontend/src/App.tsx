@@ -8,6 +8,7 @@ import Trades from './pages/Trades';
 import api from './services/api';
 import { getLevelTextStyle, getXpNeededForLevel } from './constants/levels';
 import { themes } from './constants/themes';
+import { getGlobalMute, setGlobalMute } from './services/soundManager';
 
 export default function App() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -16,6 +17,54 @@ export default function App() {
   const updateUserStats = useAuthStore((s) => s.updateUserStats);
   const [view, setView] = useState<'shop' | 'album' | 'mural' | 'trades'>('shop');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // --- Control Global de Silenciado (Mute) ---
+  const [isMuted, setIsMuted] = useState(getGlobalMute());
+
+  useEffect(() => {
+    const handleMuteChange = (e: any) => {
+      setIsMuted(e.detail.mute);
+    };
+    window.addEventListener('globalMuteChange', handleMuteChange);
+    return () => {
+      window.removeEventListener('globalMuteChange', handleMuteChange);
+    };
+  }, []);
+
+  const MuteButton = () => {
+    const handleToggleMute = () => {
+      const nextMute = !isMuted;
+      setGlobalMute(nextMute);
+      
+      // Reproducir sonido de selección si des-silenciamos
+      if (!nextMute) {
+        const audio = new Audio('/sounds/select.mp3');
+        audio.volume = 0.6;
+        audio.play().catch(() => {});
+      }
+    };
+
+    return (
+      <button
+        onClick={handleToggleMute}
+        title={isMuted ? "Activar Sonido" : "Desactivar Sonido"}
+        aria-label={isMuted ? "Activar Sonido" : "Desactivar Sonido"}
+        style={{ WebkitTapHighlightColor: 'transparent' }}
+        className="fixed bottom-6 right-6 z-[9999] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gray-950/90 backdrop-blur-xl border border-white/10 text-white shadow-[0_8px_32px_rgba(0,0,0,0.6)] hover:border-white/20 active:scale-90 hover:scale-105 transition-all duration-300 flex items-center justify-center group focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500 hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] select-none"
+      >
+        {isMuted ? (
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-red-400 group-hover:text-red-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+          </svg>
+        ) : (
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-200 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          </svg>
+        )}
+      </button>
+    );
+  };
 
   // --- Sistema de Notificaciones ---
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -117,7 +166,12 @@ export default function App() {
   }, [user?.activeTheme]);
 
   if (!isAuthenticated) {
-    return <Login />;
+    return (
+      <>
+        <Login />
+        <MuteButton />
+      </>
+    );
   }
 
   const activeThemeId = user?.activeTheme || 'default';
@@ -182,7 +236,7 @@ export default function App() {
         </div>
         
         <div className="flex items-center gap-6">
-          {user && (
+          {user && !user.isGuest && (
             <div className="flex flex-col items-end gap-1 sm:gap-1.5 min-w-[100px] sm:min-w-[140px]">
               <span 
                 style={getLevelTextStyle(user.level ?? 1)}
@@ -202,8 +256,14 @@ export default function App() {
             </div>
           )}
 
+          {user && user.isGuest && (
+            <div className="px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md select-none text-[11px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+              <span>👁️</span> Invitado
+            </div>
+          )}
+
           {/* Botón de Notificaciones */}
-          {user && (
+          {user && !user.isGuest && (
             <div className="relative">
               <button
                 onClick={() => {
@@ -287,7 +347,7 @@ export default function App() {
         {isMobileMenuOpen && (
           <div className="md:hidden w-full flex flex-col gap-2 mt-2 pt-4 border-t border-white/10 animate-fadeIn">
             {/* User Level for Mobile */}
-            {user && (
+            {user && !user.isGuest && (
               <div className="flex flex-col items-center gap-2 mb-4 bg-black/20 p-4 rounded-xl border border-white/5">
                 <span 
                   style={getLevelTextStyle(user.level ?? 1)}
@@ -304,6 +364,13 @@ export default function App() {
                 <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
                   {user.xp ?? 0} / {getXpNeededForLevel(user.level ?? 1)} XP
                 </span>
+              </div>
+            )}
+            {user && user.isGuest && (
+              <div className="flex flex-col items-center gap-2 mb-4 bg-black/20 p-4 rounded-xl border border-white/5">
+                <div className="px-3 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md select-none text-[11px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+                  <span>👁️</span> Invitado
+                </div>
               </div>
             )}
             
@@ -344,6 +411,23 @@ export default function App() {
       </nav>
 
       <main className="container mx-auto p-4 animate-fadeIn">
+        {user?.isGuest && (
+          <div className="mb-6 p-4 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 backdrop-blur-lg flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left shadow-lg select-none">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">👀</span>
+              <div>
+                <h4 className="text-sm font-black uppercase tracking-wider text-yellow-400">Modo Invitado Activo</h4>
+                <p className="text-xs text-gray-300 mt-0.5">Estás navegando en modo de lectura. Registra una cuenta para guardar progresos, abrir sobres e intercambiar cartas.</p>
+              </div>
+            </div>
+            <button
+              onClick={() => { playSelect(); logout(); }}
+              className="px-5 py-2 bg-yellow-400 hover:bg-yellow-300 text-gray-950 font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95 whitespace-nowrap"
+            >
+              Registrarse / Entrar
+            </button>
+          </div>
+        )}
         {view === 'shop' 
           ? <Shop /> 
           : view === 'album' 
@@ -353,6 +437,7 @@ export default function App() {
               : <Trades />
         }
       </main>
+      <MuteButton />
     </div>
   );
 }

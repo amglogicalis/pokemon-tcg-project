@@ -84,4 +84,37 @@ export class AuthController {
       res.status(500).json({ error: 'Error al cerrar sesión.' });
     }
   }
+
+  async guest(req: Request, res: Response): Promise<void> {
+    try {
+      const secret = process.env.JWT_SECRET || 'dev_secret';
+      const guestUser = {
+        id: 'guest',
+        username: 'Invitado',
+        packsAvailable: 0,
+        completedExpansions: [],
+        showcasedMedals: [],
+        activeTheme: 'default',
+        isGuest: true
+      };
+
+      const token = jwt.sign(
+        { userId: 'guest', username: 'Invitado', isGuest: true },
+        secret,
+        { expiresIn: '24h' }
+      );
+
+      // Setear token en cookie httpOnly
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'none',
+        maxAge: COOKIE_MAX_AGE_MS
+      });
+
+      res.status(200).json({ token, user: guestUser });
+    } catch (err: any) {
+      res.status(500).json({ error: 'Error al iniciar sesión de invitado.' });
+    }
+  }
 }

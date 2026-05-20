@@ -12,6 +12,7 @@ interface User {
   completedExpansions?: string[];
   showcasedMedals?: string[];
   activeTheme?: string;
+  isGuest?: boolean;
 }
 
 interface AuthState {

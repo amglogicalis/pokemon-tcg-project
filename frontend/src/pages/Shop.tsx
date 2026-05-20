@@ -32,6 +32,7 @@ export default function Shop() {
   const user = useAuthStore((s) => s.user);
   const activeThemeId = user?.activeTheme || 'default';
   const currentTheme = themes[activeThemeId] || themes.default;
+  const cleanTextAccent = currentTheme.textAccentClass.replace(/\bp[rlxtb]?-\d+\b/g, '').trim();
   const updatePacksAvailable = useAuthStore((s) => s.updatePacksAvailable);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [claimLoading, setClaimLoading] = useState(false);
@@ -553,16 +554,23 @@ export default function Shop() {
               <div className="flex flex-col items-center sm:items-end">
                 <motion.button
                   onClick={handleClaimDaily}
-                  disabled={claimLoading || timeRemaining > 0}
-                  whileHover={timeRemaining === 0 ? { scale: 1.02 } : {}}
-                  whileTap={timeRemaining === 0 ? { scale: 0.98 } : {}}
+                  disabled={user?.isGuest || claimLoading || timeRemaining > 0}
+                  whileHover={!user?.isGuest && timeRemaining === 0 ? { scale: 1.02 } : {}}
+                  whileTap={!user?.isGuest && timeRemaining === 0 ? { scale: 0.98 } : {}}
                   className={`relative px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-[0.1em] transition-all duration-300 flex items-center gap-2 border shadow-lg ${
-                    timeRemaining > 0
+                    user?.isGuest
                       ? 'bg-gray-800/40 border-white/5 text-gray-500 cursor-not-allowed min-w-[210px] justify-center'
-                      : `${currentTheme.accentClass} border-transparent active:scale-95 ${currentTheme.accentHoverClass}`
+                      : timeRemaining > 0
+                        ? 'bg-gray-800/40 border-white/5 text-gray-500 cursor-not-allowed min-w-[210px] justify-center'
+                        : `${currentTheme.accentClass} border-transparent active:scale-95 ${currentTheme.accentHoverClass}`
                   }`}
                 >
-                  {timeRemaining > 0 ? (
+                  {user?.isGuest ? (
+                    <>
+                      <span>🔒</span>
+                      <span>Modo Invitado</span>
+                    </>
+                  ) : timeRemaining > 0 ? (
                     <>
                       <span>🔒</span>
                       <span>Disponible en {formatTime(timeRemaining)}</span>
@@ -580,7 +588,7 @@ export default function Shop() {
                   )}
                 </motion.button>
                 <span className="text-[8px] text-gray-500 font-bold uppercase tracking-wider mt-1.5 text-center sm:text-right">
-                  {timeRemaining > 0 ? 'Una recarga cada 24 horas' : 'Recarga gratuita disponible ya'}
+                  {user?.isGuest ? 'Inicia sesión para reclamar sobres' : timeRemaining > 0 ? 'Una recarga cada 24 horas' : 'Recarga gratuita disponible ya'}
                 </span>
               </div>
 
@@ -613,11 +621,36 @@ export default function Shop() {
               <div className="shrink-0 w-2" />
             </div>
 
-            <BoosterPack 
-              onOpen={handleOpenPack} 
-              isLoading={loading} 
-              expansionId={selectedExp} 
-            />
+            {user?.isGuest ? (
+              <div 
+                style={{ borderColor: 'rgba(234, 179, 8, 0.3)' }}
+                className="mb-6 text-center max-w-[280px] sm:max-w-md px-5 py-4 rounded-xl bg-black/80 backdrop-blur-md border select-none flex flex-col items-center justify-center shadow-2xl"
+              >
+                <span className="text-yellow-400 text-xs font-black uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                  <span>🔒</span> Modo Invitado
+                </span>
+                <span className="text-gray-300 leading-normal text-[10px] sm:text-xs font-semibold">
+                  Registra tu cuenta de entrenador para obtener y abrir sobres en tiempo real.
+                </span>
+              </div>
+            ) : (!loading && (
+              <div 
+                style={{ borderColor: `rgba(${currentTheme.accentRgb}, 0.25)` }}
+                className="mb-6 text-center max-w-[280px] sm:max-w-md px-4 py-2.5 rounded-xl bg-black/75 backdrop-blur-md border select-none flex items-center justify-center shadow-lg"
+              >
+                <span className="text-gray-300 leading-normal text-[10px] sm:text-xs font-semibold tracking-wide">
+                  Tira de la tira superior del sobre hacia la <span className={cleanTextAccent}>izquierda</span> o <span className={cleanTextAccent}>derecha</span> para abrirlo.
+                </span>
+              </div>
+            ))}
+
+            <div className={user?.isGuest ? "pointer-events-none opacity-40 blur-[1.5px] grayscale-[50%] select-none" : ""}>
+              <BoosterPack 
+                onOpen={handleOpenPack} 
+                isLoading={loading} 
+                expansionId={selectedExp} 
+              />
+            </div>
           </motion.div>
         ) : (
           <motion.div 
@@ -640,7 +673,7 @@ export default function Shop() {
                   }}
                   className={`text-[10px] font-black uppercase tracking-[0.4em] hover:scale-105 transition-transform ${currentTheme.textAccentClass}`}
                 >
-                  — Abrir otro —
+                  — Volver a la tienda —
                 </button>
               )}
             </div>

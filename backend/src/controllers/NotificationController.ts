@@ -12,6 +12,11 @@ export class NotificationController {
         return;
       }
 
+      if (userId === 'guest') {
+        res.status(200).json([]);
+        return;
+      }
+
       // Obtener todas las notificaciones del usuario ordenadas por fecha descendente
       const notifications = await NotificationModel.find({ userId })
         .sort({ createdAt: -1 })

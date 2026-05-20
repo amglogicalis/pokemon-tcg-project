@@ -275,6 +275,11 @@ export class TradeController {
         return;
       }
 
+      if (activeUserId === 'guest') {
+        res.status(200).json({ sent: [], received: [] });
+        return;
+      }
+
       // Ofertas enviadas por el usuario activo (directas o públicas)
       const sentOffers = await TradeModel.find({
         senderId: activeUserId,

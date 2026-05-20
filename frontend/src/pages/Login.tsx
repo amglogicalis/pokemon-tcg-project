@@ -32,6 +32,19 @@ export default function Login() {
     }
   };
 
+  const handleGuestLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const { data } = await api.post('/auth/guest');
+      login(data.user, data.token);
+    } catch (err: any) {
+      setError(err.response?.data?.error ?? err.response?.data?.message ?? 'Error al iniciar sesión de invitado');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-400 via-red-500 to-pink-600 flex items-center justify-center p-4">
       <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-md border border-white/20">
@@ -87,6 +100,17 @@ export default function Login() {
           >
             {loading ? '...' : isRegister ? 'Crear cuenta' : 'Entrar'}
           </button>
+
+          {!isRegister && (
+            <button
+              type="button"
+              disabled={loading}
+              onClick={handleGuestLogin}
+              className="w-full py-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-sm tracking-wide transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center justify-center gap-2"
+            >
+              👀 Entrar como invitado
+            </button>
+          )}
         </form>
 
         <p className="text-center text-sm text-white/70 mt-6">
