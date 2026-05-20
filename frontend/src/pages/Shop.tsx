@@ -77,7 +77,7 @@ export default function Shop() {
       
       const completedCount = user?.completedExpansions?.length || 0;
       const packsToAward = 10 + completedCount;
-      setToastMsg(`¡Energía cósmica canalizada! Has recibido +${packsToAward} sobres.`);
+      setToastMsg(`Has recibido +${packsToAward} sobres.`);
       setTimeout(() => setToastMsg(null), 4000);
     } catch (error: any) {
       const errMsg = error.response?.data?.error || 'Error al recargar los sobres.';
@@ -296,7 +296,7 @@ export default function Shop() {
             animate={{ opacity: [0.2, 0.6, 0.2] }}
             exit={{ opacity: 0, transition: { duration: 0.5 } }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className={`fixed inset-0 pointer-events-none z-0 flex items-center justify-center ${currentTheme.textAccentClass}`}
+            className={`fixed inset-0 pointer-events-none z-0 flex items-center justify-center text-yellow-400`}
           >
             <div className="w-full h-full scale-150 bg-[radial-gradient(circle,currentColor_10%,transparent_80%)]" />
           </motion.div>
@@ -342,35 +342,50 @@ export default function Shop() {
               className="absolute inset-0 bg-[radial-gradient(circle,rgba(234,179,8,0.25)_0%,rgba(234,179,8,0.05)_25%,rgba(0,0,0,0)_50%)]" 
             />
             
-            {/* ESTRELLAS ESMERALDA Y ORO DE ALTO BRILLO */}
-            {[...Array(22)].map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ 
-                  x: Math.random() * window.innerWidth - window.innerWidth/2, 
-                  y: window.innerHeight/2 + 50,
-                  scale: 0,
-                  opacity: 0
-                }}
-                animate={{ 
-                  y: -window.innerHeight/2 - 50,
-                  x: `calc(${Math.random() * window.innerWidth - window.innerWidth/2}px + ${Math.sin(i) * 60}px)`,
-                  scale: [0, 2.2, 0],
-                  opacity: [0, 0.95, 0],
-                }}
-                transition={{ 
-                  duration: 4 + Math.random() * 4, 
-                  repeat: Infinity, 
-                  delay: Math.random() * 5,
-                  ease: "easeOut"
-                }}
-                className={`absolute w-3 h-3 rotate-45 rounded-sm blur-[0.5px] ${
-                  i % 2 === 0 
-                    ? 'bg-gradient-to-r from-emerald-400 to-cyan-300 shadow-[0_0_15px_#10b981]' 
-                    : 'bg-gradient-to-r from-yellow-300 to-emerald-400 shadow-[0_0_15px_#eab308]'
-                }`}
-              />
-            ))}
+            {/* ESTRELLAS ESMERALDA Y ORO DE ALTO BRILLO – PATRÓN DE EXPANSIÓN ORGÁNICA */}
+            {[...Array(10)].map((_, i) => {
+              const angle = (i * 2 * Math.PI) / 10;
+              const rStart = 4 + (i % 3) * 12;
+              const rEnd = rStart + 55 + (i % 2) * 15;
+              const duration = 4.0 + Math.abs(Math.sin(i * 404)) * 3.5;
+              const delay = Math.abs(Math.sin(i * 606)) * 4.5;
+              
+              const xStart = `${Math.cos(angle) * rStart}vmax`;
+              const yStart = `${Math.sin(angle) * rStart}vmax`;
+              const xMid = `${Math.cos(angle + 0.25) * (rStart + rEnd) * 0.5}vmax`;
+              const yMid = `${Math.sin(angle + 0.25) * (rStart + rEnd) * 0.5}vmax`;
+              const xEnd = `${Math.cos(angle + 0.4) * rEnd}vmax`;
+              const yEnd = `${Math.sin(angle + 0.4) * rEnd}vmax`;
+
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ 
+                    x: xStart, 
+                    y: yStart,
+                    scale: 0,
+                    opacity: 0
+                  }}
+                  animate={{ 
+                    x: [xStart, xMid, xEnd],
+                    y: [yStart, yMid, yEnd],
+                    scale: [0, 2.2, 0],
+                    opacity: [0, 0.95, 0],
+                  }}
+                  transition={{ 
+                    duration: duration, 
+                    repeat: Infinity, 
+                    delay: delay,
+                    ease: "easeOut"
+                  }}
+                  className={`absolute w-3 h-3 rotate-45 rounded-sm blur-[0.5px] ${
+                    i % 2 === 0 
+                      ? 'bg-gradient-to-r from-emerald-400 to-cyan-300 shadow-[0_0_15px_#10b981]' 
+                      : 'bg-gradient-to-r from-yellow-300 to-emerald-400 shadow-[0_0_15px_#eab308]'
+                  }`}
+                />
+              );
+            })}
           </motion.div>
         )}
         {currentBgEffect === 'ultra-secret' && (
@@ -392,31 +407,63 @@ export default function Shop() {
               className="absolute inset-0 bg-[radial-gradient(circle,rgba(234,179,8,0.35)_0%,rgba(234,179,8,0.1)_25%,rgba(0,0,0,0)_50%)]" 
             />
             
-            {/* LUVIA DE METEOROS DORADOS DIAGONALES */}
-            {[...Array(25)].map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ 
-                  x: Math.random() * window.innerWidth - window.innerWidth/3, 
-                  y: -window.innerHeight/2 - 100,
-                  scale: 0,
-                  opacity: 0
-                }}
-                animate={{ 
-                  x: `calc(${Math.random() * window.innerWidth - window.innerWidth/2}px - 200px)`,
-                  y: window.innerHeight/2 + 100,
-                  scale: [0, 2, 0],
-                  opacity: [0, 0.95, 0],
-                }}
-                transition={{ 
-                  duration: 3 + Math.random() * 3, 
-                  repeat: Infinity, 
-                  delay: Math.random() * 8,
-                  ease: "linear"
-                }}
-                className="absolute w-1.5 h-16 rounded-full bg-gradient-to-b from-yellow-300 via-rose-400 to-transparent -rotate-[35deg] blur-[1px] shadow-[0_0_15px_#eab308]"
-              />
-            ))}
+            {/* LLUVIA DE METEOROS MULTIDIRECCIONALES Y BALANCEADOS – SIN ACUMULACIONES */}
+            {[...Array(15)].map((_, i) => {
+              const type = i % 3;
+              const col = i % 5;
+              const row = Math.floor(i / 5);
+              
+              const xStart = -60 + col * 26 + row * 6;
+              const yStart = -75 - row * 22;
+              
+              let xEnd = xStart;
+              let yEnd = 70;
+              let rotation = 0;
+              
+              if (type === 0) {
+                // Diagonal izquierda
+                xEnd = xStart - 28;
+                rotation = -32;
+              } else if (type === 1) {
+                // Diagonal derecha
+                xEnd = xStart + 28;
+                rotation = 32;
+              } else {
+                // Casi vertical
+                xEnd = xStart - 4;
+                rotation = -6;
+              }
+
+              const dur = 3.2 + Math.abs(Math.cos(i * 505)) * 3;
+              const delay = Math.abs(Math.cos(i * 707)) * 7;
+
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ 
+                    x: `${xStart}vw`, 
+                    y: `${yStart}vh`,
+                    rotate: rotation,
+                    scale: 0,
+                    opacity: 0
+                  }}
+                  animate={{ 
+                    x: `${xEnd}vw`,
+                    y: `${yEnd}vh`,
+                    rotate: rotation,
+                    scale: [0, 2.0, 0],
+                    opacity: [0, 0.95, 0],
+                  }}
+                  transition={{ 
+                    duration: dur, 
+                    repeat: Infinity, 
+                    delay: delay,
+                    ease: "linear"
+                  }}
+                  className="absolute w-1.5 h-16 rounded-full bg-gradient-to-b from-yellow-300 via-rose-400 to-transparent blur-[1px] shadow-[0_0_15px_#eab308]"
+                />
+              );
+            })}
           </motion.div>
         )}
         {currentBgEffect === 'secret' && (
@@ -439,33 +486,33 @@ export default function Shop() {
             />
             
             {/* ESTRELLAS / PARTÍCULAS FUCSIA-NARANJA */}
-            {[...Array(15)].map((_, i) => (
+            {[...Array(22)].map((_, i) => (
               <motion.div
                 key={i}
                 initial={{ 
-                  x: Math.random() * window.innerWidth - window.innerWidth/2, 
-                  y: Math.random() * window.innerHeight - window.innerHeight/2,
+                  x: `${Math.sin(i * 11) * 50}vw`, 
+                  y: `${Math.cos(i * 66) * 50}vh`,
                   scale: 0,
                   opacity: 0
                 }}
                 animate={{ 
                   x: [
-                    Math.random() * window.innerWidth - window.innerWidth/2, 
-                    Math.random() * window.innerWidth - window.innerWidth/2,
-                    Math.random() * window.innerWidth - window.innerWidth/2
+                    `${((Math.abs(Math.sin(i * 11)) * 1000) % 1) * 100 - 50}vw`,
+                    `${((Math.abs(Math.cos(i * 22)) * 1000) % 1) * 100 - 50}vw`,
+                    `${((Math.abs(Math.sin(i * 33)) * 1000) % 1) * 100 - 50}vw`
                   ],
                   y: [
-                    Math.random() * window.innerHeight - window.innerHeight/2,
-                    Math.random() * window.innerHeight - window.innerHeight/2,
-                    Math.random() * window.innerHeight - window.innerHeight/2
+                    `${((Math.abs(Math.cos(i * 44)) * 1000) % 1) * 100 - 50}vh`,
+                    `${((Math.abs(Math.sin(i * 55)) * 1000) % 1) * 100 - 50}vh`,
+                    `${((Math.abs(Math.cos(i * 66)) * 1000) % 1) * 100 - 50}vh`
                   ],
                   scale: [0, 1.5, 0],
                   opacity: [0, 0.8, 0],
                 }}
                 transition={{ 
-                  duration: 2 + Math.random() * 2, 
+                  duration: 2 + Math.abs(Math.cos(i * 909)) * 2, 
                   repeat: Infinity, 
-                  delay: Math.random() * 1.2,
+                  delay: Math.abs(Math.sin(i * 808)) * 1.2,
                   ease: "easeInOut"
                 }}
                 className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-fuchsia-500 via-red-500 to-orange-400 blur-[2px] shadow-[0_0_10px_#f43f5e]"
@@ -640,25 +687,25 @@ export default function Shop() {
                           {/* Brillos específicos SOLO en la carta, no en el fondo */}
                           {isShiny ? (
                             <>
-                              <motion.div animate={{ backgroundColor: ['rgba(255,30,0,0.1)', 'rgba(0,100,255,0.1)', 'rgba(0,255,100,0.1)', 'rgba(255,30,0,0.1)'] }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }} className="absolute inset-0 z-0 pointer-events-none" />
-                              <motion.div animate={{ borderColor: ['#ff2000', '#0066ff', '#00ff66', '#ffcc00', '#ff2000'] }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }} className="absolute inset-0 border-[3px] rounded-xl z-30 pointer-events-none opacity-80" />
+                              <div className="absolute inset-0 z-0 pointer-events-none animate-shiny-bg" />
+                              <div className="absolute inset-0 border-[3px] rounded-xl z-30 pointer-events-none opacity-80 animate-shiny-border" />
                             </>
                           ) : isUltra ? (
                             <>
                               <div className="absolute inset-0 z-20 pointer-events-none bg-[radial-gradient(circle,rgba(255,200,0,0.2)_0%,transparent_80%)]" />
-                              <motion.div animate={{ opacity: [0.4, 0.7, 0.4] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }} className="absolute inset-0 border-[3px] rounded-xl z-30 pointer-events-none border-yellow-400 shadow-[0_0_15px_rgba(255,180,0,0.4)]" />
+                              <div className="absolute inset-0 border-[3px] rounded-xl z-30 pointer-events-none border-yellow-400 shadow-[0_0_15px_rgba(255,180,0,0.4)] animate-ultra-pulse" />
                             </>
                           ) : isSuperSecret ? (
                             <>
-                              <motion.div animate={{ backgroundColor: ['rgba(16,185,129,0.25)', 'rgba(234,179,8,0.25)', 'rgba(16,185,129,0.25)'] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 z-0 pointer-events-none" />
+                              <div className="absolute inset-0 z-0 pointer-events-none animate-super-secret-bg" />
                               {/* Estrella radial interactiva giratoria */}
-                              <motion.div animate={{ rotate: [0, 360] }} transition={{ repeat: Infinity, duration: 8, ease: "linear" }} className="absolute inset-0 z-0 pointer-events-none opacity-40 bg-[radial-gradient(circle,rgba(52,211,153,0.3)_0%,transparent_60%)]" />
-                              <motion.div animate={{ opacity: [0.7, 1.0, 0.7], scale: [0.98, 1.02, 0.98] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }} className="absolute inset-0 border-[3px] rounded-xl z-30 pointer-events-none border-emerald-400/80 shadow-[0_0_25px_rgba(52,211,153,0.7),inset_0_0_15px_rgba(52,211,153,0.5)]" />
+                              <div className="absolute inset-0 z-0 pointer-events-none opacity-40 bg-[radial-gradient(circle,rgba(52,211,153,0.3)_0%,transparent_60%)] animate-spin-slow-8s" />
+                              <div className="absolute inset-0 border-[3px] rounded-xl z-30 pointer-events-none border-emerald-400/80 shadow-[0_0_25px_rgba(52,211,153,0.7),inset_0_0_15px_rgba(52,211,153,0.5)] animate-super-secret-pulse" />
                             </>
                           ) : isUltraSecret ? (
                             <>
-                              <motion.div animate={{ backgroundColor: ['rgba(234,179,8,0.15)', 'rgba(244,63,94,0.15)', 'rgba(234,179,8,0.15)'] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 z-0 pointer-events-none" />
-                              <motion.div animate={{ scale: [0.98, 1.02, 0.98], opacity: [0.7, 1.0, 0.7] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }} className="absolute inset-0 border-[3px] rounded-xl z-30 pointer-events-none border-yellow-400/80 shadow-[0_0_30px_rgba(234,179,8,0.6)]" />
+                              <div className="absolute inset-0 z-0 pointer-events-none animate-ultra-secret-bg" />
+                              <div className="absolute inset-0 border-[3px] rounded-xl z-30 pointer-events-none border-yellow-400/80 shadow-[0_0_30px_rgba(234,179,8,0.6)] animate-ultra-secret-pulse" />
                             </>
                           ) : null}
 
@@ -668,49 +715,40 @@ export default function Shop() {
                               
                               {/* Holographic Foil Texture Overlay */}
                               {[...Array(8)].map((_, i) => {
-                                // Para ultra-secret seguimos un patrón ordenado de cascada uniforme; para las otras es aleatorio
-                                const top = isUltraSecret 
-                                  ? 5 + ((i * 12) % 65) 
-                                  : 5 + Math.random() * 80;
-                                const left = isUltraSecret 
-                                  ? 10 + (i * 10) 
-                                  : 5 + Math.random() * 80;
-                                const scale = isUltraSecret ? 0.8 : 0.6 + Math.random() * 0.7;
+                                const t1 = 5 + ((Math.abs(Math.sin(i * 13)) * 1000) % 1) * 80;
+                                const t2 = 5 + ((Math.abs(Math.sin(i * 41)) * 1000) % 1) * 80;
+                                const t3 = 5 + ((Math.abs(Math.sin(i * 73)) * 1000) % 1) * 80;
+                                const l1 = 5 + ((Math.abs(Math.cos(i * 17)) * 1000) % 1) * 80;
+                                const l2 = 5 + ((Math.abs(Math.cos(i * 47)) * 1000) % 1) * 80;
+                                const l3 = 5 + ((Math.abs(Math.cos(i * 79)) * 1000) % 1) * 80;
+
+                                const usTop = 5 + ((i * 12) % 65);
+                                const usLeft = 10 + (i * 10);
+
+                                const scale = isUltraSecret ? 1.25 : 0.6 + Math.abs(Math.cos(i * 101)) * 0.7;
                                 const delay = isUltraSecret ? i * 0.22 : i * 0.25;
-                                const duration = isUltraSecret ? 1.8 : 1.6 + Math.random() * 1.4;
+                                const duration = isUltraSecret ? 1.8 : 2.5 + Math.abs(Math.sin(i * 202)) * 1.5;
                                 
-                                // Animación condicional ultra y rgb shiny (ahora shiny vuelve a ser blanco)
                                 const animateProps = isUltraSecret 
                                   ? {
-                                      opacity: [0, 0.9, 0],
-                                      scale: [0.3, scale, 0.3],
+                                      opacity: [0, 1.0, 0],
+                                      scale: [0.35, scale, 0.35],
                                       x: [25, 0, -25],
                                       y: [-30, 0, 30],
+                                      top: [`${usTop}%`, `${usTop}%`, `${usTop}%`],
+                                      left: [`${usLeft}%`, `${usLeft}%`, `${usLeft}%`],
                                       color: i % 2 === 0 
-                                        ? [
-                                            'rgba(255,255,255,0.85)', 
-                                            'rgba(234,179,8,0.95)', 
-                                            'rgba(244,63,94,0.9)', 
-                                            'rgba(255,255,255,0.85)'
-                                          ]
-                                        : ['rgba(255,255,255,0.85)', 'rgba(255,255,255,0.85)'],
+                                        ? ['rgba(255,255,255,0.98)', 'rgba(254,240,138,1)', 'rgba(244,63,94,0.98)', 'rgba(255,255,255,0.98)']
+                                        : ['rgba(255,255,255,0.98)', 'rgba(255,255,255,0.98)'],
                                       boxShadow: i % 2 === 0
-                                        ? [
-                                            '0 0 8px rgba(255,255,255,0.5)',
-                                            '0 0 15px rgba(234,179,8,0.95)',
-                                            '0 0 15px rgba(244,63,94,0.9)',
-                                            '0 0 8px rgba(255,255,255,0.5)'
-                                          ]
-                                        : [
-                                            '0 0 8px rgba(255,255,255,0.4)',
-                                            '0 0 8px rgba(255,255,255,0.4)'
-                                          ]
+                                        ? ['0 0 12px rgba(255,255,255,0.85)', '0 0 24px rgba(234,179,8,1)', '0 0 24px rgba(244,63,94,1)', '0 0 12px rgba(255,255,255,0.85)']
+                                        : ['0 0 12px rgba(255,255,255,0.7)', '0 0 12px rgba(255,255,255,0.7)']
                                     }
                                   : {
-                                      opacity: [0, 0.95, 0],
-                                      scale: [0, scale, 0],
-                                      x: [0, Math.random() * 16 - 8, 0],
-                                      y: [0, Math.random() * 16 - 8, 0]
+                                      opacity: [0, 1.0, 0, 0, 1.0, 0, 0, 1.0, 0],
+                                      scale: [0, scale, 0, 0, scale, 0, 0, scale, 0],
+                                      top: [`${t1}%`, `${t1}%`, `${t1}%`, `${t2}%`, `${t2}%`, `${t2}%`, `${t3}%`, `${t3}%`, `${t3}%`],
+                                      left: [`${l1}%`, `${l1}%`, `${l1}%`, `${l2}%`, `${l2}%`, `${l2}%`, `${l3}%`, `${l3}%`, `${l3}%`]
                                     };
                                 
                                 return (
@@ -718,20 +756,19 @@ export default function Shop() {
                                     key={i}
                                     initial={{ opacity: 0, scale: 0 }}
                                     animate={animateProps}
-                                    transition={{ repeat: Infinity, duration, delay, ease: isUltraSecret ? "linear" : "easeInOut" }}
-                                    style={{ top: `${top}%`, left: `${left}%` }}
+                                    transition={{ repeat: Infinity, duration: duration * 3, delay, ease: "easeInOut" }}
                                     className="absolute z-20 pointer-events-none"
                                   >
                                     {isShiny ? (
-                                      <svg className="w-3.5 h-3.5 text-white fill-current drop-shadow-[0_0_6px_rgba(255,255,255,0.9)]" viewBox="0 0 24 24">
+                                      <svg className="w-[16px] h-[16px] text-white fill-current drop-shadow-[0_0_9px_rgba(255,255,255,1)] drop-shadow-[0_0_3px_#fff]" viewBox="0 0 24 24">
                                         <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.6L12 0Z" />
                                       </svg>
                                     ) : isSecret ? (
-                                      <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-fuchsia-300 via-rose-200 to-orange-300 blur-[0.3px] shadow-[0_0_7px_#f43f5e]" />
+                                      <div className="w-[11px] h-[11px] rounded-full bg-gradient-to-r from-fuchsia-200 via-rose-100 to-orange-200 blur-[0.2px] shadow-[0_0_10px_#f43f5e,0_0_4px_#fff]" />
                                     ) : isSuperSecret ? (
-                                      <div className="w-2.5 h-2.5 rotate-45 rounded-sm bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-200 blur-[0.3px] shadow-[0_0_7px_#34d399]" />
+                                      <div className="w-[11px] h-[11px] rotate-45 rounded-sm bg-gradient-to-r from-emerald-200 via-teal-100 to-cyan-200 blur-[0.2px] shadow-[0_0_10px_#34d399,0_0_4px_#fff]" />
                                     ) : isUltraSecret ? (
-                                      <div className="w-1 h-12 rounded-full -rotate-[35deg] bg-gradient-to-b from-current via-current/30 to-transparent" />
+                                      <div className="w-[4.5px] h-[56px] rounded-full -rotate-[35deg] bg-gradient-to-b from-current via-current/60 to-transparent" />
                                     ) : null}
                                   </motion.div>
                                 );
@@ -741,27 +778,31 @@ export default function Shop() {
                               {isUltraSecret && (
                                 <>
                                   {[...Array(6)].map((_, i) => {
-                                    const top = 8 + Math.random() * 74;
-                                    const left = 8 + Math.random() * 74;
-                                    const scale = 0.8 + Math.random() * 0.7;
+                                    const t1 = 5 + ((Math.abs(Math.sin(i * 19)) * 1000) % 1) * 85;
+                                    const t2 = 5 + ((Math.abs(Math.sin(i * 43)) * 1000) % 1) * 85;
+                                    const t3 = 5 + ((Math.abs(Math.sin(i * 61)) * 1000) % 1) * 85;
+                                    const l1 = 5 + ((Math.abs(Math.cos(i * 23)) * 1000) % 1) * 85;
+                                    const l2 = 5 + ((Math.abs(Math.cos(i * 47)) * 1000) % 1) * 85;
+                                    const l3 = 5 + ((Math.abs(Math.cos(i * 67)) * 1000) % 1) * 85;
+                                    
+                                    const scale = 0.9 + Math.abs(Math.cos(i * 101)) * 0.7;
                                     const delay = i * 0.4;
-                                    const duration = 2.0 + Math.random() * 1.5;
+                                    const duration = 2.0 + Math.abs(Math.cos(i * 303)) * 1.5;
                                     
                                     return (
                                       <motion.div
                                         key={`ultra-diamond-${i}`}
                                         initial={{ opacity: 0, scale: 0 }}
                                         animate={{
-                                          opacity: [0, 0.95, 0],
-                                          scale: [0, scale, 0],
-                                          x: [0, Math.random() * 16 - 8, 0],
-                                          y: [0, Math.random() * 16 - 8, 0]
+                                          opacity: [0, 1.0, 0, 0, 1.0, 0, 0, 1.0, 0],
+                                          scale: [0, scale, 0, 0, scale, 0, 0, scale, 0],
+                                          top: [`${t1}%`, `${t1}%`, `${t1}%`, `${t2}%`, `${t2}%`, `${t2}%`, `${t3}%`, `${t3}%`, `${t3}%`],
+                                          left: [`${l1}%`, `${l1}%`, `${l1}%`, `${l2}%`, `${l2}%`, `${l2}%`, `${l3}%`, `${l3}%`, `${l3}%`]
                                         }}
-                                        transition={{ repeat: Infinity, duration, delay, ease: "easeInOut" }}
-                                        style={{ top: `${top}%`, left: `${left}%` }}
+                                        transition={{ repeat: Infinity, duration: duration * 3, delay, ease: "easeInOut" }}
                                         className="absolute z-20 pointer-events-none"
                                       >
-                                        <svg className="w-4.5 h-8 text-white/90 fill-current drop-shadow-[0_0_8px_rgba(255,255,255,0.95)]" viewBox="0 0 24 24" preserveAspectRatio="none">
+                                        <svg className="w-[20px] h-[36px] text-white fill-current drop-shadow-[0_0_10px_rgba(255,255,255,1)] drop-shadow-[0_0_3px_#fff]" viewBox="0 0 24 24" preserveAspectRatio="none">
                                           <path d="M12 0 L17 12 L12 24 L7 12 Z" />
                                         </svg>
                                       </motion.div>

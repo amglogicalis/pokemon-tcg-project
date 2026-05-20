@@ -125,7 +125,16 @@ app.post('/api/auth/login',    authLimiter, (req, res) => authController.login(r
 app.post('/api/auth/logout',               (req, res) => authController.logout(req, res));
 
 // ─── RUTAS PROTEGIDAS POR JWT ─────────────────────────────────────────────────
-app.post('/api/packs/open',        authMiddleware, (req, res) => packController.openPack(req as any, res));
+
+const packLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  limit: 20,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Estás abriendo sobres demasiado rápido. Espera un momento.' }
+});
+app.post('/api/packs/open',        authMiddleware, packLimiter, (req, res) => packController.openPack(req as any, res));
+
 app.post('/api/packs/claim-daily', authMiddleware, (req, res) => packController.claimDailyPacks(req as any, res));
 app.get ('/api/user/album',        authMiddleware, (req, res) => albumController.getAlbum(req as any, res));
 app.post('/api/user/favorite',     authMiddleware, (req, res) => albumController.setFavoriteCard(req as any, res));

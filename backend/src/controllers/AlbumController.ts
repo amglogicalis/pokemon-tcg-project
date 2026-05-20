@@ -13,6 +13,28 @@ import sm3Cards from '../data/cards-sm3.json';
 
 const repo = new MongoUserRepository();
 
+const allCardsMap = new Map<string, any>();
+
+const addCardsToMap = (cardsArray: any[], sourceName: string, expansionId: string) => {
+  if (!cardsArray) return;
+  cardsArray.forEach((card: any) => {
+    const cleanId = String(card.id).trim();
+    allCardsMap.set(cleanId, { 
+      ...card, 
+      expansionSource: sourceName,
+      expansion: card.expansion || expansionId 
+    });
+  });
+};
+
+addCardsToMap(baseCards.cards, 'cards.json', 'dp6');
+addCardsToMap(xy5Cards.cards, 'cards-xy5.json', 'xy5');
+addCardsToMap(swsh12Cards.cards, 'cards-swsh12.json', 'swsh12');
+addCardsToMap(bw9Cards.cards, 'cards-bw9.json', 'bw9');
+addCardsToMap(xypCards.cards, 'cards-xyp.json', 'xyp');
+addCardsToMap(zsv10pt5Cards.cards, 'cards-zsv10pt5.json', 'zsv10pt5');
+addCardsToMap(sm3Cards.cards, 'cards-sm3.json', 'sm3');
+
 export class AlbumController {
   async getAlbum(req: AuthRequest, res: Response): Promise<void> {
     try {
@@ -29,27 +51,7 @@ export class AlbumController {
         return;
       }
 
-      const allCardsMap = new Map<string, any>();
-      
-      const addCardsToMap = (cardsArray: any[], sourceName: string, expansionId: string) => {
-        if (!cardsArray) return;
-        cardsArray.forEach((card: any) => {
-          const cleanId = String(card.id).trim();
-          allCardsMap.set(cleanId, { 
-            ...card, 
-            expansionSource: sourceName,
-            expansion: card.expansion || expansionId 
-          });
-        });
-      };
 
-      addCardsToMap(baseCards.cards, 'cards.json', 'dp6');
-      addCardsToMap(xy5Cards.cards, 'cards-xy5.json', 'xy5');
-      addCardsToMap(swsh12Cards.cards, 'cards-swsh12.json', 'swsh12');
-      addCardsToMap(bw9Cards.cards, 'cards-bw9.json', 'bw9');
-      addCardsToMap(xypCards.cards, 'cards-xyp.json', 'xyp');
-      addCardsToMap(zsv10pt5Cards.cards, 'cards-zsv10pt5.json', 'zsv10pt5');
-      addCardsToMap(sm3Cards.cards, 'cards-sm3.json', 'sm3');
 
       const synchronizedAlbum = user.album.reduce((acc: any[], entry) => {
         const targetId = String(entry.card.id).trim();
@@ -70,6 +72,7 @@ export class AlbumController {
         totalCards: synchronizedAlbum.reduce((sum, e) => sum + e.quantity, 0),
         uniqueCards: synchronizedAlbum.length,
         album: synchronizedAlbum,
+        allCards: Array.from(allCardsMap.values()),
         favoriteCardId: user.favoriteCardId,
         level: user.level ?? 1,
         xp: user.xp ?? 0,
@@ -132,26 +135,7 @@ export class AlbumController {
   async getMural(req: any, res: Response): Promise<void> {
     try {
       const users = await repo.findAll();
-      const allCardsMap = new Map<string, any>();
-      
-      const addCardsToMap = (cardsArray: any[], sourceName: string, expansionId: string) => {
-        if (!cardsArray) return;
-        cardsArray.forEach((card: any) => {
-          const cleanId = String(card.id).trim();
-          allCardsMap.set(cleanId, { 
-            ...card, 
-            expansionSource: sourceName,
-            expansion: card.expansion || expansionId 
-          });
-        });
-      };
 
-      addCardsToMap(baseCards.cards, 'cards.json', 'dp6');
-      addCardsToMap(swsh12Cards.cards, 'cards-swsh12.json', 'swsh12');
-      addCardsToMap(bw9Cards.cards, 'cards-bw9.json', 'bw9');
-      addCardsToMap(xypCards.cards, 'cards-xyp.json', 'xyp');
-      addCardsToMap(zsv10pt5Cards.cards, 'cards-zsv10pt5.json', 'zsv10pt5');
-      addCardsToMap(sm3Cards.cards, 'cards-sm3.json', 'sm3');
 
       const muralEntries: any[] = [];
 
