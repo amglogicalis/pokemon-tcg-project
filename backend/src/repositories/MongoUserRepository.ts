@@ -77,26 +77,23 @@ export class MongoUserRepository implements IUserRepository {
       }
     });
 
-    // 1. Calcular XP obtenida:
-    // - Abrir el sobre: 50 XP
-    // - Cada carta nueva coleccionada: 20 XP
-    const xpFromPack = 50;
-    const xpFromNewCards = newCardsCount * 20;
-    const totalXpGained = xpFromPack + xpFromNewCards;
-
-    // 2. Procesar progresión y subidas de nivel usando ProgressionService
+    // 1. Descontar el sobre antes de aplicar progresión
     const oldPacks = userDoc.packsAvailable;
-    const oldLevel = userDoc.level ?? 1;
-
-    ProgressionService.applyProgression(userDoc, totalXpGained);
-
     if (userDoc.packsAvailable > 0) {
-      userDoc.packsAvailable -= 1; // Descontar el sobre abierto
+      userDoc.packsAvailable -= 1;
     }
 
+    // 2. Calcular XP obtenida
+    const xpFromPack = 200; // increased from 50 to give meaningful progression per pack
+    const xpFromNewCards = newCardsCount * 50; // increased from 20 per new unique card
+    const totalXpGained = xpFromPack + xpFromNewCards;
+
+    // 3. Procesar progresión (nivel, XP y recompensas de sobres)
+    ProgressionService.applyProgression(userDoc, totalXpGained);
+
     await userDoc.save();
-    console.log(`💾 DB Mongo: Álbum de [${userId}] actualizado. Total: ${userDoc.album.length} cartas unicas. Level: ${userDoc.level}, XP: ${userDoc.xp} (Gained: ${totalXpGained} XP, Rewards: ${userDoc.packsAvailable - oldPacks + 1} packs)`);
-    
+    console.log(`💾 DB Mongo: Álbum de [${userId}] actualizado. Total: ${userDoc.album.length} cartas únicas. Level: ${userDoc.level}, XP: ${userDoc.xp} (Gained: ${totalXpGained} XP, Packs change: ${userDoc.packsAvailable - oldPacks})`);
+
     return userDoc.toObject() as User;
   }
 

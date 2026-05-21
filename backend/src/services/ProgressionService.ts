@@ -18,39 +18,43 @@ const expansionsData: Record<string, any> = {
 export class ProgressionService {
   
   static getXpNeededForLevel(level: number): number {
-    if (level <= 10) return 100;
-    if (level <= 50) return 100;
-    if (level <= 100) return 100;
-    if (level <= 250) return 150;
-    if (level <= 500) return 150;
-    if (level <= 1000) return 200;
-    if (level <= 2000) return 250;
-    if (level <= 5000) return 300;
-    if (level <= 10000) return 300;
-    return 600;
+    if (level <= 10) return 1000;
+    if (level <= 50) return 1000;
+    if (level <= 100) return 1000;
+    if (level <= 250) return 1500;
+    if (level <= 500) return 1500;
+    if (level <= 1000) return 2000;
+    if (level <= 2000) return 2500;
+    if (level <= 5000) return 3000;
+    if (level <= 10000) return 3000;
+    return 6000;
   }
 
   static getPacksRewardForLevel(level: number): number {
-    if (level <= 10) return 1;
-    if (level === 11) return 5;
-    if (level <= 50) return 1;
-    if (level === 51) return 10;
-    if (level <= 100) return 1;
-    if (level === 101) return 15;
-    if (level <= 250) return 2;
-    if (level === 251) return 30;
-    if (level <= 500) return 2;
-    if (level === 501) return 60;
-    if (level <= 1000) return 3;
-    if (level === 1001) return 90;
-    if (level <= 2000) return 4;
-    if (level === 2001) return 150;
-    if (level <= 5000) return 5;
-    if (level === 5001) return 250;
-    if (level <= 10000) return 5;
-    if (level === 10000) return 500;
-    return 10;
+    // Milestone rewards
+    if (level === 10) return 5;
+    if (level === 50) return 10;
+    if (level === 100) return 15;
+    if (level === 250) return 30;
+    if (level === 500) return 35;
+    if (level === 1000) return 50;
+    if (level === 2000) return 75;
+    if (level === 5000) return 100;
+    if (level === 10000) return 150;
+
+    // Tiered per‑level rewards
+    if (level > 100 && level < 250) return 2; // levels 101‑249
+    if (level > 250 && level < 500) return 2; // 251‑499
+    if (level > 500 && level < 1000) return 2; // 501‑999
+    if (level > 1000 && level < 2000) return 3; // 1001‑1999
+    if (level > 2000 && level < 5000) return 3; // 2001‑4999
+    if (level > 5000 && level < 10000) return 4; // 5001‑9999
+    if (level > 10000) return 5; // 10001 and beyond
+    // Default: no reward for other levels
+    return 0;
   }
+
+  
 
   static checkCompletedExpansions(user: User): { completedList: string[], xpGained: number } {
     const completedList: string[] = [];
