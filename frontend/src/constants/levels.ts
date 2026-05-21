@@ -81,15 +81,15 @@ export function getLevelTextStyle(level: number): React.CSSProperties {
 }
 
 export function getXpNeededForLevel(level: number): number {
-  if (level <= 10) return 100;
-  if (level <= 50) return 100;
-  if (level <= 100) return 100;
-  if (level <= 250) return 150;
-  if (level <= 500) return 150;
-  if (level <= 1000) return 200;
-  if (level <= 2000) return 250;
-  if (level <= 5000) return 300;
-  if (level <= 10000) return 300;
-  return 600;
+  // XP required to reach the next level – must match backend thresholds.
+  if (level <= 10) return 1000;          // Levels 1‑10
+  if (level <= 50) return 1000;          // Levels 11‑50
+  if (level <= 100) return 1000;         // Levels 51‑100
+  if (level <= 250) return 1500;         // Levels 101‑250
+  if (level <= 500) return 1500;         // Levels 251‑500
+  if (level <= 1000) return 2000;        // Levels 501‑1000
+  if (level <= 2000) return 2500;        // Levels 1001‑2000
+  if (level <= 5000) return 3000;        // Levels 2001‑5000
+  if (level <= 10000) return 3000;       // Levels 5001‑10000
+  return 6000;                           // Levels >10000
 }
-
