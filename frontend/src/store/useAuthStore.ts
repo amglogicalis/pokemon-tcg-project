@@ -6,6 +6,7 @@ interface User {
   username: string;
   email?: string;
   packsAvailable: number;
+  claimablePacks: number;
   level?: number;
   xp?: number;
   lastPackClaimedAt?: string;
@@ -24,6 +25,8 @@ interface AuthState {
   logout: () => Promise<void>;
   updateUserStats: (level: number, xp: number, completedExpansions?: string[]) => void;
   updatePacksAvailable: (packs: number, lastPackClaimedAt?: string) => void;
+  updateClaimablePacks: (packs: number) => void;
+  claimPacks: () => void;
   updateActiveTheme: (theme: string) => void;
   updateUser: (updatedFields: Partial<User>) => void;
 }
@@ -44,16 +47,13 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         try {
-          // Llamar al endpoint de logout real para invalidar el token en el servidor
           const token = useAuthStore.getState().token;
           await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/auth/logout`, {
             method: 'POST',
-            credentials: 'include', // envía la cookie httpOnly si existe
+            credentials: 'include',
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           });
-        } catch (_) {
-          // Si falla la llamada al servidor, continuamos con el logout local igualmente
-        }
+        } catch (_) {}
         set({
           user: null,
           token: null,
@@ -68,7 +68,7 @@ export const useAuthStore = create<AuthState>()(
                 ...state.user,
                 level,
                 xp,
-                completedExpansions: completedExpansions !== undefined ? completedExpansions : state.user.completedExpansions
+                completedExpansions: completedExpansions !== undefined ? completedExpansions : state.user.completedExpansions,
               }
             : null,
         })),
@@ -79,27 +79,53 @@ export const useAuthStore = create<AuthState>()(
             ? {
                 ...state.user,
                 packsAvailable: packs,
-                lastPackClaimedAt: lastPackClaimedAt !== undefined ? lastPackClaimedAt : state.user.lastPackClaimedAt
+                lastPackClaimedAt: lastPackClaimedAt !== undefined ? lastPackClaimedAt : state.user.lastPackClaimedAt,
               }
             : null,
         })),
+
+      updateClaimablePacks: (packs) =>
+        set((state) => ({
+          user: state.user
+            ? {
+                ...state.user,
+                claimablePacks: packs,
+              }
+            : null,
+        })),
+
+      claimPacks: () => {
+        set((state) => {
+          if (!state.user) return {};
+          const claimed = state.user.claimablePacks ?? 0;
+          const newAvailable = (state.user.packsAvailable ?? 0) + claimed;
+          return {
+            user: {
+              ...state.user,
+              packsAvailable: newAvailable,
+              claimablePacks: 0,
+            },
+          };
+        });
+      },
 
       updateActiveTheme: (theme) =>
         set((state) => ({
           user: state.user
             ? {
                 ...state.user,
-                activeTheme: theme
+                activeTheme: theme,
               }
             : null,
         })),
+
       updateUser: (updatedFields) =>
         set((state) => ({
           user: state.user ? { ...state.user, ...updatedFields } : null,
         })),
     }),
     {
-      name: 'pokemon-tcg-auth', // clave en localStorage
+      name: 'pokemon-tcg-auth',
       partialize: (state) => ({
         user: state.user,
         token: state.token,

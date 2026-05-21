@@ -16,6 +16,7 @@ const UserSchema = new Schema<IUserDocument>({
   username: { type: String, required: true, unique: true },
   passwordHash: { type: String, required: true },
   packsAvailable: { type: Number, required: true, default: 10 },
+  claimablePacks: { type: Number, required: true, default: 0 },
   album: { type: [AlbumEntrySchema], default: [] },
   createdAt: { type: String, required: true, default: () => new Date().toISOString() },
   favoriteCardId: { type: String, required: false },
