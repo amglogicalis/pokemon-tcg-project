@@ -5,6 +5,7 @@ export interface User {
   username: string;
   passwordHash: string; // bcrypt hash, NUNCA el password plano
   packsAvailable: number;
+  claimablePacks: number;
   album: AlbumEntry[];
   createdAt: string;    // ISO 8601
   favoriteCardId?: string;
