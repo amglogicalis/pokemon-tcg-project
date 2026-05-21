@@ -43,6 +43,7 @@ export class AuthService {
       username,
       passwordHash,
       packsAvailable: INITIAL_PACKS,
+      claimablePacks: 0,
       album: [],
       createdAt: new Date().toISOString(),
       level: 1,

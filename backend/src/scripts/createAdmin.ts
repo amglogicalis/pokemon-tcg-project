@@ -74,6 +74,7 @@ async function createAdmin() {
       username: 'admin',
       passwordHash,
       packsAvailable: 9999,
+      claimablePacks: 0,
       album,
       level: 10000,
       xp: 0,

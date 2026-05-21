@@ -86,6 +86,7 @@ export class LocalJsonRepository implements IUserRepository {
         userId: idToFind,
         username: "Test User",
         packsAvailable: 10,
+      claimablePacks: 0,
         album: [],
         passwordHash: "",
         createdAt: new Date().toISOString(),
